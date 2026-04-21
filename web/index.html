@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nội Thất Hiện Đại - Trang Chủ</title>
+    <!-- Font Awesome (was missing — needed for cart icon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css.css">
+</head>
+
+<body>
+
+    <header class="banner">
+        DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG
+    </header>
+
+    <nav class="top-menu">
+        <div class="nav-links">
+            <a href="index.html">Trang Chủ</a>
+            <a href="#">Sản Phẩm</a>
+            <a href="#">Khuyến Mãi</a>
+            <a href="#">Liên Hệ</a>
+        </div>
+
+        <div class="auth-buttons">
+            <a href="#" class="cart-btn" onclick="return false;">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Giỏ hàng <span class="cart-count" id="cartCount">0</span>
+            </a>
+            <a href="login.html" class="btn-login">Đăng Nhập</a>
+            <a href="register.html" class="btn-register">Đăng Ký</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <aside class="left-menu">
+            <h3>DANH MỤC</h3>
+            <ul>
+                <li>Phòng Khách</li>
+                <li>Phòng Ngủ</li>
+                <li>Phòng Bếp</li>
+                <li>Bàn Ghế Làm Việc</li>
+                <li>Trang Trí Decor</li>
+                <li>Đèn Chiếu Sáng</li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h2 style="margin-bottom: 20px; color: #333;">Sản Phẩm Nổi Bật</h2>
+
+            <div class="product">
+                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=80" alt="Sofa hiện đại">
+                <h4>Sofa Da Cao Cấp</h4>
+                <p>15.000.000đ</p>
+                <button onclick="addToCart()">Thêm vào giỏ</button>
+            </div>
+
+            <div class="product">
+                <img src="https://images.unsplash.com/photo-1583847268964-b28dc2f51ac9?auto=format&fit=crop&w=500&q=80" alt="Bàn ăn gỗ">
+                <h4>Bàn Ăn Gỗ Sồi</h4>
+                <p>8.500.000đ</p>
+                <button onclick="addToCart()">Thêm vào giỏ</button>
+            </div>
+
+            <div class="product">
+                <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=500&q=80" alt="Ghế làm việc">
+                <h4>Ghế Xoay Ergonomic</h4>
+                <p>3.200.000đ</p>
+                <button onclick="addToCart()">Thêm vào giỏ</button>
+            </div>
+
+            <div class="product">
+                <img src="https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&w=500&q=80" alt="Giường ngủ">
+                <h4>Giường Ngủ Minimalist</h4>
+                <p>12.000.000đ</p>
+                <button onclick="addToCart()">Thêm vào giỏ</button>
+            </div>
+
+            <div class="product">
+                <img src="https://images.unsplash.com/photo-1513507766391-aa617bdddad0?auto=format&fit=crop&w=500&q=80" alt="Đèn decor">
+                <h4>Đèn Cây Đứng</h4>
+                <p>1.500.000đ</p>
+                <button onclick="addToCart()">Thêm vào giỏ</button>
+            </div>
+
+            <div class="product">
+                <img src="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=500&q=80" alt="Tủ kệ">
+                <h4>Kệ Sách Tổ Ong</h4>
+                <p>2.400.000đ</p>
+                <button onclick="addToCart()">Thêm vào giỏ</button>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <p>Nhóm 3 - Lã Ngọc Huyền | Trần Anh Đức | Nguyễn Phi Long | 2026</p>
+        <p>| 29-08-2005 | 11-11-2005 |</p>
+    </footer>
+
+    <script>
+        let cartCount = 0;
+        function addToCart() {
+            cartCount++;
+            document.getElementById('cartCount').textContent = cartCount;
+        }
+    </script>
+
+</body>
+</html>

@@ -60,20 +60,33 @@ public class users_DAO {
         return false;
     }
  
+       public boolean isEmailExist(String email) {
+        String sql = "SELECT user_id FROM users WHERE email = ?";
+        try (Connection conn = new dbConnect().getConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception ex) {
+            Logger.getLogger(users_DAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+       
     /**
      * Đăng ký tài khoản mới.
      * @return true nếu thành công
      */
-    public boolean register(String username, String password) {
-        String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, 'user')";
+    public boolean register(String username, String email, String phone, String address, String password) {
+        String sql = "INSERT INTO users (username, email, phone, address, password, role) VALUES (?, ?, ?, ?, ?, 'user')";
         try (Connection conn = new dbConnect().getConnect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
- 
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, email);
+            ps.setString(3, phone);
+            ps.setString(4, address);
+            ps.setString(5, password);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
         } catch (Exception ex) {
             Logger.getLogger(users_DAO.class.getName()).log(Level.SEVERE, null, ex);
         }

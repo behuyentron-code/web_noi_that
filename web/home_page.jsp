@@ -3,15 +3,37 @@
 <%@page import="DAO.products_DAO"%>
 <%@page import="java.text.NumberFormat"%>
 <%@page import="java.util.Locale"%>
+<%@page import="jakarta.servlet.http.HttpSession"%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 
 <!DOCTYPE html>
 
 <html>
-    <%
-        String user = (String) session.getAttribute("user");
-    %>
+<%
+    String user = (String) session.getAttribute("user");
+
+    String loginError    = (String) session.getAttribute("loginError");
+    String loginUsername = (String) session.getAttribute("loginUsername");
+    if (loginError != null) {
+        session.removeAttribute("loginError");
+        session.removeAttribute("loginUsername");
+    }
+
+    String registerError  = (String) session.getAttribute("registerError");
+    String regUsername    = (String) session.getAttribute("regUsername");
+    String regEmail       = (String) session.getAttribute("regEmail");
+    String regPhone       = (String) session.getAttribute("regPhone");
+    String regAddress     = (String) session.getAttribute("regAddress");
+    if (registerError != null) {
+        session.removeAttribute("registerError");
+        session.removeAttribute("regUsername");
+        session.removeAttribute("regEmail");
+        session.removeAttribute("regPhone");
+        session.removeAttribute("regAddress");
+    }
+%>
 
     <head>
         <meta charset="UTF-8">
@@ -29,7 +51,22 @@
         <nav class="top-menu">
             <div class="nav-links">
                 <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
-                <a href="${pageContext.request.contextPath}/productDetail">Sản Phẩm</a>
+                <div class="dropdown">
+                <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-content">
+                    <% 
+                        // Lấy lại list categories đã được gửi từ Servlet
+                        java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                        if(navCats != null) {
+                            for(String cat : navCats) {
+                    %>
+                        <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                    <% 
+                            }
+                        } 
+                    %>
+                </div>
+            </div>
                 <a href="#">Khuyến Mãi</a>
                 <a href="lienhe.jsp">Liên hệ</a> 
 
@@ -243,13 +280,7 @@
 
         <!-- ================= MODAL LOGIN ================= -->
         <!--    <form action="loginServlet" method="post">
-        <%
-            String loginError = (String) session.getAttribute("loginError");
-            if (loginError != null) {
-                session.removeAttribute("loginError"); // xóa sau khi hiển thị
-%>
-            <p style="color: red;"><%= loginError%></p>
-        <% }%>
+
         <input type="text" name="username" placeholder="Email" required>
         <input type="password" name="password" placeholder="Mật khẩu" required>
         <button type="submit" name="action" value="login">Đăng nhập</button>
@@ -260,19 +291,37 @@
                 <span class="close" onclick="closeModal('loginModal')" style="color: #333">&times;</span>
 
                 <h2>Đăng nhập</h2>
-
-                <form action="login" method="post" >
-                    <input type="text" name="username" placeholder="Email" required>
+                
+                <form action="login" method="post">
+                    <input type="text" name="username" placeholder="Tên đăng nhập"
+                           value="<%= loginUsername != null ? loginUsername : "" %>" required>
                     <input type="password" name="password" placeholder="Mật khẩu" required>
                     <button type="submit" name="action" value="login">Đăng nhập</button>
                 </form>
 
+                <% if (loginError != null) { %>
+                <div style="
+                    background: #fff3f3;
+                    border: 1px solid #f5c6cb;
+                    color: #c0392b;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    margin-top: 12px;
+                    margin-bottom: 12px;
+                ">
+                    <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= loginError %>
+                </div>
+                <% } %>
+                
                 <p style="color: #333">
 
                     <a style="color: #333">Chưa có tài khoản</a>
                     <span>|</span>
                     <a href="#" onclick="switchModal('loginModal', 'registerModal')" style="color: #333">Đăng ký</a>
                 </p>
+                
+
             </div>
         </div>
 
@@ -283,14 +332,34 @@
 
                 <h2>Đăng ký</h2>
 
-                <form action="login" method="post" >
-                    <input type="text" name="username" placeholder="Email" required>
-                    <input type="password" name="password" placeholder="Mật khẩu" required>
-                    <input type="password" name="password" placeholder="Nhập lại mật khẩu" required>
+        <form action="login" method="post">
+            <input type="text" name="username" placeholder="Tên đăng nhập"
+                   value="<%= regUsername != null ? regUsername : "" %>" required>
+            <input type="email" name="email" placeholder="Email"
+                   value="<%= regEmail != null ? regEmail : "" %>" required>
+            <input type="tel" name="phone" placeholder="Số điện thoại"
+                   value="<%= regPhone != null ? regPhone : "" %>">
 
-                    <button type="submit" name="action" value="register">Đăng ký</button>
-                </form>
+            <input type="password" name="password" placeholder="Mật khẩu" required>
+            <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+            <button type="submit" name="action" value="register">Đăng ký</button>
+        </form>
 
+                <% if (registerError != null) { %>
+                <div style="
+                    background: #fff3f3;
+                    border: 1px solid #f5c6cb;
+                    color: #c0392b;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    margin-top: 12px;
+                    margin-bottom: 12px;
+                ">
+                    <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= registerError %>
+                </div>
+                <% } %>
+        
                 <p style="color: #333" >Đã có tài khoản?
                     <a href="#" onclick="switchModal('registerModal', 'loginModal')" style="color: #333">Đăng nhập</a>
                 </p>

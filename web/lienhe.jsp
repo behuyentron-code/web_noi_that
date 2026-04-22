@@ -10,43 +10,85 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>liên hệ </title>
-        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css\lienhe.css">
+        <link rel="stylesheet" href="css\style.css">
     </head>
-    <body>
-        <!-- Banner -->
-<div class="banner">
-    DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG
-</div>
-
-
-<div class="top-menu">
-    <div>
-        <a href="#">Trang chủ</a>
-        <a href="#">Khuyến mãi </a>
-        <a href="#">Sản phẩm</a>
-        <a href="#">Liên hệ</a>
-    </div>
+    
+    
     <%
     String user = (String) session.getAttribute("user");
-    %>
-    <div class="auth-buttons">
-            <a href="cart.jsp" class="cart-btn">
-                <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
-                <span class="cart-count" id="cartCount">
-                    <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %>
-                </span>
-            </a>
+
+    String loginError    = (String) session.getAttribute("loginError");
+    String loginUsername = (String) session.getAttribute("loginUsername");
+    if (loginError != null) {
+        session.removeAttribute("loginError");
+        session.removeAttribute("loginUsername");
+    }
+
+    String registerError  = (String) session.getAttribute("registerError");
+    String regUsername    = (String) session.getAttribute("regUsername");
+    String regEmail       = (String) session.getAttribute("regEmail");
+    String regPhone       = (String) session.getAttribute("regPhone");
+    String regAddress     = (String) session.getAttribute("regAddress");
+    if (registerError != null) {
+        session.removeAttribute("registerError");
+        session.removeAttribute("regUsername");
+        session.removeAttribute("regEmail");
+        session.removeAttribute("regPhone");
+        session.removeAttribute("regAddress");
+    }
+%>
+
+    <body>
+        <!-- Banner -->
+        <header class="banner">
+            DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG
+        </header>
+
+        <nav class="top-menu">
+            <div class="nav-links">
+                <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
+                <div class="dropdown">
+                <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-content">
+                    <% 
+                        // Lấy lại list categories đã được gửi từ Servlet
+                        java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                        if(navCats != null) {
+                            for(String cat : navCats) {
+                    %>
+                        <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                    <% 
+                            }
+                        } 
+                    %>
+                </div>
+            </div>
+                <a href="#">Khuyến Mãi</a>
+                <a href="lienhe.jsp">Liên hệ</a> 
+
+            </div>
+
+            <div class="auth-buttons">
+                <a href="cart.jsp" class="cart-btn">
+                    <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+                    <span class="cart-count" id="cartCount">
+                        <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0%>
+                    </span>
+                </a>
+
+                <% if (user != null) {%>
+                <span class="material-symbols-rounded">account_circle</span>
                 
-           <% if(user != null){ %>
-                <span style="color:white;">Xin chào, <%= user %></span>
-                <a href="logout.jsp">Đăng xuất</a>
-            <% } else { %>
+                <a href="login?action=logout">Đăng xuất</a>
+                <% } else { %>
                 <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
                 <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
-            <% } %>
-            
-        </div>
-</div>
+                <% } %>
+
+            </div>
+        </nav>
+
 
 <!-- Layout chính -->
 <div class="container">
@@ -62,33 +104,43 @@
     </div>
 
     <!-- CONTENT -->
-    <div class="content">
+   <div class="content">
 
-        <!-- 2 BOX -->
-        <div class="box">
-            <h3>Talk to sales</h3>
-            <p>Interested in our hosting? Call us</p>
+    <!-- 2 BOX -->
+    <div class="contact-box-wrapper">
+
+        <div class="contact-box">
+            <div class="icon">💬</div>
+            <h3>Nói chuyện với người bán hàng</h3>
+            <p>Hãy liên hệ với chúng tôi qua số điện thoại</p>
             <button class="btn">01202340234</button>
         </div>
 
-        <div class="box">
-    <h3>Contact support</h3>
-    <p id="support-text">We’re here for you</p>
-    <button class="btn" onclick="showPhone()">CONTACT SUPPORT</button>
-     </div>
+        <div class="contact-box">
+            <div class="icon">💬</div>
+            <h3>Liên hệ để được hỗ trợ</h3>
+            <p id="support-text">Chúng tôi luôn sẵn sàng giúp bạn</p>
+            <button class="btn" onclick="showPhone()">CONTACT SUPPORT</button>
+        </div>
 
-        <!-- FORM -->
+    </div>
+
+    <!-- FORM -->
+    <div class="form-box">
         <h2>Ask a question</h2>
 
         <form action="ContactServlet" method="post">
-            <input type="text" name="name" placeholder="Họ và tên" required><br><br>
-    <input type="email" name="email" placeholder="Email"><br><br>
-    <input type="text" name="phone" placeholder="Phone"><br><br>
-    <textarea name="message" placeholder="Nội dung"></textarea><br><br>
-    <button type="submit">GỬI</button><br><br>
-     </form>
+            <input type="text" name="name" placeholder="Họ và tên *">
+            <input type="email" name="email" placeholder="Email">
+            <input type="text" name="phone" placeholder="Số điện thoại">
+           
 
+<textarea name="message" placeholder="Nội dung"></textarea>
+            <button type="submit">GỬI</button>
+        </form>
     </div>
+
+</div>
 </div>
 
 <!-- Footer -->
@@ -98,15 +150,15 @@
     </div>
 </div>
 <script>
-    function showPhone() {
-        let text = document.getElementById("support-text");
+   function showPhone() {
+    let text = document.getElementById("support-text");
 
-        if (text.innerText === "We’re here for you") {
-            text.innerText = "Hotline: 01202340234";
-        } else {
-            text.innerText = "We’re here for you";
-        }
+    if (text.innerText === "Chúng tôi luôn sẵn sàng giúp bạn") {
+        text.innerText = "Hotline: 01202340234";
+    } else {
+        text.innerText = "Chúng tôi luôn sẵn sàng giúp bạn";
     }
+}
 </script>
     </body>
 </html>

@@ -8,19 +8,20 @@ import Model.dbConnect;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
-import javax.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import java.io.PrintWriter;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
  * @author TRANG ANH LAPTOP
  */
+
 public class ContactServlet extends HttpServlet {
 
     /**
@@ -32,46 +33,54 @@ public class ContactServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String message = request.getParameter("message");
+   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    
+    // Set encoding để không bị lỗi font tiếng Việt
+    request.setCharacterEncoding("UTF-8");
+    response.setContentType("text/html;charset=UTF-8");
+    
+    String name = request.getParameter("name");
+    String email = request.getParameter("email");
+    String phone = request.getParameter("phone");
+    String message = request.getParameter("message");
 
-        try {
-            Connection conn = new dbConnect().getConnect();
+    try {
+        Connection conn = new dbConnect().getConnect();
+        String sql = "INSERT INTO contacts (name,email,phone,message) VALUES (?,?,?,?)";
+        PreparedStatement ps = conn.prepareStatement(sql);
 
-            String sql = "INSERT INTO contact(name,email,phone,message) VALUES (?,?,?,?)";
-            PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, name);
+        ps.setString(2, email);
+        ps.setString(3, phone);
+        ps.setString(4, message);
 
-            ps.setString(1, name);
-            ps.setString(2, email);
-            ps.setString(3, phone);
-            ps.setString(4, message);
+        ps.executeUpdate();
 
-            ps.executeUpdate();
+        // Đóng kết nối để giải phóng tài nguyên
+        ps.close();
+        conn.close();
 
-            // quay lại trang liên hệ
-            response.sendRedirect("lienhe.jsp");
+        // Quay lại trang liên hệ sau khi thêm thành công
+        response.sendRedirect("lienhe.jsp");
+        return; // <--- RẤT QUAN TRỌNG: Thêm return để kết thúc hàm tại đây
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        
+        // Nếu có lỗi, in ra lỗi thay vì chuyển hướng
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ContactServlet</title>");
-            out.println("</head>");
+            out.println("<head><title>Lỗi</title></head>");
             out.println("<body>");
-            out.println("<h1>Servlet ContactServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Đã xảy ra lỗi khi gửi liên hệ!</h1>");
+            out.println("<p>" + e.getMessage() + "</p>");
             out.println("</body>");
             out.println("</html>");
         }
     }
+}
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

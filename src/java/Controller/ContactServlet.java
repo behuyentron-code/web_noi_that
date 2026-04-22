@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import DAO.products_DAO;
 import Model.dbConnect;
 import java.io.IOException;
 import java.sql.Connection;
@@ -16,6 +17,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  *
@@ -39,7 +41,13 @@ public class ContactServlet extends HttpServlet {
     // Set encoding để không bị lỗi font tiếng Việt
     request.setCharacterEncoding("UTF-8");
     response.setContentType("text/html;charset=UTF-8");
-    
+    products_DAO dao = new products_DAO();
+        
+    // Lấy danh sách categories cho dropdown (luôn lấy)
+    List<String> categories = dao.getAllCategoryNames();
+    request.setAttribute("categories", categories);
+        
+    // Lấy dữ liệu từ form
     String name = request.getParameter("name");
     String email = request.getParameter("email");
     String phone = request.getParameter("phone");
@@ -55,15 +63,20 @@ public class ContactServlet extends HttpServlet {
         ps.setString(3, phone);
         ps.setString(4, message);
 
-        ps.executeUpdate();
+        int result = ps.executeUpdate();
 
         // Đóng kết nối để giải phóng tài nguyên
         ps.close();
         conn.close();
 
-        // Quay lại trang liên hệ sau khi thêm thành công
-        response.sendRedirect("lienhe.jsp");
-        return; // <--- RẤT QUAN TRỌNG: Thêm return để kết thúc hàm tại đây
+        if (result > 0) {
+                // Thành công - chuyển về trang liên hệ với thông báo
+            request.setAttribute("success", "Gửi liên hệ thành công!");
+            request.getRequestDispatcher("/lienhe.jsp").forward(request, response);
+        } else {
+            request.setAttribute("error", "Gửi thất bại, vui lòng thử lại!");
+            request.getRequestDispatcher("/lienhe.jsp").forward(request, response);
+        }
 
     } catch (Exception e) {
         e.printStackTrace();

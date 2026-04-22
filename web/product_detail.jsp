@@ -23,18 +23,8 @@
     <title><%= p != null ? p.getProduct_name() : "Chi tiết sản phẩm" %> - Decor Luxury</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* ===== BANNER ===== */
+    <link rel="stylesheet" href="css/chitietsp.css">
 
-
-        /* ===== FOOTER ===== */
-
-        @media (max-width: 800px) {
-            .detail-wrapper { flex-direction: column; margin: 20px; }
-            .detail-image-box { flex: none; width: 100%; }
-            .action-row { flex-direction: column; }
-        }
-    </style>
 </head>
 <body>
 
@@ -43,9 +33,27 @@
 <nav class="top-menu">
     <div class="nav-links">
         <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
-        <a href="${pageContext.request.contextPath}/hienthi">Sản Phẩm</a>
-        <a href="#">Khuyến Mãi</a>
-        <a href="#">Liên Hệ</a>
+        
+        <div class="dropdown">
+            <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
+            <div class="dropdown-content">
+                <% 
+                    java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                    if(navCats == null) {
+                        navCats = (java.util.List<String>) session.getAttribute("categories");
+                    }
+                    if(navCats != null) {
+                        for(String cat : navCats) {
+                %>
+                    <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                <% 
+                        }
+                    } 
+                %>
+            </div>
+        </div>  
+        
+        <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
     </div>
     <div class="auth-buttons">
         <a href="cart.jsp" class="cart-btn">
@@ -247,5 +255,6 @@ function showToast(msg) {
     setTimeout(() => t.classList.remove('show'), 2800);
 }
 </script>
+
 </body>
 </html>

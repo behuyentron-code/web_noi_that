@@ -67,8 +67,8 @@
                     %>
                 </div>
             </div>
-                <a href="#">Khuyến Mãi</a>
-                <a href="lienhe.jsp">Liên hệ</a> 
+               
+                <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
 
             </div>
 
@@ -149,13 +149,13 @@
                              alt="<%= p.getProduct_name()%>"
                              onerror="this.src='https://placehold.co/500x300?text=<%= p.getProduct_name()%>'">
                         <h4><%= p.getProduct_name()%></h4>
-                        <p class="product-desc"><%= p.getDescription() != null ? p.getDescription() : "Không có mô tả"%></p>
+<!--                        <p class="product-desc"><%= p.getDescription() != null ? p.getDescription() : "Không có mô tả"%></p>-->
                         <p><%= formattedPrice%></p>
                         <button onclick="addToCart(<%= p.getProduct_id()%>, '<%= p.getProduct_name()%>')">
                             Thêm vào giỏ
                         </button>
 
-                        <button onclick="location.href = '${pageContext.request.contextPath}/ProductDetail?id=<%= p.getProduct_id()%>'">Xem thêm</button>    
+                        <button onclick="location.href = '${pageContext.request.contextPath}/ProductDetail?id=<%= p.getProduct_id()%>'">Chi tiết</button>    
 
                     </div>
 
@@ -249,18 +249,8 @@
         </div>
 
         <!-- ===== TOAST ===== -->
-        <div id="toast" style="
-             position: fixed; bottom: 28px; right: 28px; z-index: 9999;
-             background: #4e5c34; color: white;
-             padding: 14px 20px; border-radius: 12px;
-             font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
-             display: flex; align-items: center; gap: 10px;
-             box-shadow: 0 8px 24px rgba(78,92,52,.35);
-             opacity: 0; transform: translateY(20px);
-             transition: opacity .35s, transform .35s;
-             pointer-events: none;
-             ">
-            <i id="toast-icon" class="fa-solid fa-circle-check" style="font-size:18px; color:white;"></i>
+        <div class="toast" id="toast">
+            <i class="fa-solid fa-circle-check"></i>
             <span id="toast-msg">Đã thêm vào giỏ hàng!</span>
         </div>
 
@@ -368,23 +358,12 @@
 
 
         <script>
-            function showToast(msg, isError) {
+            // ===== HIỂN THỊ THANH THÔNG BÁO  =====
+            function showToast(msg) {
                 const t = document.getElementById('toast');
-                const ic = document.getElementById('toast-icon');
-                const m = document.getElementById('toast-msg');
-                ic.className = isError
-                        ? 'fa-solid fa-circle-xmark'
-                        : 'fa-solid fa-circle-check';
-                ic.style.color = 'white';
-                t.style.background = isError ? '#b91c1c' : '#4e5c34';
-                m.textContent = msg;
-                t.style.opacity = '1';
-                t.style.transform = 'translateY(0)';
-                clearTimeout(window._toastTimer);
-                window._toastTimer = setTimeout(() => {
-                    t.style.opacity = '0';
-                    t.style.transform = 'translateY(20px)';
-                }, 2800);
+                document.getElementById('toast-msg').textContent = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2800);
             }
 
             // ===== THÊM VÀO GIỎ =====

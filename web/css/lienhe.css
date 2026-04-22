@@ -45,8 +45,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 }
 
 /* BUTTON */
-.btn {
-    background: #f26522;
+.contact-box .btn {
+    background-color: #f26522;
     color: white;
     border: none;
     padding: 12px 25px;
@@ -58,6 +58,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 .btn:hover {
     background: #d35400;
 }
+
 
 /* FORM */
 .form-box {

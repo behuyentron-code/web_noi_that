@@ -45,11 +45,12 @@
             DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG
         </header>
 
-        <nav class="top-menu">
-            <div class="nav-links">
-                <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
-                <div class="dropdown">
-                <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
+<nav class="top-menu">
+    <div class="nav-links">
+        <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
+        
+        <div class="dropdown">
+            <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
                 <div class="dropdown-content">
                     <% 
                         // Lấy lại list categories đã được gửi từ Servlet
@@ -63,46 +64,60 @@
                         } 
                     %>
                 </div>
-            </div>
-                <a href="#">Khuyến Mãi</a>
-                <a href="lienhe.jsp">Liên hệ</a> 
-
-            </div>
-
-            <div class="auth-buttons">
-                <a href="cart.jsp" class="cart-btn">
-                    <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
-                    <span class="cart-count" id="cartCount">
-                        <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0%>
-                    </span>
-                </a>
-
-                <% if (user != null) {%>
-                <span class="material-symbols-rounded">account_circle</span>
-                
-                <a href="login?action=logout">Đăng xuất</a>
-                <% } else { %>
-                <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
-                <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
-                <% } %>
-
-            </div>
-        </nav>
+        </div>  
+        
+        <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
+    </div>
+    
+    <div class="auth-buttons">
+        <a href="cart.jsp" class="cart-btn">
+            <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+            <span class="cart-count" id="cartCount">
+                <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %>
+            </span>
+        </a>
+        <% if(user != null){ %>
+            <span style="margin-left:10px;font-family:'Montserrat',sans-serif;font-weight:600;">Xin chào, <%= user %></span>
+            <a href="logout.jsp" class="btn-login">Đăng xuất</a>
+        <% } else { %>
+            <a href="#" class="btn-login" onclick="openLogin()">Đăng Nhập</a>
+            <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
+        <% } %>
+    </div>
+</nav>
 
 
 <!-- Layout chính -->
 <div class="container">
 
     <!-- LEFT MENU -->
-    <div class="left-menu">
-        <h3>Danh mục</h3>
-        <ul>
-            <li>Trang chủ</li>
-            <li>Sản phẩm</li>
-            <li>Liên hệ</li>
-        </ul>
-    </div>
+<%
+    // Lấy categories từ request trước, nếu không có thì lấy từ session
+    java.util.List<String> categories = (java.util.List<String>) request.getAttribute("categories");
+    if (categories == null || categories.isEmpty()) {
+        categories = (java.util.List<String>) session.getAttribute("categories");
+    }
+%>
 
+<!-- LEFT MENU -->
+    <aside class="left-menu">
+        <h3>DANH MỤC</h3>
+        <ul>
+            <li onclick="location.href = '${pageContext.request.contextPath}/hienthi'">Tất Cả</li>
+            <% 
+                if (categories != null && !categories.isEmpty()) {
+                    for (String cat : categories) {
+            %>
+                <li onclick="location.href = '${pageContext.request.contextPath}/hienthi?category=<%= cat %>'"><%= cat %></li>
+            <% 
+                    }
+                } else {
+            %>
+                <li>Không có danh mục</li>
+            <% } %>
+        </ul>
+    </aside>
+    
     <!-- CONTENT -->
    <div class="content">
 
@@ -120,7 +135,7 @@
             <div class="icon">💬</div>
             <h3>Liên hệ để được hỗ trợ</h3>
             <p id="support-text">Chúng tôi luôn sẵn sàng giúp bạn</p>
-            <button class="btn" onclick="showPhone()">CONTACT SUPPORT</button>
+            <button class="btn " onclick="showPhone()">CONTACT SUPPORT</button>
         </div>
 
     </div>
@@ -134,9 +149,15 @@
             <input type="email" name="email" placeholder="Email">
             <input type="text" name="phone" placeholder="Số điện thoại">
            
-
-<textarea name="message" placeholder="Nội dung"></textarea>
-            <button type="submit">GỬI</button>
+            <textarea name="message" placeholder="Nội dung"></textarea>
+            <button class="btn" type="submit" style="background-color:#4e5c34; 
+                    color:#fff;
+                    padding:10px;
+                    font-weight: bold;
+                    font-size: 15px;
+                    margin-top:25px;"
+                    >GỬI</button>
+            
         </form>
     </div>
 
@@ -144,11 +165,20 @@
 </div>
 
 <!-- Footer -->
-<div class="footer">
-    <div class="footer-info">
-        <p>© 2026 - Website của bạn</p>
-    </div>
-</div>
+<footer class="footer">
+            <div>
+                <h3>Nhóm 3</h3>
+                <p>Lã Ngọc Huyền    | 29-08-2005 </p>
+                <p>Trần Anh Đức     | 11-11-2005 </p>
+                <p>Nguyễn Phi Long  | 14-06-2005 </p>
+            </div>
+
+            <div class="footer-logo">
+                <img src="./images/logo.png">
+            </div>
+
+</footer>
+
 <script>
    function showPhone() {
     let text = document.getElementById("support-text");

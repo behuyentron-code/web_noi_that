@@ -14,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  *
@@ -32,29 +33,40 @@ public class ProductDetail extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-         request.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
+        products_DAO dao = new products_DAO();
+        
+        // Lấy danh sách categories cho dropdown (luôn lấy)
+        List<String> categories = dao.getAllCategoryNames();
+        request.setAttribute("categories", categories);
+        
+        // Lấy id sản phẩm từ request
         String idParam = request.getParameter("id");
+        
         if (idParam == null || idParam.trim().isEmpty()) {
+            // Không có id -> về trang chủ
             response.sendRedirect(request.getContextPath() + "/hienthi");
             return;
         }
-
+        
         try {
             int productId = Integer.parseInt(idParam.trim());
-            products_DAO dao = new products_DAO();
             products product = dao.getProductById(productId);
-
+            
             if (product == null) {
+                // Không tìm thấy sản phẩm -> về trang chủ
                 response.sendRedirect(request.getContextPath() + "/hienthi");
                 return;
             }
-
+            
+            // Gửi sản phẩm và categories sang JSP
             request.setAttribute("product", product);
             request.getRequestDispatcher("/product_detail.jsp").forward(request, response);
-
+            
         } catch (NumberFormatException e) {
+            // id không hợp lệ -> về trang chủ
             response.sendRedirect(request.getContextPath() + "/hienthi");
         }
         try (PrintWriter out = response.getWriter()) {

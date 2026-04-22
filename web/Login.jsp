@@ -18,19 +18,23 @@
                 <h2>Đăng Nhập</h2>
 
                 <!-- FORM THẬT -->
-                <form action="loginServlet" method="post">
+                <form action="loginServlet" method="post" style="color: #333">
 
-                    <label style="color: #ffffff">Email</label>
+                    <label>Email</label>
                     <input type="text" name="username" placeholder="Nhập email của bạn" required>
 
-                    <label style="color: #ffffff">Mật khẩu</label>
+                    <label >Mật khẩu</label>
                     <input type="password" name="password" placeholder="Nhập mật khẩu" required>
+                    
+                    <p style="color:red">
+                        ${mess}
+                    </p>
 
                     <div class="modal-actions">
                         <div class="modal-links">
                             <a href="register.jsp">Đăng ký</a>
                             <span>|</span>
-                            <a href="#">Quên mật khẩu</a>
+                            <a href="#">Chưa có tài khoản</a>
                         </div>
 
                         <div class="modal-btn-group">
@@ -43,16 +47,6 @@
                     </div>
 
                 </form>
-
-                <!-- SOCIAL -->
-                <div class="modal-social">
-                    <button class="social-btn fb">
-                        <i class="fa-brands fa-facebook-f"></i>
-                    </button>
-                    <button class="social-btn gg">
-                        <i class="fa-brands fa-google"></i>
-                    </button>
-                </div>
 
             </div>
         </div>

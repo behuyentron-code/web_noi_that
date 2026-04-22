@@ -71,7 +71,7 @@ public class ChatServlet extends HttpServlet {
         response.getWriter().write(botReply);
     }
 
-    private static final String API_KEY = "AIzaSyCQv-zJHgfQoBnZZ7FE3z_9rafYd_EZlFM"; // key Google của bạn
+    private static final String API_KEY = ""; // key Google của bạn
 
 private String callGemini(String message) {
     try {

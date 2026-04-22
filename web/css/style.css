@@ -412,10 +412,10 @@ p,a, span, strong, button, li,ul{
 .modal-box input[type="password"] {
     width: 100%;
     padding: 12px 14px;
-    background: #2d2d2d;
+    background: #ffffff;
     border: 1px solid #3a3a3a;
     border-radius: 6px;
-    color: black;
+    color: #333;
     font-size: 15px;
     margin-bottom: 18px;
     box-sizing: border-box;
@@ -438,7 +438,7 @@ p,a, span, strong, button, li,ul{
     color: #aaa;
 }
 .modal-links a {
-    color: #aaa;
+    color: #3333ff;
     text-decoration: none;
     transition: color 0.2s;
 }
@@ -480,35 +480,8 @@ p,a, span, strong, button, li,ul{
 .btn-cancel:hover {
     background: #2d6cc0;
 }
-.modal-social {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 22px;
-}
-.social-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.15s, opacity 0.15s;
-}
-.social-btn:hover {
-    transform: scale(1.1);
-    opacity: 0.9;
-}
-.social-btn.fb {
-    background: #1877f2;
-}
-.social-btn.gg {
-    background: #db4437;
-}
+
+
 .modal-switch {
     text-align: center;
     margin-top: 18px;
@@ -544,7 +517,7 @@ p,a, span, strong, button, li,ul{
     padding: 30px;
     width: 400px;
     border-radius: 10px;
-    color: white;
+    color: #333;
 }
 
 /* INPUT */
@@ -554,13 +527,13 @@ p,a, span, strong, button, li,ul{
     margin: 10px 0;
     background: #333;
     border: none;
-    color: white;
+    color: #333;
 }
 
 /* BUTTON */
 .modal-content button {
     padding: 10px 15px;
-    background: orange;
+    background: #4e5c34;;
     border: none;
     cursor: pointer;
 }
@@ -570,7 +543,7 @@ p,a, span, strong, button, li,ul{
     float: right;
     font-size: 25px;
     cursor: pointer;
-    color:#ffffff;
+    color:#333;
 }
 
 

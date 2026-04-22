@@ -10,26 +10,42 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>liên hệ </title>
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/style.css">
+        <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
         <!-- Banner -->
 <div class="banner">
-    LIÊN HỆ
+    DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG
 </div>
 
 
 <div class="top-menu">
     <div>
         <a href="#">Trang chủ</a>
+        <a href="#">Khuyến mãi </a>
         <a href="#">Sản phẩm</a>
         <a href="#">Liên hệ</a>
     </div>
-
+    <%
+    String user = (String) session.getAttribute("user");
+    %>
     <div class="auth-buttons">
-        <a href="#" class="btn-login">Đăng nhập</a>
-        <a href="#" class="btn-register">Đăng ký</a>
-    </div>
+            <a href="cart.jsp" class="cart-btn">
+                <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+                <span class="cart-count" id="cartCount">
+                    <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %>
+                </span>
+            </a>
+                
+           <% if(user != null){ %>
+                <span style="color:white;">Xin chào, <%= user %></span>
+                <a href="logout.jsp">Đăng xuất</a>
+            <% } else { %>
+                <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
+                <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
+            <% } %>
+            
+        </div>
 </div>
 
 <!-- Layout chính -->

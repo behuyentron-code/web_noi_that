@@ -1,0 +1,93 @@
+package DAO;
+
+import Model.contacts;
+import Model.dbConnect;
+import java.sql.*;
+import java.util.*;
+
+public class contacts_DAO {
+
+    /**
+     * User gửi tin nhắn liên hệ → INSERT vào DB
+     * @return true nếu thành công
+     */
+    public boolean insert(String name, String email, String phone, String message) {
+        String sql = "INSERT INTO contacts (name, email, phone, message) VALUES (?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = new dbConnect().getConnect();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setString(2, email);
+            ps.setString(3, phone);
+            ps.setString(4, message);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("[contacts_DAO] insert error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try { if (ps != null) ps.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        }
+        return false;
+    }
+
+    /**
+     * Admin xem toàn bộ danh sách liên hệ, mới nhất lên đầu
+     */
+    public List<contacts> getAll() {
+        List<contacts> list = new ArrayList<>();
+        String sql = "SELECT * FROM contacts ORDER BY created_at DESC";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = new dbConnect().getConnect();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                contacts c = new contacts(
+                    rs.getInt("contact_id"),
+                    rs.getString("name"),
+                    rs.getString("email"),
+                    rs.getString("phone"),
+                    rs.getString("message"),
+                    rs.getDate("created_at")
+                );
+                list.add(c);
+            }
+        } catch (Exception e) {
+            System.err.println("[contacts_DAO] getAll error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (ps != null) ps.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        }
+        return list;
+    }
+
+    /**
+     * Admin xóa liên hệ theo ID
+     * @return true nếu xóa thành công
+     */
+    public boolean delete(int contact_id) {
+        String sql = "DELETE FROM contacts WHERE contact_id = ?";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = new dbConnect().getConnect();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, contact_id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("[contacts_DAO] delete error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try { if (ps != null) ps.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        }
+        return false;
+    }
+}

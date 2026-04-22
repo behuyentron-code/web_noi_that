@@ -1,0 +1,8 @@
+/build/
+/dist/
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.classpath
+.project
+*.class

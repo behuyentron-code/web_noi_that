@@ -162,6 +162,7 @@
         <button class="tab-btn" onclick="switchTab('policy')">Chính sách</button>
     </div>
     <div id="tab-desc" class="tab-panel active">
+        <p style="font-weight:bold"><%= p.getDescription() %></p>
         <p><%= p.getProduct_name() %> là sản phẩm nội thất cao cấp thuộc danh mục <strong><%= p.getCategoryName() %></strong>,
            được thiết kế tỉ mỉ nhằm mang lại không gian sống tiện nghi và thẩm mỹ.</p>
         <ul>

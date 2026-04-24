@@ -649,7 +649,7 @@ p,a, span, strong, button, li,ul{
 
    
         /*===== ChatBox =====*/
-        #chatIcon {
+#chatIcon {
 
     position: fixed;
     bottom: 20px;

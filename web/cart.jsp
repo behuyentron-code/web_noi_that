@@ -15,6 +15,27 @@
 <html>
 <%
     String user = (String) session.getAttribute("user");
+    
+    String loginError    = (String) session.getAttribute("loginError");
+    String loginUsername = (String) session.getAttribute("loginUsername");
+    if (loginError != null) {
+        session.removeAttribute("loginError");
+        session.removeAttribute("loginUsername");
+    }
+
+    String registerError  = (String) session.getAttribute("registerError");
+    String regUsername    = (String) session.getAttribute("regUsername");
+    String regEmail       = (String) session.getAttribute("regEmail");
+    String regPhone       = (String) session.getAttribute("regPhone");
+    String regAddress     = (String) session.getAttribute("regAddress");
+    if (registerError != null) {
+        session.removeAttribute("registerError");
+        session.removeAttribute("regUsername");
+        session.removeAttribute("regEmail");
+        session.removeAttribute("regPhone");
+        session.removeAttribute("regAddress");
+    }
+    
     NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
     // cart: Map<product_id, [product, qty]>
@@ -37,17 +58,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/giohang.css">
-   
+
 </head>
 <body>
 
 <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>
 
-
-<nav class="top-menu">
-    <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
-        <div class="dropdown">
+        <nav class="top-menu">
+            <div class="nav-links">
+                <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
+                <div class="dropdown">
                 <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
                 <div class="dropdown-content">
                     <% 
@@ -62,35 +82,31 @@
                         } 
                     %>
                 </div>
-        </div>   
-        <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
-    </div>
-    <div class="auth-buttons">
-        <a href="cart.jsp" class="cart-btn" style="background:var(--olive-pale);border:1px solid var(--olive-mid);border-radius:8px;">
-            <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
-            <span class="cart-count" id="cartCount">
-                <% 
-                    int totalQty = 0;
-                    if (cart != null && !cart.isEmpty()) {
-                        for (Object[] e : cart.values()) {
-                            if (e != null && e.length >= 2) {
-                                totalQty += (int) e[1];
-                            }
-                        }
-                    }
-                    out.print(totalQty);
-                %>
-            </span>
-        </a>
-        <% if(user != null){ %>
-            <span style="margin-left:10px;font-family:'Montserrat',sans-serif;font-weight:600;">Xin chào, <%= user %></span>
-            <a href="logout.jsp" class="btn-login">Đăng xuất</a>
-        <% } else { %>
-            <a href="#" class="btn-login" onclick="openLogin()">Đăng Nhập</a>
-            <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
-        <% } %>
-    </div>
-</nav>
+            </div>
+                <a href="khuyen_mai.jsp">Khuyến Mãi</a> 
+                <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
+
+            </div>
+
+            <div class="auth-buttons">
+                <a href="cart.jsp" class="cart-btn">
+                    <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+                    <span class="cart-count" id="cartCount">
+                        <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0%>
+                    </span>
+                </a>
+
+                <% if (user != null) {%>
+                <span class="material-symbols-rounded">account_circle</span>
+                
+                <a href="login?action=logout">Đăng xuất</a>
+                <% } else { %>
+                <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
+                <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
+                <% } %>
+
+            </div>
+        </nav>
 
 <div class="breadcrumb">
     <a href="${pageContext.request.contextPath}/hienthi"><i class="fa-solid fa-house"></i> Trang chủ</a>
@@ -240,7 +256,7 @@
                 <!-- Checkout -->
                 <div class="checkout-section">
                     <% if(!cart.isEmpty()) { %>
-                        <form action="${pageContext.request.contextPath}/checkout" method="post">
+                        <form action="${pageContext.request.contextPath}/CheckoutServlet" method="post">
                             <button type="submit" class="btn-checkout">
                                 <i class="fa-solid fa-shield-halved"></i>
                                 Đặt hàng ngay
@@ -278,12 +294,120 @@
     <div class="footer-logo"><img src="./images/logo.png"></div>
 </footer>
 
+ <!-- ================= MODAL LOGIN ================= -->
+
+        <div id="loginModal" class="modal">
+            <div class="modal-box">
+                <span class="close" onclick="closeModal('loginModal')" style="color: #333">&times;</span>
+
+                <h2>Đăng nhập</h2>
+                
+                <form action="login" method="post" >
+                    <input type="text" name="username" placeholder="Tên đăng nhập"
+                           value="<%= loginUsername != null ? loginUsername : "" %>" required>
+                    <input type="password" name="password" placeholder="Mật khẩu" required>
+                    <button type="submit" name="action" value="login" class="btn-submit">Đăng nhập</button>
+                </form>
+
+                <% if (loginError != null) { %>
+                <div style="
+                    background: #fff3f3;
+                    border: 1px solid #f5c6cb;
+                    color: #c0392b;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    margin-top: 12px;
+                    margin-bottom: 12px;
+                    font-family: Montserrat, sans-serif;
+                ">
+                    <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= loginError %>
+                </div>
+                <% } %>
+                
+                <p style="color: #333">
+
+                    <a style="color: #333">Chưa có tài khoản</a>
+                    <span>|</span>
+                    <a href="#" onclick="switchModal('loginModal', 'registerModal')" style="color: #333">Đăng ký</a>
+                </p>
+                
+
+            </div>
+        </div>
+
+        <!-- ================= MODAL REGISTER ================= -->
+        <div id="registerModal" class="modal">
+            <div class="modal-box">
+                <span class="close" onclick="closeModal('registerModal')" style="color: #333">&times;</span>
+
+                <h2>Đăng ký</h2>
+
+        <form action="login" method="post">
+            <input type="text" name="username" placeholder="Tên đăng nhập"
+                   value="<%= regUsername != null ? regUsername : "" %>" required>
+            <input type="email" name="email" placeholder="Email"
+                   value="<%= regEmail != null ? regEmail : "" %>" required>
+            <input type="tel" name="phone" placeholder="Số điện thoại"
+                   value="<%= regPhone != null ? regPhone : "" %>">
+
+            <input type="password" name="password" placeholder="Mật khẩu" required>
+            <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+            <button type="submit" name="action" value="register" class="btn-submit">Đăng ký</button>
+        </form>
+
+                <% if (registerError != null) { %>
+                <div style="
+                    background: #fff3f3;
+                    border: 1px solid #f5c6cb;
+                    color: #c0392b;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    margin-top: 12px;
+                    margin-bottom: 12px;
+                    font-family: Montserrat, sans-serif;
+                ">
+                    <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= registerError %>
+                </div>
+                <% } %>
+        
+                <p style="color: #333" >Đã có tài khoản?
+                    <a href="#" onclick="switchModal('registerModal', 'loginModal')" style="color: #333">Đăng nhập</a>
+                </p>
+            </div>
+        </div>
+
+
+                    
+                    
 <div class="toast" id="toast">
     <i class="fa-solid fa-circle-check"></i>
     <span id="toast-msg">Đã cập nhật giỏ hàng!</span>
 </div>
 
 <script>
+    // ===== QUẢN LÝ MODAL =====
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get("openModal") === "login")
+                openLogin();
+            if (urlParams.get("openModal") === "register")
+                openRegister();
+
+            function openLogin() {
+                document.getElementById("loginModal").style.display = "flex";
+            }
+            function openRegister() {
+                document.getElementById("registerModal").style.display = "flex";
+            }
+            function closeModal(id) {
+                document.getElementById(id).style.display = "none";
+            }
+            function switchModal(closeId, openId) {
+                closeModal(closeId);
+                document.getElementById(openId).style.display = "flex";
+            }
+            
 function updateCartQty(productId, delta) {
     const input = document.getElementById('qty-' + productId);
     let val = parseInt(input.value) + delta;

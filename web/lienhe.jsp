@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="css\style.css">
     </head>
     
-    
+     <!-- ================= MODAL LOGIN ================= -->
     <%
     String user = (String) session.getAttribute("user");
 
@@ -65,7 +65,8 @@
                     %>
                 </div>
         </div>  
-        
+                
+        <a href="khuyen_mai.jsp">Khuyến Mãi</a> 
         <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
     </div>
     
@@ -86,6 +87,86 @@
     </div>
 </nav>
 
+ <div id="loginModal" class="modal">
+            <div class="modal-box">
+                <span class="close" onclick="closeModal('loginModal')" style="color: #333">&times;</span>
+
+                <h2>Đăng nhập</h2>
+
+                <form action="login" method="post" >
+                    <input type="text" name="username" placeholder="Tên đăng nhập"
+                           value="<%= loginUsername != null ? loginUsername : ""%>" required>
+                    <input type="password" name="password" placeholder="Mật khẩu" required>
+                    <button type="submit" name="action" value="login" class="btn-submit">Đăng nhập</button>
+                </form>
+
+                <% if (loginError != null) {%>
+                <div style="
+                     background: #fff3f3;
+                     border: 1px solid #f5c6cb;
+                     color: #c0392b;
+                     padding: 10px 14px;
+                     border-radius: 8px;
+                     font-size: 14px;
+                     margin-top: 12px;
+                     margin-bottom: 12px;
+                     ">
+                    <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= loginError%>
+                </div>
+                <% }%>
+
+                <p style="color: #333">
+
+                    <a style="color: #333">Chưa có tài khoản</a>
+                    <span>|</span>
+                    <a href="#" onclick="switchModal('loginModal', 'registerModal')" style="color: #333">Đăng ký</a>
+                </p>
+
+
+            </div>
+        </div>
+
+        <!-- ================= MODAL REGISTER ================= -->
+        <div id="registerModal" class="modal">
+            <div class="modal-box">
+                <span class="close" onclick="closeModal('registerModal')" style="color: #333">&times;</span>
+
+                <h2>Đăng ký</h2>
+
+                <form action="login" method="post">
+                    <input type="text" name="username" placeholder="Tên đăng nhập"
+                           value="<%= regUsername != null ? regUsername : ""%>" required>
+                    <input type="email" name="email" placeholder="Email"
+                           value="<%= regEmail != null ? regEmail : ""%>" required>
+                    <input type="tel" name="phone" placeholder="Số điện thoại"
+                           value="<%= regPhone != null ? regPhone : ""%>">
+
+                    <input type="password" name="password" placeholder="Mật khẩu" required>
+                    <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+                    <button type="submit" name="action" value="register" class="btn-submit">Đăng ký</button>
+                </form>
+
+                <% if (registerError != null) {%>
+                <div style="
+                     background: #fff3f3;
+                     border: 1px solid #f5c6cb;
+                     color: #c0392b;
+                     padding: 10px 14px;
+                     border-radius: 8px;
+                     font-size: 14px;
+                     margin-top: 12px;
+                     margin-bottom: 12px;
+                     ">
+                    <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= registerError%>
+                </div>
+                <% }%>
+
+                <p style="color: #333" >Đã có tài khoản?
+                    <a href="#" onclick="switchModal('registerModal', 'loginModal')" style="color: #333">Đăng nhập</a>
+                </p>
+            </div>
+        </div>   
+    
 
 <!-- Layout chính -->
 <div class="container">
@@ -180,15 +261,35 @@
 </footer>
 
 <script>
-   function showPhone() {
-    let text = document.getElementById("support-text");
+            function showPhone() {
+                let text = document.getElementById("support-text");
 
-    if (text.innerText === "Chúng tôi luôn sẵn sàng giúp bạn") {
-        text.innerText = "Hotline: 01202340234";
-    } else {
-        text.innerText = "Chúng tôi luôn sẵn sàng giúp bạn";
-    }
-}
-</script>
+                if (text.innerText === "We’re here for you") {
+                    text.innerText = "Hotline: 01202340234";
+                } else {
+                    text.innerText = "We’re here for you";
+                }
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get("openModal") === "login")
+                openLogin();
+            if (urlParams.get("openModal") === "register")
+                openRegister();
+
+            function openLogin() {
+                document.getElementById("loginModal").style.display = "flex";
+            }
+            function openRegister() {
+                document.getElementById("registerModal").style.display = "flex";
+            }
+            function closeModal(id) {
+                document.getElementById(id).style.display = "none";
+            }
+            function switchModal(closeId, openId) {
+                closeModal(closeId);
+                document.getElementById(openId).style.display = "flex";
+            }
+        </script>
     </body>
 </html>

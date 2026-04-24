@@ -3,7 +3,7 @@
 <%@page import="DAO.products_DAO"%>
 <%@page import="java.text.NumberFormat"%>
 <%@page import="java.util.Locale"%>
-<%@page import="jakarta.servlet.http.HttpSession"%>
+<%@page import="javax.servlet.http.HttpSession"%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
@@ -11,9 +11,10 @@
 <!DOCTYPE html>
 
 <html>
+    
 <%
     String user = (String) session.getAttribute("user");
-
+    
     String loginError    = (String) session.getAttribute("loginError");
     String loginUsername = (String) session.getAttribute("loginUsername");
     if (loginError != null) {
@@ -67,23 +68,28 @@
                     %>
                 </div>
             </div>
-               
-                <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
+                <a href="khuyen_mai.jsp">Khuyến Mãi</a> 
+                <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a> 
 
             </div>
 
             <div class="auth-buttons">
                 <a href="cart.jsp" class="cart-btn">
-                    <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+                    <i class="fa-solid fa-cart-shopping"></i> Giỏ Hàng
                     <span class="cart-count" id="cartCount">
                         <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0%>
                     </span>
                 </a>
 
-                <% if (user != null) {%>
+               <% if (user != null) { %>
+                    <% if ("admin".equals(session.getAttribute("role"))) { %>
+                        <a href="${pageContext.request.contextPath}/admin/dashboard" class="admin-link">
+                            <i class="fa-solid fa-user-tie"></i> Quản trị
+                        </a>
+                    <% } %>
                 <span class="material-symbols-rounded">account_circle</span>
                 
-                <a href="login?action=logout">Đăng xuất</a>
+                <a href="login?action=logout">Đăng Xuất</a>
                 <% } else { %>
                 <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
                 <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
@@ -91,6 +97,7 @@
 
             </div>
         </nav>
+
 
         <div class="container">
             <aside class="left-menu">
@@ -149,8 +156,8 @@
                              alt="<%= p.getProduct_name()%>"
                              onerror="this.src='https://placehold.co/500x300?text=<%= p.getProduct_name()%>'">
                         <h4><%= p.getProduct_name()%></h4>
-<!--                        <p class="product-desc"><%= p.getDescription() != null ? p.getDescription() : "Không có mô tả"%></p>-->
-                        <p><%= formattedPrice%></p>
+                        
+                        <p style="color:#6b7c4a"><%= formattedPrice%></p>
                         <button onclick="addToCart(<%= p.getProduct_id()%>, '<%= p.getProduct_name()%>')">
                             Thêm vào giỏ
                         </button>
@@ -249,8 +256,18 @@
         </div>
 
         <!-- ===== TOAST ===== -->
-        <div class="toast" id="toast">
-            <i class="fa-solid fa-circle-check"></i>
+        <div id="toast" style="
+             position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+             background: #4e5c34; color: white;
+             padding: 14px 20px; border-radius: 12px;
+             font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
+             display: flex; align-items: center; gap: 10px;
+             box-shadow: 0 8px 24px rgba(78,92,52,.35);
+             opacity: 0; transform: translateY(20px);
+             transition: opacity .35s, transform .35s;
+             pointer-events: none;
+             ">
+            <i id="toast-icon" class="fa-solid fa-circle-check" style="font-size:18px; color:white;"></i>
             <span id="toast-msg">Đã thêm vào giỏ hàng!</span>
         </div>
 
@@ -269,12 +286,6 @@
         </footer>
 
         <!-- ================= MODAL LOGIN ================= -->
-        <!--    <form action="loginServlet" method="post">
-
-        <input type="text" name="username" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Mật khẩu" required>
-        <button type="submit" name="action" value="login">Đăng nhập</button>
-    </form>-->
 
         <div id="loginModal" class="modal">
             <div class="modal-box">
@@ -282,11 +293,11 @@
 
                 <h2>Đăng nhập</h2>
                 
-                <form action="login" method="post">
+                <form action="login" method="post" >
                     <input type="text" name="username" placeholder="Tên đăng nhập"
                            value="<%= loginUsername != null ? loginUsername : "" %>" required>
                     <input type="password" name="password" placeholder="Mật khẩu" required>
-                    <button type="submit" name="action" value="login">Đăng nhập</button>
+                    <button type="submit" name="action" value="login" class="btn-submit">Đăng nhập</button>
                 </form>
 
                 <% if (loginError != null) { %>
@@ -299,6 +310,7 @@
                     font-size: 14px;
                     margin-top: 12px;
                     margin-bottom: 12px;
+                    font-family: Montserrat, sans-serif;
                 ">
                     <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= loginError %>
                 </div>
@@ -332,7 +344,7 @@
 
             <input type="password" name="password" placeholder="Mật khẩu" required>
             <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
-            <button type="submit" name="action" value="register">Đăng ký</button>
+            <button type="submit" name="action" value="register" class="btn-submit">Đăng ký</button>
         </form>
 
                 <% if (registerError != null) { %>
@@ -345,6 +357,7 @@
                     font-size: 14px;
                     margin-top: 12px;
                     margin-bottom: 12px;
+                    font-family: Montserrat, sans-serif;
                 ">
                     <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= registerError %>
                 </div>
@@ -358,12 +371,23 @@
 
 
         <script>
-            // ===== HIỂN THỊ THANH THÔNG BÁO  =====
-            function showToast(msg) {
+            function showToast(msg, isError) {
                 const t = document.getElementById('toast');
-                document.getElementById('toast-msg').textContent = msg;
-                t.classList.add('show');
-                setTimeout(() => t.classList.remove('show'), 2800);
+                const ic = document.getElementById('toast-icon');
+                const m = document.getElementById('toast-msg');
+                ic.className = isError
+                        ? 'fa-solid fa-circle-xmark'
+                        : 'fa-solid fa-circle-check';
+                ic.style.color = 'white';
+                t.style.background = isError ? '#b91c1c' : '#4e5c34';
+                m.textContent = msg;
+                t.style.opacity = '1';
+                t.style.transform = 'translateY(0)';
+                clearTimeout(window._toastTimer);
+                window._toastTimer = setTimeout(() => {
+                    t.style.opacity = '0';
+                    t.style.transform = 'translateY(20px)';
+                }, 2800);
             }
 
             // ===== THÊM VÀO GIỎ =====

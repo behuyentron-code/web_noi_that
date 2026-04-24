@@ -13,7 +13,7 @@
     font-style: normal; /*đưa các chữ in nghiêng, chữ in đậm về dạng chữ thẳng.*/
     color: white;
     background-color: #4e5c34 ;
-    
+
     padding: 20px;
     text-align: center;
     font-size: 36px;
@@ -46,12 +46,12 @@ p,a, span, strong, button, li,ul{
     justify-content: space-between; /* Đẩy 2 cụm menu ra 2 đầu */
     align-items: center;
     padding: 0 50px;
-    
-        background-color: #ffffff; 
-        border-bottom: 2px solid #d6ddc8; 
-        padding: 0 50px; 
-        margin: 0;
-    
+
+    background-color: #ffffff;
+    border-bottom: 2px solid #d6ddc8;
+    padding: 0 50px;
+    margin: 0;
+
     margin-bottom: 20px; /* Khoảng cách với nội dung bên dưới/Footer */
 
 }
@@ -63,9 +63,9 @@ p,a, span, strong, button, li,ul{
     text-decoration: none; /*loại bỏ các đường gạch trang trí mặc định trên văn bản.*/
     color: black;
 
-        border-right: 1px solid #d6ddc8; 
-        color: #2c2c2c;
-        
+    border-right: 1px solid #d6ddc8;
+    color: #2c2c2c;
+
     border-right: 1px solid;  /*Tạo vách ngăn giữa các nút*/
     font-weight: bold;
     transition: 0.4s; /*tạo chuyển động mượt mà khi ấn xuống*/
@@ -78,7 +78,7 @@ p,a, span, strong, button, li,ul{
 }
 
 /* Xóa gạch đứng cuối cùng của cụm bên trái và cụm bên phải */
-.left-nav a:last-child, 
+.left-nav a:last-child,
 .right-nav a:last-child {
     border-right: none;
 }
@@ -168,10 +168,10 @@ p,a, span, strong, button, li,ul{
     position: absolute;
     top: -5px;
     right: -5px;
-    background-color: #6b7c4a; 
-    
+    background-color: #6b7c4a;
+
     border-radius: 10px;
-    
+
     color: white;
     font-size: 12px;
     font-weight: bold;
@@ -425,7 +425,7 @@ p,a, span, strong, button, li,ul{
 
 
 /* ===== MODAL OVERLAY ===== */
-.modal-overlay {
+/*.modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
@@ -437,11 +437,28 @@ p,a, span, strong, button, li,ul{
 }
 .modal-overlay.active {
     display: flex;
-}
+}*/
 
 /*         ===== MODAL BOX ===== */
+
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0,0,0,0.7);
+
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
 .modal-box {
-    background: #ffffff;
+    background: #f8f9fa;
     border-radius: 10px;
     padding: 40px 36px 32px;
     width: 100%;
@@ -468,14 +485,16 @@ p,a, span, strong, button, li,ul{
     letter-spacing: 2px;
     text-transform: uppercase;
     margin-bottom: 28px;
+    font-family: "Montserrat", sans-serif;
 }
 
 .modal-box input[type="text"],
 .modal-box input[type="email"],
-.modal-box input[type="password"] {
+.modal-box input[type="password"],
+.modal-box input[type = "tel"]{
     width: 100%;
     padding: 12px 14px;
-    background: #2d2d2d;
+    background: #ffffff;
     border: 1px solid #3a3a3a;
     border-radius: 6px;
     color: black;
@@ -498,10 +517,10 @@ p,a, span, strong, button, li,ul{
 }
 .modal-links {
     font-size: 13px;
-    color: #aaa;
+    color: #333;
 }
 .modal-links a {
-    color: #aaa;
+    color: #3a3a3a;
     text-decoration: none;
     transition: color 0.2s;
 }
@@ -516,8 +535,8 @@ p,a, span, strong, button, li,ul{
     gap: 10px;
 }
 .btn-submit {
-    background: #f57c00;
-    color: #fff;
+    background: #4e5c34;
+    color: #f8f9fa;
     border: none;
     border-radius: 6px;
     padding: 10px 24px;
@@ -525,23 +544,11 @@ p,a, span, strong, button, li,ul{
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
+    display: block;
+    margin: 0 auto;
 }
 .btn-submit:hover {
-    background: #e06900;
-}
-.btn-cancel {
-    background: #3a7bd5;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 24px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.btn-cancel:hover {
-    background: #2d6cc0;
+    background: #2c2c2c;
 }
 
 .modal-switch {
@@ -557,345 +564,387 @@ p,a, span, strong, button, li,ul{
     cursor: pointer;
     font-family: "Montserrat", sans-serif;
 }
-/* NỀN ĐEN MỜ */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-
-    background: rgba(0,0,0,0.7);
-
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-}
-
-/* BOX LOGIN */
-.modal-content {
-    background: #ffffffe;
-    padding: 30px;
-    width: 400px;
-    border-radius: 10px;
-    color: white;
-}
-
-/* INPUT */
-.modal-content input {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    background: #333;
-    border: none;
-    color: white;
-}
-
-/* BUTTON */
-.modal-content button {
-    padding: 10px 15px;
-    background: orange;
-    border: none;
-    cursor: pointer;
-}
-
 /* NÚT ĐÓNG */
 .close {
     float: right;
     font-size: 25px;
     cursor: pointer;
-    color:#ffffff;
+    /*    color:#3a3a3a;*/
 }
 
 
 /*Web chi tiết sản phẩm*/
-        /* ===== BREADCRUMB ===== */
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 20px;
-            background: #f0f3ea;
-            border-bottom: 1px solid #d6ddc8;
-            font-family: "Montserrat", sans-serif;
-            font-size: 13px;
-            color: #6b7280;
-        }
-        .breadcrumb a { color: #6b7c4a; text-decoration: none; font-weight: 500; }
-        .breadcrumb a:hover { color:#4e5c34; text-decoration: underline; }
-        .breadcrumb i { font-size: 10px; color: #d6ddc8; }
+/* ===== BREADCRUMB ===== */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    background: #f0f3ea;
+    border-bottom: 1px solid #d6ddc8;
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    color: #6b7280;
+}
+.breadcrumb a {
+    color: #6b7c4a;
+    text-decoration: none;
+    font-weight: 500;
+}
+.breadcrumb a:hover {
+    color:#4e5c34;
+    text-decoration: underline;
+}
+.breadcrumb i {
+    font-size: 10px;
+    color: #d6ddc8;
+}
 
-        /* ===== DETAIL WRAPPER ===== */
-        .detail-wrapper {
-            display: flex;
-            gap: 48px;
-            margin: 32px 40px;
-            align-items: flex-start;
-        }
+/* ===== DETAIL WRAPPER ===== */
+.detail-wrapper {
+    display: flex;
+    gap: 48px;
+    margin: 32px 40px;
+    align-items: flex-start;
+}
 
-        /* ===== IMAGE SECTION ===== */
-        .detail-image-box {
-            flex: 0 0 420px;
-            background: #ffffff;
-            border-radius: 16px;
-            border: 1px solid #e2e8d8;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(107,124,74,.1);
-        }
-        .detail-image-box img {
-            width: 100%;
-            height: 380px;
-            object-fit: cover;
-            display: block;
-        }
-        .detail-badge-row {
-            display: flex;
-            gap: 8px;
-            padding: 14px 16px;
-            border-top: 1px solid #e2e8d8;
-            background: #f8f9fa;
-        }
-        .badge {
-            font-size: 11px;
-            font-family: "Montserrat", sans-serif;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            letter-spacing: .03em;
-        }
-        .badge-green  { background: #e8f5e9; color: #2e7d32; }
-        .badge-blue   { background: #e3f2fd; color: #1565c0; }
-        .badge-olive  { background: #f0f3ea; color: #4e5c34; }
+/* ===== IMAGE SECTION ===== */
+.detail-image-box {
+    flex: 0 0 420px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8d8;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(107,124,74,.1);
+}
+.detail-image-box img {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    display: block;
+}
+.detail-badge-row {
+    display: flex;
+    gap: 8px;
+    padding: 14px 16px;
+    border-top: 1px solid #e2e8d8;
+    background: #f8f9fa;
+}
+.badge {
+    font-size: 11px;
+    font-family: "Montserrat", sans-serif;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: .03em;
+}
+.badge-green  {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+.badge-blue   {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+.badge-olive  {
+    background: #f0f3ea;
+    color: #4e5c34;
+}
 
-        /* ===== INFO SECTION ===== */
-        .detail-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .detail-category {
-            display: inline-block;
-            background: #f0f3ea;
-            color: #4e5c34;
-            font-family: "Montserrat", sans-serif;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            padding: 5px 14px;
-            border-radius: 20px;
-            border: 1px solid #d6ddc8;
-            margin-bottom: 14px;
-        }
-        .detail-name {
-            font-family: "Montserrat", sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            color: #2c2c2c;
-            line-height: 1.3;
-            margin: 0 0 8px;
-        }
-        .detail-desc-short {
-            font-family: "Montserrat", sans-serif;
-            font-size: 14px;
-            color:#6b7280;
-            margin: 0 0 20px;
-            line-height: 1.7;
-        }
-        .detail-price-box {
-            background: #f0f3ea;
-            border: 1px solid #d6ddc8;
-            border-radius: 12px;
-            padding: 18px 22px;
-            margin-bottom: 24px;
-        }
-        .price-label {
-            font-size: 12px;
-            font-family: "Montserrat", sans-serif;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            margin-bottom: 4px;
-        }
-        .detail-price {
-            font-size: 32px;
-            font-weight: 800;
-            color: #4e5c34;
-            font-family: "Montserrat", sans-serif;
-        }
-        .price-note {
-            font-size: 12px;
-            color: #6b7280;
-            font-family: "Montserrat", sans-serif;
-            margin-top: 4px;
-        }
+/* ===== INFO SECTION ===== */
+.detail-info {
+    flex: 1;
+    min-width: 0;
+}
+.detail-category {
+    display: inline-block;
+    background: #f0f3ea;
+    color: #4e5c34;
+    font-family: "Montserrat", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid #d6ddc8;
+    margin-bottom: 14px;
+}
+.detail-name {
+    font-family: "Montserrat", sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c2c2c;
+    line-height: 1.3;
+    margin: 0 0 8px;
+}
+.detail-desc-short {
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    color:#6b7280;
+    margin: 0 0 20px;
+    line-height: 1.7;
+}
+.detail-price-box {
+    background: #f0f3ea;
+    border: 1px solid #d6ddc8;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+}
+.price-label {
+    font-size: 12px;
+    font-family: "Montserrat", sans-serif;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 4px;
+}
+.detail-price {
+    font-size: 32px;
+    font-weight: 800;
+    color: #4e5c34;
+    font-family: "Montserrat", sans-serif;
+}
+.price-note {
+    font-size: 12px;
+    color: #6b7280;
+    font-family: "Montserrat", sans-serif;
+    margin-top: 4px;
+}
 
-        /* ===== QUANTITY ===== */
-        .qty-section { margin-bottom: 24px; }
-        .qty-label-text {
-            font-family: "Montserrat", sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            color: #2c2c2c;
-            margin-bottom: 10px;
-        }
-        .qty-control {
-            display: flex;
-            align-items: center;
-            gap: 0;
-            width: fit-content;
-            border: 2px solid #d6ddc8;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .qty-control button {
-            width: 44px;
-            height: 44px;
-            border: none;
-            background: #f0f3ea;
-            color: #4e5c34;
-            font-size: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: .2s;
-            font-family: "Montserrat", sans-serif;
-        }
-        .qty-control button:hover { background: #d6ddc8; }
-        .qty-control input {
-            width: 60px;
-            height: 44px;
-            border: none;
-            border-left: 1px solid #d6ddc8;;
-            border-right: 1px solid #d6ddc8;;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 700;
-            font-family: "Montserrat", sans-serif;
-            color: #2c2c2c;
-            outline: none;
-        }
+/* ===== QUANTITY ===== */
+.qty-section {
+    margin-bottom: 24px;
+}
+.qty-label-text {
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c2c2c;
+    margin-bottom: 10px;
+}
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: fit-content;
+    border: 2px solid #d6ddc8;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.qty-control button {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: #f0f3ea;
+    color: #4e5c34;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+    font-family: "Montserrat", sans-serif;
+}
+.qty-control button:hover {
+    background: #d6ddc8;
+}
+.qty-control input {
+    width: 60px;
+    height: 44px;
+    border: none;
+    border-left: 1px solid #d6ddc8;
+    ;
+    border-right: 1px solid #d6ddc8;
+    ;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: "Montserrat", sans-serif;
+    color: #2c2c2c;
+    outline: none;
+}
 
-        /* ===== ACTION BUTTONS ===== */
-        .action-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 28px;
-        }
-        .btn-addcart {
-            flex: 1;
-            padding: 14px 24px;
-            background: #6b7c4a;
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            font-family: "Montserrat", sans-serif;
-            cursor: pointer;
-            transition: .25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .btn-addcart:hover { background: #4e5c34;; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(107,124,74,.3); }
-        .btn-buynow {
-            flex: 1;
-            padding: 14px 24px;
-            background: #ffffff;
-            color: #4e5c34;
-            border: 2px solid #6b7c4a;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            font-family: "Montserrat", sans-serif;
-            cursor: pointer;
-            transition: .25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .btn-buynow:hover { background: #f0f3ea; }
+/* ===== ACTION BUTTONS ===== */
+.action-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+.btn-addcart {
+    flex: 1;
+    padding: 14px 24px;
+    background: #6b7c4a;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: "Montserrat", sans-serif;
+    cursor: pointer;
+    transition: .25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.btn-addcart:hover {
+    background: #4e5c34;
+    ;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(107,124,74,.3);
+}
+.btn-buynow {
+    flex: 1;
+    padding: 14px 24px;
+    background: #ffffff;
+    color: #4e5c34;
+    border: 2px solid #6b7c4a;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: "Montserrat", sans-serif;
+    cursor: pointer;
+    transition: .25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.btn-buynow:hover {
+    background: #f0f3ea;
+}
 
-        /* ===== FEATURES ===== */
-        .features-row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8d8;
-        }
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: "Montserrat", sans-serif;
-            font-size: 12px;
-            color: #6b7280;
-        }
-        .feature-item i { color: #6b7c4a;; font-size: 15px; }
+/* ===== FEATURES ===== */
+.features-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8d8;
+}
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 12px;
+    color: #6b7280;
+}
+.feature-item i {
+    color: #6b7c4a;
+    ;
+    font-size: 15px;
+}
 
-        /* ===== TABS ===== */
-        .tabs-section {
-            margin: 0 40px 40px;
-            background: white;
-            border-radius: 14px;
-            border: 1px solid #e2e8d8;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,.05);
-        }
-        .tabs-nav {
-            display: flex;
-            border-bottom: 2px solid #d6ddc8;
-            background: #f8f9fa;
-        }
-        .tab-btn {
-            padding: 14px 28px;
-            background: none;
-            border: none;
-            font-family: "Montserrat", sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            color: #6b7280;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-            transition: .2s;
-        }
-        .tab-btn.active { color:#4e5c34;; border-bottom-color: #6b7c4a;; background: white; }
-        .tab-btn:hover:not(.active) { background: #f0f3ea; color: #6b7c4a; }
-        .tab-panel { display: none; padding: 28px 32px; }
-        .tab-panel.active { display: block; }
-        .tab-panel p, .tab-panel li {
-            font-family: "Montserrat", sans-serif;
-            font-size: 14px;
-            color: #6b7280;
-            line-height: 1.9;
-        }
-        .tab-panel ul { padding-left: 20px; }
-        .tab-panel li { margin-bottom: 6px; }
-        .spec-table { width: 100%; border-collapse: collapse; font-family: "Montserrat", sans-serif; font-size: 14px; }
-        .spec-table tr:nth-child(even) td { background: #f0f3ea; }
-        .spec-table td { padding: 10px 16px; border-bottom: 1px solid #e2e8d8;; color: #2c2c2c; }
-        .spec-table td:first-child { font-weight: 600; color:  #4e5c34;; width: 35%; }
+/* ===== TABS ===== */
+.tabs-section {
+    margin: 0 40px 40px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e2e8d8;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+}
+.tabs-nav {
+    display: flex;
+    border-bottom: 2px solid #d6ddc8;
+    background: #f8f9fa;
+}
+.tab-btn {
+    padding: 14px 28px;
+    background: none;
+    border: none;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: .2s;
+}
+.tab-btn.active {
+    color:#4e5c34;
+    ;
+    border-bottom-color: #6b7c4a;
+    ;
+    background: white;
+}
+.tab-btn:hover:not(.active) {
+    background: #f0f3ea;
+    color: #6b7c4a;
+}
+.tab-panel {
+    display: none;
+    padding: 28px 32px;
+}
+.tab-panel.active {
+    display: block;
+}
+.tab-panel p, .tab-panel li {
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.9;
+}
+.tab-panel ul {
+    padding-left: 20px;
+}
+.tab-panel li {
+    margin-bottom: 6px;
+}
+.spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Montserrat", sans-serif;
+    font-size: 14px;
+}
+.spec-table tr:nth-child(even) td {
+    background: #f0f3ea;
+}
+.spec-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #e2e8d8;
+    ;
+    color: #2c2c2c;
+}
+.spec-table td:first-child {
+    font-weight: 600;
+    color:  #4e5c34;
+    ;
+    width: 35%;
+}
 
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed; bottom: 28px; right: 28px;
-            background:  #4e5c34; color: white;
-            padding: 14px 22px; border-radius: 10px;
-            font-family: "Montserrat", sans-serif; font-size: 13px; font-weight: 600;
-            display: flex; align-items: center; gap: 10px;
-            opacity: 0; transform: translateY(20px);
-            transition: .35s; z-index: 9999; pointer-events: none;
-        }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        
-        
-        
-        /*===== ChatBox =====*/
-        #chatIcon {
+/* ===== TOAST ===== */
+.toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background:  #4e5c34;
+    color: white;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: .35s;
+    z-index: 9999;
+    pointer-events: none;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+
+/*===== ChatBox =====*/
+#chatIcon {
 
     position: fixed;
     bottom: 20px;
@@ -919,16 +968,16 @@ p,a, span, strong, button, li,ul{
 #chatSidebar {
     position: fixed;
     top: 20px;
-   left: -500px;
+    left: -500px;
     width: 450px;
     height: 80%;
     background: white;
-    
+
     border: 2px solid #ccc;
     transition: 0.3s;
     display: flex;
     flex-direction: column;
-    border-top-left-radius: 16px;   
+    border-top-left-radius: 16px;
     border-bottom-left-radius: 8px;
     border-top-right-radius: 16px;
     border-bottom-right-radius: 8px;
@@ -936,7 +985,7 @@ p,a, span, strong, button, li,ul{
 }
 
 #chatSidebar.open{
-   left: 0px;
+    left: 0px;
 }
 
 /* HEADER */
@@ -959,7 +1008,7 @@ p,a, span, strong, button, li,ul{
 .chat-input {
     display: flex;
     border-top: 1px solid #ccc;
-   
+
 }
 
 .chat-input input {
@@ -968,7 +1017,7 @@ p,a, span, strong, button, li,ul{
     border: 1px solid #ccc;
     width: 50%;
     bottom: 2px;
-   left:2px;
+    left:2px;
 }
 
 .chat-input button {

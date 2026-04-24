@@ -37,10 +37,6 @@ p,a, span, strong, button, li,ul{
 
 /*==========Top menu==========*/
 
-/*display: flex;            Kích hoạt Flexbox 
-  align-items: center;      Căn giữa theo chiều dọc 
-  justify-content: center;  Căn giữa theo chiều ngang */
-
 .top-menu{
     display: flex;
     justify-content: space-between; /* Đẩy 2 cụm menu ra 2 đầu */
@@ -422,22 +418,6 @@ p,a, span, strong, button, li,ul{
     opacity: 0.7; /*làm mờ ảnh từ 0 - 1 trong đó 1 là hiện rõ nhất*/
 }
 
-
-
-/* ===== MODAL OVERLAY ===== */
-/*.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(114, 104, 104, 0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(6px);
-}
-.modal-overlay.active {
-    display: flex;
-}*/
 
 /*         ===== MODAL BOX ===== */
 

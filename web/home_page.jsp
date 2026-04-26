@@ -212,6 +212,7 @@
                  ">
                 <i class="fa-solid fa-robot"></i>
                 Trợ lý DECOR LUXURY
+                <span onclick="minimize()" style="margin-left:auto; cursor:pointer; font-size:18px; opacity:.8;">➖</span>
                 <span onclick="toggleChat()" style="margin-left:auto; cursor:pointer; font-size:18px; opacity:.8;">✕</span>
             </div>
 
@@ -483,6 +484,37 @@
             chat.style.opacity = '0';
             chat.style.transform = 'translateY(30px) scale(.95)';
             chat.style.pointerEvents = 'none';
+
+            localStorage.removeItem("chatHistory");
+        document.getElementById("chatMessages").innerHTML = `
+         <p style="
+                   background: #e8eddf; color: #2c2c2c;
+                   padding: 10px 14px; border-radius: 12px 12px 12px 4px;
+                   margin: 0; line-height: 1.5;
+                   "><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất DECOR LUXURY. Bạn cần tư vấn gì không?</p>
+    `;
+        } else {
+            chat.style.opacity = '1';
+            chat.style.transform = 'translateY(0) scale(1)';
+            chat.style.pointerEvents = 'all';
+            document.getElementById("chatInput").focus();
+             document.getElementById("quickReplies").style.display = 'flex';
+            // Ẩn quick replies sau khi đã chat
+            if (document.getElementById("chatMessages").children.length > 3) {
+                document.getElementById("quickReplies").style.display = 'none';
+            }
+        }
+    }
+
+    let isSending = false;
+
+    function minimize(){
+         const chat = document.getElementById("chatSidebar");
+        const isOpen = chat.style.opacity === '1';
+        if (isOpen) {
+            chat.style.opacity = '0';
+            chat.style.transform = 'translateY(30px) scale(.95)';
+            chat.style.pointerEvents = 'none';
         } else {
             chat.style.opacity = '1';
             chat.style.transform = 'translateY(0) scale(1)';
@@ -494,8 +526,6 @@
             }
         }
     }
-
-    let isSending = false;
 
     // ── Gửi tin nhắn quick reply ──
     function quickSend(text) {

@@ -2,322 +2,426 @@ package Controller;
 
 import Model.dbConnect;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.sql.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.regex.*;
+import jakarta.servlet.http.*;
 
 public class ChatServlet extends HttpServlet {
-//    private static final String API_KEY = "AIzaSyAUPHW_KydhmY5ZLdkTGkWvWJBZ1I4mmWg";
-    private static final int MAX_PRODUCTS = 10;
 
-    private static class ConversationState {
-        boolean waitingForPromotionAnswer = false;
-        List<Map<String, Object>> promoProducts = new ArrayList<>();
-        String lastQuery = null;
+    private static final int MAX_RESULTS = 10;
+
+    // Chỉnh lại route này nếu trang liên hệ của bạn khác
+    private static final String CONTACT_URL = "/Contact";
+
+    // Từ điển đồng nghĩa: key là từ dùng tìm trong DB, value là những gì user hay gõ
+    private static final Map<String, String[]> KeyWord = new LinkedHashMap<>();
+    static {
+        KeyWord.put("sofa",      new String[]{"sofa", "ghế sofa", "couch", "ghế dài", "ghế tựa"});
+        KeyWord.put("bàn",       new String[]{"bàn", "table", "desk", "bàn học", "bàn làm việc", "bàn ăn", "bàn trà"});
+        KeyWord.put("ghế",       new String[]{"ghế", "chair", "ghế ngồi", "ghế xoay", "ghế văn phòng"});
+        KeyWord.put("giường",    new String[]{"giường", "bed", "giường ngủ", "nệm"});
+        KeyWord.put("tủ",        new String[]{"tủ", "cabinet", "wardrobe", "tủ quần áo", "tủ đồ"});
+        KeyWord.put("loa",       new String[]{"Loa","âm thanh","sound","phát thanh"});
+        KeyWord.put("kệ",        new String[]{"kệ", "shelf", "kệ sách", "kệ tivi", "giá đỡ"});
+        KeyWord.put("đèn",       new String[]{"đèn", "lamp", "light", "đèn led", "đèn trang trí", "đèn chùm"});
+        KeyWord.put("máy giặt",  new String[]{"máy giặt", "washing machine"});
+        KeyWord.put("trang trí", new String[]{"trang trí", "decor", "gương", "thảm", "rèm", "đồng hồ", "tranh"});
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain;charset=UTF-8");
-        request.setCharacterEncoding("UTF-8");
-        HttpSession session = request.getSession();
-        ConversationState state = (ConversationState) session.getAttribute("chatState");
-        if (state == null) {
-            state = new ConversationState();
-            session.setAttribute("chatState", state);
-        }
+    // Các dạng câu hỏi cần tư vấn viên thật — bot không thể trả lời chắc chắn
+    // vì cần biết ảnh phòng, kích thước thực tế, sở thích cá nhân...
+    private static final String[] NEEDS_HUMAN_PATTERNS = {
+        "hợp.*phòng", "phù hợp.*nhà", "hợp.*không gian", "hợp.*màu",
+        "trông.*thế nào", "nhìn.*thế nào", "đẹp không", "có hợp không",
+        "nên chọn.*nào", "nên mua.*nào", "tư vấn.*phong cách",
+        "thiết kế.*phòng", "phối.*màu", "bố trí", "sắp xếp.*nội thất",
+        "size.*phù hợp", "kích thước.*phù hợp", "vừa.*phòng",
+        "phong cách.*gì", "style.*gì", "hợp.*gu",
+        "không biết.*chọn", "không biết.*mua", "phân vân",
+        "gợi ý.*tổng thể", "tư vấn.*trọn gói", "tư vấn.*nội thất"
+    };
 
-        String message = request.getParameter("message");
-        if (message == null || message.trim().isEmpty()) {
-            response.getWriter().write("Vui lòng nhập câu hỏi.");
+    // Câu chào & cảm ơn có vài phiên bản để bot không bị lặp đơ
+    private static final String[] GREETINGS = {
+        "Chào bạn! 👋 Bạn đang tìm đồ nội thất gì vậy?",
+        "Xin chào! 😊 Mình có thể giúp gì cho bạn hôm nay?",
+        "Hi bạn! Bạn muốn trang trí không gian nào — phòng khách, phòng ngủ hay văn phòng?"
+    };
+    private static final String[] THANKS_REPLIES = {
+        "Không có gì! 😊 Bạn cần thêm gì cứ hỏi mình nhé.",
+        "Vui được giúp bạn! Còn sản phẩm nào bạn muốn tìm nữa không?",
+        "Oke bạn ơi! Có gì cần tư vấn thêm cứ ping mình nha 🙌"
+    };
+
+    private final Random rng = new Random();
+
+    // ==================== ENTRY POINT ====================
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        res.setContentType("text/plain;charset=UTF-8");
+        req.setCharacterEncoding("UTF-8");
+
+        String message = req.getParameter("message");
+        if (message == null || message.isBlank()) {
+            res.getWriter().write("Bạn muốn hỏi gì vậy? 😊");
             return;
         }
         message = message.trim();
 
-        // Xử lý trả lời khuyến mãi
-        if (state.waitingForPromotionAnswer) {
-            String reply = handlePromotionAnswer(message, state, request, response);
-            if (reply != null) {
-                response.getWriter().write(reply);
-                if (!state.waitingForPromotionAnswer) session.removeAttribute("chatState");
+        HttpSession session = req.getSession();
+        ChatState state = getOrCreateState(session);
+
+        // Đang chờ user trả lời câu hỏi về khuyến mãi?
+        if (state.waitingForPromoAnswer) {
+            String promoReply = handlePromoResponse(message, state, req, res);
+            if (promoReply != null) {
+                res.getWriter().write(promoReply);
+                if (!state.waitingForPromoAnswer) session.removeAttribute("chatState");
                 return;
             }
         }
 
-        // Rule cứng (chào, cảm ơn, ...)
-        String quick = quickReply(message);
-        if (quick != null) {
-            response.getWriter().write(quick);
+        // Câu hỏi cần tư vấn viên thật → chỉ đường sang trang liên hệ
+        if (needsHumanAdvice(message)) {
+            res.getWriter().write(buildContactSuggestion(req, res));
             return;
         }
 
-        // Phân tích câu hỏi
-        ParsedQuery pq = parseQuery(message);
-        List<Map<String, Object>> products = new ArrayList<>();
-
-        if (pq.intent.equals("find_product")) {
-            products = searchProducts(pq);
-        }
-
-        // Thiếu thông tin -> hỏi lại
-        if (pq.intent.equals("find_product") && products.isEmpty() && pq.priceMin == 0 && pq.priceMax == 0 && pq.category == null) {
-            state.lastQuery = message;
-            session.setAttribute("chatState", state);
-            response.getWriter().write("🔍 Bạn muốn tìm **" + pq.productType + "**? Hãy cho mình biết thêm:\n• 💰 Khoảng giá\n• 🛋️ Danh mục (phòng khách, phòng ngủ, đèn, bàn ghế làm việc...)\n👉 Ví dụ: \"Giường ngủ dưới 3 triệu phòng ngủ\"");
+        // Câu chào, cảm ơn, địa chỉ... trả lời ngay không cần DB
+        String quickReply = tryQuickReply(message);
+        if (quickReply != null) {
+            res.getWriter().write(quickReply);
             return;
         }
 
-        // Có sản phẩm -> xử lý khuyến mãi hoặc trả kết quả
-        if (!products.isEmpty()) {
-            List<Map<String, Object>> promoProducts = filterPromotionProducts(products);
-            if (!promoProducts.isEmpty() && !state.waitingForPromotionAnswer) {
-                state.waitingForPromotionAnswer = true;
-                state.promoProducts = promoProducts;
+        // Phân tích xem user muốn tìm sản phẩm gì
+        UserIntent intent = analyzeMessage(message);
+
+        if (intent.wantsProduct) {
+            // Còn mơ hồ → hỏi thêm trước khi tìm
+            if (intent.productKeyword != null
+                    && intent.specificName == null
+                    && intent.priceMin == 0 && intent.priceMax == 0
+                    && intent.category == null) {
+                state.lastQuestion = message;
                 session.setAttribute("chatState", state);
-                StringBuilder sb = new StringBuilder("🎉 **Ưu đãi đặc biệt!** Có sản phẩm giảm giá:\n");
-                for (Map<String, Object> p : promoProducts) {
-                    sb.append("- ").append(p.get("name")).append(": <del>").append(formatPrice((float)p.get("price_old"))).append("đ</del> → **")
-                      .append(formatPrice((float)p.get("price"))).append("đ**\n");
-                }
-                sb.append("\n🤔 Bạn **có muốn** xem sản phẩm giảm giá này không? (Có / Không)");
-                response.getWriter().write(sb.toString());
+                res.getWriter().write(buildClarifyQuestion(intent.productKeyword));
                 return;
             }
-            String reply = formatProductResponse(products, request, response);
-            response.getWriter().write(reply);
-            session.removeAttribute("chatState");
+
+            List<Map<String, Object>> found = queryProducts(intent);
+
+            if (!found.isEmpty()) {
+                List<Map<String, Object>> onSale = filterOnSale(found);
+                if (!onSale.isEmpty() && !state.waitingForPromoAnswer) {
+                    state.waitingForPromoAnswer = true;
+                    state.promoList = onSale;
+                    session.setAttribute("chatState", state);
+                    res.getWriter().write(buildPromoTeaser(onSale));
+                    return;
+                }
+                res.getWriter().write(formatResults(found, req, res));
+                session.removeAttribute("chatState");
+                return;
+            }
+
+            // Tìm không ra → thành thật, gợi ý liên hệ
+            res.getWriter().write(buildNotFoundReply(intent.productKeyword, req, res));
             return;
         }
 
-        // Không tìm thấy sản phẩm hoặc câu hỏi chung -> gọi Gemini
-        System.out.println("[ChatServlet] Gọi Gemini API cho câu: " + message);
-        String aiReply = callGemini(message, products, request, response);
-        response.getWriter().write(aiReply);
+        // Câu hỏi linh tinh không nhận dạng được → gợi ý liên hệ
+        res.getWriter().write(buildContactSuggestion(req, res));
         session.removeAttribute("chatState");
     }
 
-    // -------------------- CÁC HÀM XỬ LÝ --------------------
-    private String quickReply(String msg) {
-        String m = msg.toLowerCase();
-        if (m.matches(".*(xin chào|hello|hi|chào|hey).*")) return "Xin chào! 👋 Bạn cần tư vấn nội thất gì ạ?";
-        if (m.matches(".*(cảm ơn|cám ơn|thanks|thank).*")) return "Không có gì! 😊 Bạn cần thêm gì nữa không?";
-        if (m.matches(".*(giờ mở cửa|địa chỉ|liên hệ|hotline).*")) return "📍 DECOR LUXURY: 8h-21h hàng ngày. Liên hệ qua trang Liên Hệ nhé!";
-        return null;
-    }
+    // ==================== PHÂN TÍCH CÂU HỎI ====================
 
-    private ParsedQuery parseQuery(String message) {
-        ParsedQuery pq = new ParsedQuery();
+    private boolean needsHumanAdvice(String message) {
         String lower = message.toLowerCase();
-        if (lower.contains("tìm") || lower.contains("muốn mua") || lower.contains("cho tôi") || 
-            lower.contains("sản phẩm") || lower.contains("tư vấn") || lower.contains("hỗ trợ") || 
-            lower.contains("giải đáp") || lower.contains("check")  || lower.contains("biết")) {
-            pq.intent = "find_product";
-        } else {
-            pq.intent = "general";
-            return pq;
+        for (String pattern : NEEDS_HUMAN_PATTERNS) {
+            if (lower.matches(".*" + pattern + ".*")) return true;
         }
-        String[] keywords = {"giường", "đèn", "bàn", "ghế", "sofa", "tủ", "kệ", "trà", "máy giặt"};
-        for (String kw : keywords) {
-            if (lower.contains(kw)) { pq.productType = kw; break; }
-        }
-        // Giá
-        Pattern pricePattern = Pattern.compile("(\\d+(?:\\.\\d+)?)\\s*(k|triệu|tr|ngàn|nghìn)");
-        Matcher m = pricePattern.matcher(lower);
-        if (m.find()) {
-            float val = Float.parseFloat(m.group(1));
-            String unit = m.group(2);
-            if (unit.equals("k") || unit.equals("ngàn") || unit.equals("nghìn")) val *= 1000;
-            else if (unit.equals("triệu") || unit.equals("tr")) val *= 1000000;
-            if (lower.contains("dưới") || lower.contains("nhỏ hơn")) pq.priceMax = val;
-            else if (lower.contains("trên") || lower.contains("lớn hơn")) pq.priceMin = val;
-            else { pq.priceMin = val * 0.8f; pq.priceMax = val * 1.2f; }
-        }
-        // Danh mục
-        String[] cats = {"phòng khách", "phòng ngủ", "đèn", "bàn ghế làm việc", "trang trí decor"};
-        for (String cat : cats) {
-            if (lower.contains(cat)) { pq.category = cat; break; }
-        }
-        return pq;
+        return false;
     }
 
-    private List<Map<String, Object>> searchProducts(ParsedQuery pq) {
+    private UserIntent analyzeMessage(String message) {
+        UserIntent intent = new UserIntent();
+        String lower = message.toLowerCase().trim();
+
+        boolean soundsLikeShopping = lower.matches(
+            ".*(tìm|muốn mua|cho tôi|cho mình|sản phẩm|hỗ trợ||buy|take" +
+            "check|có bán|giá|bao nhiêu|xem thử|mua|cần|buy|take).*"
+        );
+
+        boolean mentionedProduct = false;
+        outer:
+        for (Map.Entry<String, String[]> entry : KeyWord.entrySet()) {
+            for (String word : entry.getValue()) {
+                if (lower.contains(word)) {
+                    intent.productKeyword = entry.getKey();
+                    mentionedProduct = true;
+                    break outer;
+                }
+            }
+        }
+
+        intent.wantsProduct = soundsLikeShopping || mentionedProduct;
+        if (!intent.wantsProduct) return intent;
+
+        extractPrice(lower, intent);
+
+        String[] roomTypes = {"phòng khách", "phòng ngủ", "đèn", "bàn ghế làm việc", "trang trí decor"};
+        for (String room : roomTypes) {
+            if (lower.contains(room)) { intent.category = room; break; }
+        }
+
+        // Chỉ dùng specificName khi câu ngắn gọn, không có giá và không có category.
+        // Nếu đã có filter giá hoặc phòng rồi thì để DB tự lọc — không gán specificName
+        // vì sẽ khiến SQL LIKE khớp cả chuỗi dài "giường cho phòng ngủ giá dưới 8 triệu" → không ra gì.
+        boolean hasOtherFilters = intent.priceMin > 0 || intent.priceMax > 0 || intent.category != null;
+        if (!hasOtherFilters && message.split("\\s+").length >= 3 && mentionedProduct) {
+            String cleaned = lower
+                .replaceAll("tìm|muốn mua|cho tôi|cho mình|tư vấn|hỗ trợ|check|mua|cần|xem thử|buy|take", "")
+                .trim();
+            if (cleaned.split("\\s+").length >= 2) intent.specificName = cleaned;
+        }
+
+        return intent;
+    }
+
+    private void extractPrice(String lower, UserIntent intent) {
+        Pattern p = Pattern.compile("(\\d+(?:[.,]\\d+)?)\\s*(k|triệu|tr|ngàn|nghìn)");
+        Matcher m = p.matcher(lower);
+        if (!m.find()) return;
+
+        float amount = Float.parseFloat(m.group(1).replace(",", "."));
+        String unit  = m.group(2);
+        if (unit.equals("k") || unit.equals("ngàn") || unit.equals("nghìn")) amount *= 1_000;
+        else if (unit.equals("triệu") || unit.equals("tr"))                   amount *= 1_000_000;
+
+        if      (lower.contains("dưới") || lower.contains("nhỏ hơn")) intent.priceMax = amount;
+        else if (lower.contains("trên") || lower.contains("lớn hơn")) intent.priceMin = amount;
+        else { intent.priceMin = amount * 0.8f; intent.priceMax = amount * 1.2f; }
+    }
+
+    // ==================== DATABASE ====================
+
+    private List<Map<String, Object>> queryProducts(UserIntent intent) {
         List<Map<String, Object>> results = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = new dbConnect().getConnect();
-            StringBuilder sql = new StringBuilder(
-                "SELECT p.product_id, p.product_name, p.price, p.description, c.category_name, p.discount_price " +
-                "FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.price > 0"
-            );
-            List<Object> params = new ArrayList<>();
-            if (pq.category != null) { sql.append(" AND c.category_name LIKE ?"); params.add("%" + pq.category + "%"); }
-            if (pq.priceMin > 0) { sql.append(" AND p.price >= ?"); params.add(pq.priceMin); }
-            if (pq.priceMax > 0) { sql.append(" AND p.price <= ?"); params.add(pq.priceMax); }
-            if (pq.productType != null && !pq.productType.equals("sản phẩm")) {
-                sql.append(" AND p.product_name LIKE ?"); params.add("%" + pq.productType + "%");
+        try (Connection conn = new dbConnect().getConnect();
+             PreparedStatement ps = conn.prepareStatement(buildSQL(intent))) {
+
+            List<Object> params = buildParams(intent);
+            for (int i = 0; i < params.size(); i++) ps.setObject(i + 1, params.get(i));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) results.add(rowToMap(rs));
             }
-            sql.append(" ORDER BY p.price ASC LIMIT ").append(MAX_PRODUCTS);
-            ps = conn.prepareStatement(sql.toString());
-            for (int i = 0; i < params.size(); i++) ps.setObject(i+1, params.get(i));
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("id", rs.getInt("product_id"));
-                item.put("name", rs.getString("product_name"));
-                float original = rs.getFloat("price");
-                float discount = rs.getFloat("discount_price");
-                boolean hasPromo = discount > 0;
-                item.put("price", hasPromo ? discount : original);
-                item.put("price_old", original);
-                item.put("description", rs.getString("description"));
-                item.put("category", rs.getString("category_name"));
-                results.add(item);
-            }
-        } catch (Exception e) { e.printStackTrace(); } 
-        finally {
-            try { if (rs != null) rs.close(); } catch (Exception e) {}
-            try { if (ps != null) ps.close(); } catch (Exception e) {}
-            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        } catch (Exception e) {
+            System.err.println("[ChatServlet] DB lỗi: " + e.getMessage());
         }
         return results;
     }
 
-    private List<Map<String, Object>> filterPromotionProducts(List<Map<String, Object>> products) {
-        List<Map<String, Object>> promo = new ArrayList<>();
-        for (Map<String, Object> p : products) {
-            if ((float)p.get("price") < (float)p.get("price_old")) promo.add(p);
-        }
-        return promo;
+    private String buildSQL(UserIntent intent) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT p.product_id, p.product_name, p.price, p.description, " +
+            "       c.category_name, p.discount_price " +
+            "FROM products p " +
+            "LEFT JOIN categories c ON p.category_id = c.category_id " +
+            "WHERE p.price > 0"
+        );
+        if (intent.category     != null) sql.append(" AND LOWER(c.category_name) LIKE LOWER(?)");
+        if (intent.priceMin     >  0)    sql.append(" AND p.price >= ?");
+        if (intent.priceMax     >  0)    sql.append(" AND p.price <= ?");
+        if (intent.specificName != null) sql.append(" AND p.product_name LIKE ?");
+        else if (intent.productKeyword != null && !intent.productKeyword.equals("sản phẩm"))
+                                          sql.append(" AND p.product_name LIKE ?");
+        sql.append(" ORDER BY p.price ASC LIMIT ").append(MAX_RESULTS);
+        return sql.toString();
     }
 
-    private String formatProductResponse(List<Map<String, Object>> products, HttpServletRequest req, HttpServletResponse resp) {
+    private List<Object> buildParams(UserIntent intent) {
+        List<Object> p = new ArrayList<>();
+        if (intent.category     != null) p.add("%" + intent.category + "%");
+        if (intent.priceMin     >  0)    p.add(intent.priceMin);
+        if (intent.priceMax     >  0)    p.add(intent.priceMax);
+        if (intent.specificName != null) p.add("%" + intent.specificName + "%");
+        else if (intent.productKeyword != null && !intent.productKeyword.equals("sản phẩm"))
+                                          p.add("%" + intent.productKeyword + "%");
+        return p;
+    }
+
+    private Map<String, Object> rowToMap(ResultSet rs) throws SQLException {
+        float original   = rs.getFloat("price");
+        float discounted = rs.getFloat("discount_price");
+        boolean hasDiscount = discounted > 0 && discounted < original;
+
+        Map<String, Object> row = new HashMap<>();
+        row.put("id",       rs.getInt("product_id"));
+        row.put("name",     rs.getString("product_name"));
+        row.put("price",    hasDiscount ? discounted : original);
+        row.put("priceOld", original);
+        row.put("desc",     rs.getString("description"));
+        row.put("category", rs.getString("category_name"));
+        return row;
+    }
+
+    // ==================== FORMAT RESPONSE ====================
+
+    private String tryQuickReply(String msg) {
+        String m = msg.toLowerCase();
+        if (m.matches(".*(xin chào|hello|hi|chào|hey).*"))
+            return GREETINGS[rng.nextInt(GREETINGS.length)];
+        if (m.matches(".*(cảm ơn|cám ơn|thanks|thank|thx).*"))
+            return THANKS_REPLIES[rng.nextInt(THANKS_REPLIES.length)];
+        if (m.matches(".*(giờ mở cửa|địa chỉ|liên hệ|hotline|ở đâu).*"))
+            return "📍 CozyHome mở cửa **8h–21h** hàng ngày.\n" +
+                   "Ghé trang **Liên Hệ** để xem địa chỉ và số điện thoại nhé!";
+        return null;
+    }
+
+    private String buildClarifyQuestion(String keyword) {
+        return "🔍 Bạn đang tìm **" + keyword + "** đúng không?\n\n" +
+               "Cho mình biết thêm một chút để tìm chính xác hơn:\n" +
+               "• 💰 Khoảng giá bạn dự tính?\n" +
+               "• 🏠 Đặt ở phòng nào (phòng khách, phòng ngủ, văn phòng...)?\n\n" +
+               "_Ví dụ: \"Tôi cần " + keyword + " cho phòng khách, giá dưới 8 triệu\"_";
+    }
+
+    private String buildContactSuggestion(HttpServletRequest req, HttpServletResponse res) {
+        String link = res.encodeRedirectURL(req.getContextPath() + CONTACT_URL);
+        return "Câu hỏi này cần tư vấn chuyên sâu hơn, mình chưa đủ khả năng trả lời chắc chắn 😅\n\n" +
+               "Để được tư vấn **đúng nhất** về phong cách, màu sắc hay cách bố trí phù hợp với " +
+               "căn phòng của bạn, bạn nên nói chuyện trực tiếp với đội ngũ CozyHome nhé!\n\n" +
+               "👉 [Liên hệ tư vấn viên ngay](" + link + ")\n\n" +
+               "_Phản hồi trong vòng vài phút trong giờ làm việc (8h–21h)_ 🙏";
+    }
+
+    private String buildNotFoundReply(String keyword, HttpServletRequest req, HttpServletResponse res) {
+        String link = res.encodeRedirectURL(req.getContextPath() + CONTACT_URL);
+        String kw   = keyword != null ? keyword : "sản phẩm này";
+        return "Mình tìm trong hệ thống nhưng hiện chưa có **" + kw + "** phù hợp với yêu cầu của bạn 😔\n\n" +
+               "Có thể hàng đang tạm hết hoặc chưa cập nhật lên web.\n\n" +
+               "👉 [Liên hệ tư vấn viên](" + link + ") để kiểm tra kho hàng thực tế nhé, " +
+               "chắc chắn sẽ tìm được thứ bạn cần! 💪";
+    }
+
+    private String buildPromoTeaser(List<Map<String, Object>> onSale) {
+        StringBuilder sb = new StringBuilder("🎉 Mình tìm được mấy sản phẩm đang **giảm giá** này:\n\n");
+        for (Map<String, Object> p : onSale) {
+            sb.append("• **").append(p.get("name")).append("**: ")
+              .append("<del>").append(toVND(price(p, "priceOld"))).append("đ</del>")
+              .append(" → **").append(toVND(price(p, "price"))).append("đ**\n");
+        }
+        sb.append("\n👉 Bạn **có muốn xem chi tiết** mấy sp này không? *(Có / Không)*");
+        return sb.toString();
+    }
+
+    private String formatResults(List<Map<String, Object>> products,
+                                  HttpServletRequest req, HttpServletResponse res) {
+        if (products.size() == 1) return formatSingle(products.get(0), req, res);
+        return formatList(products, req, res);
+    }
+
+    private String formatSingle(Map<String, Object> p,
+                                  HttpServletRequest req, HttpServletResponse res) {
+        float current = price(p, "price");
+        float old     = price(p, "priceOld");
+        String link   = productLink(p, req, res);
         StringBuilder sb = new StringBuilder();
-        if (products.size() == 1) {
-            Map<String, Object> p = products.get(0);
-            String link = resp.encodeRedirectURL(req.getContextPath() + "/ProductDetail?id=" + p.get("id"));
-            sb.append("✅ **").append(p.get("name")).append("**\n💰 ").append(formatPrice((float)p.get("price"))).append("đ");
-            if ((float)p.get("price") < (float)p.get("price_old")) sb.append(" (giảm từ ").append(formatPrice((float)p.get("price_old"))).append("đ)");
-            sb.append("\n📂 ").append(p.get("category")).append("\n🔗 [Xem chi tiết](").append(link).append(")");
-        } else {
-            sb.append("🔎 Có ").append(products.size()).append(" sản phẩm phù hợp:\n");
-            for (Map<String, Object> p : products) {
-                String link = resp.encodeRedirectURL(req.getContextPath() + "/ProductDetail?id=" + p.get("id"));
-                sb.append("- **").append(p.get("name")).append("**: ").append(formatPrice((float)p.get("price"))).append("đ");
-                if ((float)p.get("price") < (float)p.get("price_old")) sb.append(" (giảm)");
-                sb.append(" 🔗 [Chi tiết](").append(link).append(")\n");
-            }
+        sb.append("✅ **").append(p.get("name")).append("**\n");
+        sb.append("💰 ").append(toVND(current)).append("đ");
+        if (current < old) sb.append(" *(giảm từ ").append(toVND(old)).append("đ)*");
+        sb.append("\n📂 ").append(p.get("category"));
+        sb.append("\n🔗 [Xem chi tiết](").append(link).append(")");
+        return sb.toString();
+    }
+
+    private String formatList(List<Map<String, Object>> products,
+                               HttpServletRequest req, HttpServletResponse res) {
+        StringBuilder sb = new StringBuilder(
+            "🔎 Mình tìm được **" + products.size() + " sản phẩm** phù hợp:\n\n"
+        );
+        for (Map<String, Object> p : products) {
+            float current = price(p, "price");
+            float old     = price(p, "priceOld");
+            String link   = productLink(p, req, res);
+            sb.append("• **").append(p.get("name")).append("** — ")
+              .append(toVND(current)).append("đ");
+            if (current < old) sb.append(" 🔥 giảm");
+            sb.append("\n 🔗 [Chi tiết](").append(link).append(")\n");
         }
         return sb.toString();
     }
 
-    private String formatPrice(float price) {
-        return String.format("%,d", (long)price).replace(',', '.');
-    }
+    // ==================== KHUYẾN MÃI ====================
 
-    // -------------------- GEMINI API CÓ XỬ LÝ 429 --------------------
-    private String callGemini(String userMessage, List<Map<String, Object>> products, HttpServletRequest req, HttpServletResponse resp) {
-        System.out.println("[Gemini] Bắt đầu gọi API, prompt dài " + userMessage.length() + " ký tự");
-        try {
-            URL url = new URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-            conn.setDoOutput(true);
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(25000);
-
-            String context = "";
-            if (!products.isEmpty()) {
-                context = "Dưới đây là danh sách sản phẩm liên quan:\n";
-                for (Map<String, Object> p : products) {
-                    context += "- " + p.get("name") + " giá " + formatPrice((float)p.get("price")) + "đ (danh mục: " + p.get("category") + ")\n";
-                }
-                context += "Hãy tư vấn dựa trên các sản phẩm này.";
-            } else {
-                context = "Trả lời câu hỏi của khách hàng về nội thất một cách thân thiện, ngắn gọn bằng tiếng Việt. Nếu khách hỏi về sản phẩm cụ thể mà bạn chưa rõ, hãy hỏi lại khách: 'Bạn muốn tôi tư vấn sản phẩm nào? (đặt ở đâu, chất liệu nào, hay giá cả bao nhiêu)'";
-            }
-
-            String prompt = "Bạn là trợ lý nội thất DECOR LUXURY.\n" + context + "\n\nCâu hỏi: " + userMessage;
-            String json = "{\"contents\":[{\"parts\":[{\"text\":\"" + escapeJson(prompt) + "\"}]}],\"generationConfig\":{\"maxOutputTokens\":500,\"temperature\":0.7}}";
-            try (OutputStream os = conn.getOutputStream()) { os.write(json.getBytes("utf-8")); }
-
-            int code = conn.getResponseCode();
-            if (code == 200) {
-                try (Scanner sc = new Scanner(conn.getInputStream(), "utf-8")) {
-                    StringBuilder sb = new StringBuilder();
-                    while (sc.hasNextLine()) sb.append(sc.nextLine());
-                    return parseGeminiResponse(sb.toString());
-                }
-            } else if (code == 429) {
-                // Xử lý rate limit: trả về câu hỏi dẫn dắt tư vấn sản phẩm
-                return "🤖 *Trợ lý AI tạm thời quá tải.*\n\n" +
-                       "Nhưng mình vẫn có thể giúp bạn tìm sản phẩm thủ công.\n" +
-                       "👉 **Bạn muốn tôi tư vấn sản phẩm nào?** (đặt ở đâu, chất liệu nào, hay giá cả bao nhiêu)\n" +
-                       "Hãy cho mình biết thêm: **tên sản phẩm**, **khoảng giá** hoặc **danh mục** nhé!";
-            } else {
-                return "Xin lỗi, AI tạm thời bận (mã " + code + "). Vui lòng thử lại sau.";
-            }
-        } catch (Exception e) {
-            return "🌐 Lỗi kết nối AI: " + e.getMessage();
+    private List<Map<String, Object>> filterOnSale(List<Map<String, Object>> products) {
+        List<Map<String, Object>> onSale = new ArrayList<>();
+        for (Map<String, Object> p : products) {
+            if (price(p, "price") < price(p, "priceOld")) onSale.add(p);
         }
+        return onSale;
     }
 
-    private String escapeJson(String s) {
-        return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
-    }
-
-    private String parseGeminiResponse(String json) {
-        int idx = json.indexOf("\"text\":\"");
-        if (idx == -1) return "Không nhận được phản hồi từ AI.";
-        idx += 8;
-        StringBuilder out = new StringBuilder();
-        for (int i = idx; i < json.length(); i++) {
-            char c = json.charAt(i);
-            if (c == '\\' && i+1 < json.length()) {
-                char n = json.charAt(i+1);
-                if (n == '"') { out.append('"'); i++; }
-                else if (n == 'n') { out.append('\n'); i++; }
-                else if (n == '\\') { out.append('\\'); i++; }
-                else out.append(c);
-            } else if (c == '"') break;
-            else out.append(c);
+    private String handlePromoResponse(String msg, ChatState state,
+                                        HttpServletRequest req, HttpServletResponse res) {
+        String lower = msg.toLowerCase();
+        if (lower.matches(".*(có|ok|ừ|muốn|xem|được).*")) {
+            state.waitingForPromoAnswer = false;
+            String reply = "🎁 **Sản phẩm giảm giá dành cho bạn:**\n\n" +
+                           formatList(state.promoList, req, res);
+            state.promoList.clear();
+            return reply;
         }
-        String result = out.toString().replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>").replace("\n", "<br>");
-        return result;
-    }
-
-    private static class ParsedQuery {
-        String intent = "general";
-        String productType = "sản phẩm";
-        float priceMin = 0, priceMax = 0;
-        String category = null;
-    }
-
-    private String handlePromotionAnswer(String msg, ConversationState state, HttpServletRequest req, HttpServletResponse resp) {
-        msg = msg.toLowerCase();
-        if (msg.contains("có") || msg.contains("ok")) {
-            state.waitingForPromotionAnswer = false;
-            StringBuilder sb = new StringBuilder("🎁 Sản phẩm giảm giá:\n");
-            for (Map<String, Object> p : state.promoProducts) {
-                String link = resp.encodeRedirectURL(req.getContextPath() + "/ProductDetail?id=" + p.get("id"));
-                sb.append("- **").append(p.get("name")).append("**: ").append(formatPrice((float)p.get("price"))).append("đ (giảm từ ").append(formatPrice((float)p.get("price_old"))).append("đ) 🔗 [Xem](").append(link).append(")\n");
-            }
-            state.promoProducts.clear();
-            return sb.toString();
-        } else if (msg.contains("không")) {
-            state.waitingForPromotionAnswer = false;
-            state.promoProducts.clear();
-            return "OK! Bạn muốn tìm sản phẩm với tiêu chí nào khác?";
+        if (lower.matches(".*(không|thôi|bỏ qua|skip).*")) {
+            state.waitingForPromoAnswer = false;
+            state.promoList.clear();
+            return "Oke! Bạn muốn tìm thêm sản phẩm nào khác không? 😊";
         }
         return null;
+    }
+
+    // ==================== HELPERS ====================
+
+    private float price(Map<String, Object> product, String key) {
+        return ((Number) product.get(key)).floatValue();
+    }
+
+    private String toVND(float amount) {
+        return String.format("%,d", (long) amount).replace(',', '.');
+    }
+
+    private String productLink(Map<String, Object> p, HttpServletRequest req, HttpServletResponse res) {
+        return res.encodeRedirectURL(req.getContextPath() + "/ProductDetail?id=" + p.get("id"));
+    }
+
+    private ChatState getOrCreateState(HttpSession session) {
+        ChatState state = (ChatState) session.getAttribute("chatState");
+        if (state == null) {
+            state = new ChatState();
+            session.setAttribute("chatState", state);
+        }
+        return state;
+    }
+
+    // ==================== INNER CLASSES ====================
+
+    private static class ChatState {
+        boolean waitingForPromoAnswer = false;
+        List<Map<String, Object>> promoList = new ArrayList<>();
+        String lastQuestion = null;
+    }
+
+    private static class UserIntent {
+        boolean wantsProduct   = false;
+        String  productKeyword = null;
+        String  specificName   = null;
+        float   priceMin       = 0;
+        float   priceMax       = 0;
+        String  category       = null;
     }
 }

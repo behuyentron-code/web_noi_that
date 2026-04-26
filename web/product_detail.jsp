@@ -21,8 +21,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title><%= p != null ? p.getProduct_name() : "Chi tiết sản phẩm"%> - Decor Luxury</title>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=account_circle" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/chitietsp.css">
         <style>
@@ -43,51 +44,64 @@
             #chatMessages::-webkit-scrollbar-thumb { background:#ccc; border-radius:4px; }
         </style>
     </head>
+    
     <body>
-
-        <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>
-
         <nav class="top-menu">
-            <div class="nav-links">
-                <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
-                <div class="dropdown">
-                <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
-                <div class="dropdown-content">
-                    <% 
-                        // Lấy lại list categories đã được gửi từ Servlet
-                        java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
-                        if(navCats != null) {
-                            for(String cat : navCats) {
-                    %>
-                        <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
-                    <% 
-                            }
-                        } 
-                    %>
-                </div>
-            </div>
-                <a href="khuyen_mai.jsp">Khuyến Mãi</a> 
-                <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
-
-            </div>
-
-            <div class="auth-buttons">
-                <a href="cart.jsp" class="cart-btn">
-                    <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
-                    <span class="cart-count" id="cartCount">
-                        <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0%>
-                    </span>
+            <div class="left-nav">
+                <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
+                    <i class="fa-solid fa-leaf"></i> Trang Chủ
                 </a>
+                <div class="dropdown">
+                    <a class="dropbtn">Sản phẩm <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-content">
+                        <% 
+                            java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                            if(navCats != null) {
+                                for(String cat : navCats) {
+                        %>
+                            <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                        <% 
+                                }
+                            } 
+                        %>
+                    </div>
+                </div>
+                <a href="khuyen_mai.jsp">Khuyến mãi</a>
+                <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
+            </div>
 
-                <% if (user != null) {%>
-                <span class="material-symbols-rounded">account_circle</span>
-                
-                <a href="login?action=logout">Đăng xuất</a>
-                <% } else { %>
-                <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
-                <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
-                <% } %>
+            <div class="right-nav">
+                <div class="search-container">
+                    <input type="text" placeholder="Tìm kiếm...">
+                    <button><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
 
+                <div class="auth-group">
+                    <a href="cart.jsp" class="icon-btn">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
+                    </a>
+
+                     <% if (user != null) { %>
+                        <%-- Kiểm tra vai trò --%>
+                        <% if ("admin".equals(session.getAttribute("role"))) { %>
+                            <a href="${pageContext.request.contextPath}/AdminDashboardServlet" class="admin-link">
+                                <i class="fa-solid fa-user-tie"></i> Quản trị
+                            </a>
+                        <% } else { %>
+                            <%-- Chỉ hiện icon account cho User, không dẫn link đi đâu cả --%>
+                            <div class="icon-btn" style="cursor: default;">
+                                <i class="fa-solid fa-circle-user"></i>
+                            </div>
+                        <% } %>
+
+                        <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
+
+                    <% } else { %>
+                        <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
+                        <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
+                    <% } %>
+                </div>
             </div>
         </nav>
 
@@ -323,9 +337,9 @@
                      alt="<%= p.getProduct_name()%>"
                      onerror="this.src='https://placehold.co/600x400/f0f3ea/6b7c4a?text=<%= java.net.URLEncoder.encode(p.getProduct_name(), "UTF-8")%>'">
                 <div class="detail-badge-row">
-                    <span class="badge badge-green"><i class="fa-solid fa-shield-halved"></i> Bảo hành 12 tháng</span>
-                    <span class="badge badge-blue"><i class="fa-solid fa-truck"></i> Miễn phí vận chuyển</span>
-                    <span class="badge badge-olive"><i class="fa-solid fa-rotate-left"></i> Đổi trả 7 ngày</span>
+                    <span class="detail-badge badge-green"><i class="fa-solid fa-shield-halved"></i> Bảo hành 12 tháng</span>
+                    <span class="detail-badge badge-blue"><i class="fa-solid fa-truck"></i> Miễn phí vận chuyển</span>
+                    <span class="detail-badge badge-olive"><i class="fa-solid fa-rotate-left"></i> Đổi trả 7 ngày</span>
                 </div>
             </div>
 
@@ -430,6 +444,30 @@
             <span id="toast-msg">Đã thêm vào giỏ hàng!</span>
         </div>
 
+       <!-- CHATBOT -->
+        <button onclick="toggleChat()" class="chat-toggle"><i class="fa-solid fa-comments"></i></button>
+            <div id="chatSidebar" class="chat-sidebar">
+                <div class="chat-header">Trợ lý DECOR LUXURY 
+                    <span onclick="toggleChat()">➖</span>
+                    <span onclick="toggleChat()">✕</span>
+                </div>
+
+                <div id="chatMessages" class="chat-messages">
+                    <p><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất. Bạn cần tư vấn gì không?</p>
+                </div>
+                <div id="typingIndicator" class="typing-indicator">Đang soạn tin...</div>
+                <div id="quickReplies" class="quick-replies">
+                    <button onclick="quickSend('Sofa phòng khách')">🛋️ Sofa</button>
+                    <button onclick="quickSend('Giường ngủ')">🛏️ Giường</button>
+                    <button onclick="quickSend('Bàn làm việc')">🖥️ Bàn</button>
+                    <button onclick="quickSend('Sản phẩm rẻ nhất')">💰 Giá rẻ</button>
+                </div>
+                <div class="chat-input">
+                    <input id="chatInput" type="text" placeholder="Nhập câu hỏi..." onkeypress="if(event.key==='Enter') sendMsg()">
+                    <button id="sendBtn" onclick="sendMsg()">Gửi</button>
+                </div>
+            </div>
+        
         <script>
             function changeQty(delta) {
                 const input = document.getElementById('qty');
@@ -441,21 +479,25 @@
                 input.value = val;
             }
 
-            function addToCart(id, name, price) {
-                const qty = parseInt(document.getElementById('qty').value);
-                // Gọi servlet AddToCart
-                fetch('${pageContext.request.contextPath}/AddToCart?productId=' + id + '&qty=' + qty, {method: 'POST'})
-                        .then(res => res.json())
-                        .then(data => {
-                            document.getElementById('cartCount').textContent = data.cartCount;
-                            showToast('Đã thêm ' + qty + ' sản phẩm vào giỏ hàng!');
-                        })
-                        .catch(() => {
-                            // Fallback: cập nhật UI tạm thời
-                            const cur = parseInt(document.getElementById('cartCount').textContent) || 0;
-                            document.getElementById('cartCount').textContent = cur + qty;
-                            showToast('Đã thêm ' + qty + ' × ' + name + ' vào giỏ!');
-                        });
+            function addToCart(productId, productName) {
+                fetch('<%=request.getContextPath()%>/AddToCart?productId=' + productId + '&qty=1', {
+                    method: 'GET'
+                })
+                .then(res => {
+                    if (res.ok) {
+                        // Cập nhật badge giỏ hàng
+                        const badge = document.querySelector('.badge');
+                        if (badge) {
+                            badge.textContent = parseInt(badge.textContent || 0) + 1;
+                        }
+                        showToast('Đã thêm "' + productName + '" vào giỏ hàng!', false);
+                    } else {
+                        showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
+                    }
+                })
+                .catch(() => {
+                    showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
+                });
             }
 
             function buyNow(id) {
@@ -472,9 +514,20 @@
                 event.target.classList.add('active');
             }
 
-            function showToast(msg) {
+            function showToast(msg, isError = false) {
                 const t = document.getElementById('toast');
+                const icon = t.querySelector('i');
+
                 document.getElementById('toast-msg').textContent = msg;
+
+                if (isError) {
+                    t.style.background = '#c0392b';
+                    icon.className = 'fa-solid fa-circle-xmark';
+                } else {
+                    t.style.background = '#4e5c34';
+                    icon.className = 'fa-solid fa-circle-check';
+                }
+
                 t.classList.add('show');
                 setTimeout(() => t.classList.remove('show'), 2800);
             }
@@ -498,200 +551,170 @@
                 closeModal(closeId);
                 document.getElementById(openId).style.display = "flex";
             }
-             function toggleChat() {
-        const chat = document.getElementById("chatSidebar");
-        const isOpen = chat.style.opacity === '1';
-        if (isOpen) {
-            chat.style.opacity = '0';
-            chat.style.transform = 'translateY(30px) scale(.95)';
-            chat.style.pointerEvents = 'none';
-             localStorage.removeItem("chatHistory");
-
-    
-    document.getElementById("chatMessages").innerHTML = `
-         <p style="
+            
+            
+        function toggleChat() {
+            const chat = document.getElementById("chatSidebar");
+            const isOpen = chat.style.opacity === '1';
+            if (isOpen) {
+                chat.style.opacity = '0';
+                chat.style.transform = 'translateY(30px) scale(.95)';
+                chat.style.pointerEvents = 'none';
+           
+            localStorage.removeItem("chatHistory");
+            document.getElementById("chatMessages").innerHTML = `
+            <p style="
                    background: #e8eddf; color: #2c2c2c;
                    padding: 10px 14px; border-radius: 12px 12px 12px 4px;
                    margin: 0; line-height: 1.5;
                    "><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất DECOR LUXURY. Bạn cần tư vấn gì không?</p>
     `;
-        } else {
-            chat.style.opacity = '1';
-            chat.style.transform = 'translateY(0) scale(1)';
-            chat.style.pointerEvents = 'all';
-            document.getElementById("chatInput").focus();
-            document.getElementById("quickReplies").style.display = 'flex';
-            // Ẩn quick replies sau khi đã chat
-            if (document.getElementById("chatMessages").children.length > 3) {
-                document.getElementById("quickReplies").style.display = 'none';
+            } else {
+                chat.style.opacity = '1';
+                chat.style.transform = 'translateY(0) scale(1)';
+                chat.style.pointerEvents = 'all';
+                document.getElementById("chatInput").focus();
+                 document.getElementById("quickReplies").style.display = 'flex';
             }
         }
-    }
-     let isSending = false;
-    
-    function minimize(){
-        const chat = document.getElementById("chatSidebar");
-        const isOpen = chat.style.opacity === '1';
-        if (isOpen) {
-            chat.style.opacity = '0';
-            chat.style.transform = 'translateY(30px) scale(.95)';
-            chat.style.pointerEvents = 'none';
-        }else{
-           chat.style.opacity = '1';
-            chat.style.transform = 'translateY(0) scale(1)';
-            chat.style.pointerEvents = 'all';
-            document.getElementById("chatInput").focus(); 
-            if (document.getElementById("chatMessages").children.length > 3) {
-                document.getElementById("quickReplies").style.display = 'none';
-            }
-        }
-    }
         
+        function minimize(){
+            const chat = document.getElementById("chatSidebar");
+            const isOpen = chat.style.opacity === '1';
+            if (isOpen) {
+               chat.style.opacity = '0';
+               chat.style.transform = 'translateY(30px) scale(.95)';
+               chat.style.pointerEvents = 'none';
+           } else {
+               chat.style.opacity = '1';
+               chat.style.transform = 'translateY(0) scale(1)';
+               chat.style.pointerEvents = 'all';
+               document.getElementById("chatInput").focus();
+               // Ẩn quick replies sau khi đã chat
+               if (document.getElementById("chatMessages").children.length > 3) {
+                   document.getElementById("quickReplies").style.display = 'none';
+               }
+           }
+        }
+        let isSending = false;
 
-   
-
-    // ── Gửi tin nhắn quick reply ──
-    function quickSend(text) {
-        document.getElementById("chatInput").value = text;
-        document.getElementById("quickReplies").style.display = 'none';
-        sendMsg();
-    }
-
-    // ── Gửi tin nhắn ──
-    function sendMsg() {
-        const input  = document.getElementById("chatInput");
-        const btn    = document.getElementById("sendBtn");
-        const msg    = input.value.trim();
-
-        if (!msg || isSending) return;
-
-        // Hiện tin nhắn user
-        addMessage("user", msg);
-        input.value = "";
-
-        // Kiểm tra local reply trước (không cần gọi server)
-        const local = localReply(msg);
-        if (local) {
-            addMessage("bot", local);
-            return;
+        // ── Gửi tin nhắn quick reply ──
+        function quickSend(text) {
+            document.getElementById("chatInput").value = text;
+            document.getElementById("quickReplies").style.display = 'flex';
+            sendMsg();
         }
 
-        // Gọi server
-        isSending = true;
-        btn.disabled = true;
-        btn.style.opacity = '.5';
-        showTyping(true);
+        // ── Gửi tin nhắn ──
+        function sendMsg() {
+            const input  = document.getElementById("chatInput");
+            const btn    = document.getElementById("sendBtn");
+            const msg    = input.value.trim();
 
-        fetch("<%=request.getContextPath()%>/ChatBot", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
-            body: "message=" + encodeURIComponent(msg)
-        })
-        .then(res => {
-            if (!res.ok) {
-                showTyping(false);
-                addMessage("bot", "Lỗi server: " + res.status);
+            if (!msg || isSending) return;
+
+            // Hiện tin nhắn user
+            addMessage("user", msg);
+            input.value = "";
+
+            // Kiểm tra local reply trước (không cần gọi server)
+            const local = localReply(msg);
+            if (local) {
+                addMessage("bot", local);
                 return;
             }
-            return res.text();
-        })
-        .then(data => {
-            showTyping(false);
-            if (!data || data.trim() === "") {
-                addMessage("bot", "Xin lỗi, mình chưa tìm được thông tin phù hợp.");
-            } else {
-                addMessage("bot", data);
-            }
-        })
-        .catch(() => {
-            showTyping(false);
-            addMessage("bot", "🌐 Lỗi kết nối Server, vui lòng thử lại!");
-        })
-        .finally(() => {
-            setTimeout(() => {
-                isSending = false;
-                btn.disabled = false;
-                btn.style.opacity = '1';
-            }, 1500);
-        });
-    }
 
-    // ── Hiện/ẩn typing indicator ──
-    function showTyping(show) {
-        const el = document.getElementById("typingIndicator");
-        el.style.display = show ? 'flex' : 'none';
-        if (show) {
+            // Gọi server
+            isSending = true;
+            btn.disabled = true;
+            btn.style.opacity = '.5';
+            showTyping(true);
+
+            fetch("<%=request.getContextPath()%>/ChatServlet", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+                body: "message=" + encodeURIComponent(msg)
+            })
+            .then(res => {
+                if (!res.ok) {
+                    showTyping(false);
+                    addMessage("bot", "Lỗi server: " + res.status);
+                    return;
+                }
+                return res.text();
+            })
+            .then(data => {
+                showTyping(false);
+                if (!data || data.trim() === "") {
+                    addMessage("bot", "Xin lỗi, mình chưa tìm được thông tin phù hợp.");
+                } else {
+                    addMessage("bot", data);
+                }
+            })
+            .catch(() => {
+                showTyping(false);
+                addMessage("bot", "🌐 Lỗi kết nối Server, vui lòng thử lại!");
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    isSending = false;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }, 1500);
+            });
+        }
+
+            // ── Hiện/ẩn typing indicator ──
+            function showTyping(show) {
+                const el = document.getElementById("typingIndicator");
+                el.style.display = show ? 'flex' : 'none';
+                if (show) {
+                    const box = document.getElementById("chatMessages");
+                    box.scrollTop = box.scrollHeight;
+                }
+            }
+
+            // ── Thêm tin nhắn vào khung chat ──
+            function addMessage(sender, text) {
+            if (!text) return;
             const box = document.getElementById("chatMessages");
+            const isUser = sender === "user";
+            const div = document.createElement("div");
+            div.style.cssText = `
+                background: ${isUser ? 'linear-gradient(135deg,#4e5c34,#6b7c4a)' : '#fff'};
+                color: ${isUser ? 'white' : '#2c2c2c'};
+                padding: 10px 14px;
+                border-radius: ${isUser ? '12px 12px 4px 12px' : '12px 12px 12px 4px'};
+                align-self: ${isUser ? 'flex-end' : 'flex-start'};
+                max-width: 85%; line-height: 1.6; font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,.08);
+                word-break: break-word;
+            `;
+            // Chuyển markdown link [text](url) -> HTML <a href="url">text</a>
+            let formatted = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:#4e5c34;text-decoration:underline;">$1</a>');
+            // Chuyển **bold** -> <b>
+            formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+            // Chuyển xuống dòng
+            formatted = formatted.replace(/\n/g, '<br>');
+            div.innerHTML = formatted;
+            box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }
-    }
 
-    // ── Thêm tin nhắn vào khung chat ──
-    function addMessage(sender, text) {
-    if (!text) return;
-    const box = document.getElementById("chatMessages");
-    const isUser = sender === "user";
-    const div = document.createElement("div");
-    div.style.cssText = `
-        background: ${isUser ? 'linear-gradient(135deg,#4e5c34,#6b7c4a)' : '#fff'};
-        color: ${isUser ? 'white' : '#2c2c2c'};
-        padding: 10px 14px;
-        border-radius: ${isUser ? '12px 12px 4px 12px' : '12px 12px 12px 4px'};
-        align-self: ${isUser ? 'flex-end' : 'flex-start'};
-        max-width: 85%; line-height: 1.6; font-size: 14px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.08);
-        word-break: break-word;
-    `;
-    // Chuyển markdown link [text](url) -> HTML <a href="url">text</a>
-    let formatted = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:#4e5c34;text-decoration:underline;">$1</a>');
-    // Chuyển **bold** -> <b>
-    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-    // Chuyển xuống dòng
-    formatted = formatted.replace(/\n/g, '<br>');
-    div.innerHTML = formatted;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-}
+            // ── Local reply (không cần gọi API) ──
+            function localReply(msg) {
+                msg = msg.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+                if (/xin chao|hello|hi\b|chao/.test(msg)) {
+                    return "Xin chào! 👋 Bạn cần tư vấn sản phẩm gì ạ?";
+                }
+                if (/cam on|thanks|thank/.test(msg)) {
+                    return "Không có gì! Bạn cần thêm thông tin gì cứ hỏi nhé 😊";
+                }
+                return null;
+            }
 
-    // ── Local reply (không cần gọi API) ──
-    function localReply(msg) {
-        msg = msg.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-        if (/xin chao|hello|hi\b|chao/.test(msg)) {
-            return "Xin chào! 👋 Bạn cần tư vấn sản phẩm gì ạ?";
-        }
-        if (/cam on|thanks|thank/.test(msg)) {
-            return "Không có gì! Bạn cần thêm thông tin gì cứ hỏi nhé 😊";
-        }
-        return null;
-    }
-    (function makeDraggable() {
-    const chat = document.getElementById("chatSidebar");
-    const header = chat.firstElementChild; // header
 
-    let isDragging = false;
-    let offsetX = 0, offsetY = 0;
-
-    header.style.cursor = "move";
-
-    header.addEventListener("mousedown", function (e) {
-        isDragging = true;
-        offsetX = e.clientX - chat.offsetLeft;
-        offsetY = e.clientY - chat.offsetTop;
-    });
-
-    document.addEventListener("mousemove", function (e) {
-        if (!isDragging) return;
-
-        chat.style.left = (e.clientX - offsetX) + "px";
-        chat.style.top  = (e.clientY - offsetY) + "px";
-
-        chat.style.bottom = "auto"; // bỏ fixed bottom
-    });
-
-    document.addEventListener("mouseup", function () {
-        isDragging = false;
-    });
-})();
         </script>
+    
     </body>
 </html>

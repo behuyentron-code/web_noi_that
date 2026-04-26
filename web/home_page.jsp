@@ -394,6 +394,25 @@
         }
     let isSending = false;
 
+    function minimize(){
+         const chat = document.getElementById("chatSidebar");
+        const isOpen = chat.style.opacity === '1';
+        if (isOpen) {
+            chat.style.opacity = '0';
+            chat.style.transform = 'translateY(30px) scale(.95)';
+            chat.style.pointerEvents = 'none';
+        } else {
+            chat.style.opacity = '1';
+            chat.style.transform = 'translateY(0) scale(1)';
+            chat.style.pointerEvents = 'all';
+            document.getElementById("chatInput").focus();
+            // Ẩn quick replies sau khi đã chat
+            if (document.getElementById("chatMessages").children.length > 3) {
+                document.getElementById("quickReplies").style.display = 'none';
+            }
+        }
+    }
+
     // ── Gửi tin nhắn quick reply ──
     function quickSend(text) {
         document.getElementById("chatInput").value = text;

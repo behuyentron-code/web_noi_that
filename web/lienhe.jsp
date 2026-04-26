@@ -15,6 +15,24 @@
         
         <link rel="stylesheet" href="css\lienhe.css">
         <link rel="stylesheet" href="css\style.css">
+
+        <style>
+                .quick-btn {
+                    background: #f0f4e8; border: 1.5px solid #c8d5a8;
+                    color: #4e5c34; border-radius: 20px;
+                    padding: 4px 10px; font-size: 12px; cursor: pointer;
+                    transition: background .2s;
+                }
+                .quick-btn:hover { background: #dce8c0; }
+                
+                @keyframes bounce {
+                    0%,80%, 100% { transform: scale(0.6); opacity:.5; }
+                    40%            { transform: scale(1.0); opacity:1; }
+                }
+                
+                #chatMessages::-webkit-scrollbar { width: 4px; }
+                #chatMessages::-webkit-scrollbar-thumb { background:#ccc; border-radius:4px; }
+        </style>
     </head>
     
      <!-- ================= MODAL LOGIN ================= -->

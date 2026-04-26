@@ -26,6 +26,23 @@
         
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/chitietsp.css">
+        <style>
+            .quick-btn {
+                background: #f0f4e8; border: 1.5px solid #c8d5a8;
+                color: #4e5c34; border-radius: 20px;
+                padding: 4px 10px; font-size: 12px; cursor: pointer;
+                transition: background .2s;
+            }
+            .quick-btn:hover { background: #dce8c0; }
+            
+            @keyframes bounce {
+                0%,80%, 100% { transform: scale(0.6); opacity:.5; }
+                40%            { transform: scale(1.0); opacity:1; }
+            }
+            
+            #chatMessages::-webkit-scrollbar { width: 4px; }
+            #chatMessages::-webkit-scrollbar-thumb { background:#ccc; border-radius:4px; }
+        </style>
     </head>
     
     <body>
@@ -88,6 +105,113 @@
             </div>
         </nav>
 
+         <button onclick="toggleChat()" style="
+                position: fixed; bottom: 28px; left: 28px; z-index: 9998;
+                width: 56px; height: 56px; border-radius: 50%;
+                background: #4e5c34; color: white; border: none;
+                font-size: 22px; cursor: pointer;
+                box-shadow: 0 6px 20px rgba(78,92,52,.4);
+                display: flex; align-items: center; justify-content: center;
+                transition: background .2s, transform .2s;
+                " onmouseover="this.style.background = '#6b7c4a';this.style.transform = 'scale(1.08)'"
+                onmouseout="this.style.background = '#4e5c34';this.style.transform = 'scale(1)'">
+            <i class="fa-solid fa-comments"></i>
+        </button>
+
+<!-- ===== CHATBOX SIDEBAR ===== -->
+        <div id="chatSidebar" style="
+             position: fixed; bottom: auto; left: 100px;top: 100px; z-index: 9997;
+             width: 340px; height: 480px;
+             background: #fff; border-radius: 16px;
+             box-shadow: 0 12px 40px rgba(0,0,0,.18);
+             display: flex; flex-direction: column;
+             overflow: hidden;
+             transform: translateY(30px) scale(.95);
+             opacity: 0; pointer-events: none;
+             transition: opacity .3s, transform .3s;
+             ">
+            <!-- Header -->
+            <div style="
+                 background: #4e5c34; color: white;
+                 padding: 14px 18px;
+                 font-family: 'Montserrat', sans-serif;
+                 font-size: 15px; font-weight: 700;
+                 display: flex; align-items: center; gap: 10px;
+                 ">
+                <i class="fa-solid fa-robot"></i>
+                Trợ lý DECOR LUXURY
+                <span onclick="minimize()" style="margin-left:auto; cursor:pointer; font-size:18px; opacity:.8;">➖</span>
+                <span onclick="toggleChat()" style="margin-left:auto; cursor:pointer; font-size:18px; opacity:.8;">✕</span>
+            </div>
+
+
+    
+
+
+    <!-- Messages -->
+            <div id="chatMessages" style="
+                 flex: 1; overflow-y: auto;
+                 padding: 14px; display: flex; flex-direction: column; gap: 8px;
+                 background: #f8f9fa;
+                 font-family: 'Montserrat', sans-serif; font-size: 13px;
+                 ">
+                <p style="
+                   background: #e8eddf; color: #2c2c2c;
+                   padding: 10px 14px; border-radius: 12px 12px 12px 4px;
+                   margin: 0; line-height: 1.5;
+                   "><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất DECOR LUXURY. Bạn cần tư vấn gì không?</p>
+            </div>
+
+             
+             <!-- Typing indicator (ẩn mặc định) -->
+    <div id="typingIndicator" style="
+        padding: 0 14px 6px; display:none; align-items:center; gap:6px;
+        font-size:12px; color:#888;">
+        <span style="
+            display:inline-flex; gap:3px; align-items:center;">
+            <span class="dot" style="width:6px;height:6px;border-radius:50%;background:#aaa;
+                animation:bounce .9s infinite ease-in-out;"></span>
+            <span class="dot" style="width:6px;height:6px;border-radius:50%;background:#aaa;
+                animation:bounce .9s .2s infinite ease-in-out;"></span>
+            <span class="dot" style="width:6px;height:6px;border-radius:50%;background:#aaa;
+                animation:bounce .9s .4s infinite ease-in-out;"></span>
+        </span>
+        <span>Đang soạn tin...</span>
+    </div>
+
+    <!-- Quick replies -->
+    <div id="quickReplies" style="padding:6px 14px; display:flex; gap:6px; flex-wrap:wrap;">
+        <button onclick="quickSend('Sofa phòng khách')" class="quick-btn">🛋️ Sofa</button>
+        <button onclick="quickSend('Giường ngủ')" class="quick-btn">🛏️ Giường</button>
+        <button onclick="quickSend('Bàn làm việc')" class="quick-btn">🖥️ Bàn làm việc</button>
+        <button onclick="quickSend('Sản phẩm rẻ nhất')" class="quick-btn">💰 Giá rẻ</button>
+    </div>
+
+            <!-- Input -->
+            <div style="
+                 display: flex; gap: 8px;
+                 padding: 12px; border-top: 1px solid #e2e8d8;
+                 background: #fff;
+                 ">
+                <input id="chatInput" type="text"
+                       placeholder="Nhập câu hỏi..."
+                       onkeydown="if (event.key === 'Enter')
+                                   sendMsg()"
+                       style="
+                       flex: 1; padding: 10px 14px;
+                       border: 1px solid #d6ddc8; border-radius: 10px;
+                       font-family: 'Montserrat', sans-serif; font-size: 13px;
+                       outline: none;
+                       ">
+                <button onclick="sendMsg()" id="sendBtn" style="
+                        padding: 10px 16px;
+                        background: #4e5c34; color: white; border: none;
+                        border-radius: 10px; cursor: pointer;
+                        font-family: 'Montserrat', sans-serif;
+                        font-size: 13px; font-weight: 700;
+                        ">Gửi</button>
+            </div>
+        </div>
 
 
         <!-- ================= MODAL LOGIN ================= -->

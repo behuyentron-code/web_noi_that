@@ -27,11 +27,8 @@
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/chitietsp.css">
     </head>
+    
     <body>
-
-        <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>
-
-        
         <nav class="top-menu">
             <div class="left-nav">
                 <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
@@ -323,6 +320,30 @@
             <span id="toast-msg">Đã thêm vào giỏ hàng!</span>
         </div>
 
+       <!-- CHATBOT -->
+        <button onclick="toggleChat()" class="chat-toggle"><i class="fa-solid fa-comments"></i></button>
+            <div id="chatSidebar" class="chat-sidebar">
+                <div class="chat-header">Trợ lý DECOR LUXURY 
+                    <span onclick="toggleChat()">➖</span>
+                    <span onclick="toggleChat()">✕</span>
+                </div>
+
+                <div id="chatMessages" class="chat-messages">
+                    <p><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất. Bạn cần tư vấn gì không?</p>
+                </div>
+                <div id="typingIndicator" class="typing-indicator">Đang soạn tin...</div>
+                <div id="quickReplies" class="quick-replies">
+                    <button onclick="quickSend('Sofa phòng khách')">🛋️ Sofa</button>
+                    <button onclick="quickSend('Giường ngủ')">🛏️ Giường</button>
+                    <button onclick="quickSend('Bàn làm việc')">🖥️ Bàn</button>
+                    <button onclick="quickSend('Sản phẩm rẻ nhất')">💰 Giá rẻ</button>
+                </div>
+                <div class="chat-input">
+                    <input id="chatInput" type="text" placeholder="Nhập câu hỏi..." onkeypress="if(event.key==='Enter') sendMsg()">
+                    <button id="sendBtn" onclick="sendMsg()">Gửi</button>
+                </div>
+            </div>
+        
         <script>
             function changeQty(delta) {
                 const input = document.getElementById('qty');
@@ -406,6 +427,170 @@
                 closeModal(closeId);
                 document.getElementById(openId).style.display = "flex";
             }
+            
+            
+        function toggleChat() {
+            const chat = document.getElementById("chatSidebar");
+            const isOpen = chat.style.opacity === '1';
+            if (isOpen) {
+                chat.style.opacity = '0';
+                chat.style.transform = 'translateY(30px) scale(.95)';
+                chat.style.pointerEvents = 'none';
+           
+            localStorage.removeItem("chatHistory");
+            document.getElementById("chatMessages").innerHTML = `
+            <p style="
+                   background: #e8eddf; color: #2c2c2c;
+                   padding: 10px 14px; border-radius: 12px 12px 12px 4px;
+                   margin: 0; line-height: 1.5;
+                   "><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất DECOR LUXURY. Bạn cần tư vấn gì không?</p>
+    `;
+            } else {
+                chat.style.opacity = '1';
+                chat.style.transform = 'translateY(0) scale(1)';
+                chat.style.pointerEvents = 'all';
+                document.getElementById("chatInput").focus();
+                 document.getElementById("quickReplies").style.display = 'flex';
+            }
+        }
+        
+        function minimize(){
+            const chat = document.getElementById("chatSidebar");
+            const isOpen = chat.style.opacity === '1';
+            if (isOpen) {
+               chat.style.opacity = '0';
+               chat.style.transform = 'translateY(30px) scale(.95)';
+               chat.style.pointerEvents = 'none';
+           } else {
+               chat.style.opacity = '1';
+               chat.style.transform = 'translateY(0) scale(1)';
+               chat.style.pointerEvents = 'all';
+               document.getElementById("chatInput").focus();
+               // Ẩn quick replies sau khi đã chat
+               if (document.getElementById("chatMessages").children.length > 3) {
+                   document.getElementById("quickReplies").style.display = 'none';
+               }
+           }
+        }
+        let isSending = false;
+
+        // ── Gửi tin nhắn quick reply ──
+        function quickSend(text) {
+            document.getElementById("chatInput").value = text;
+            document.getElementById("quickReplies").style.display = 'flex';
+            sendMsg();
+        }
+
+        // ── Gửi tin nhắn ──
+        function sendMsg() {
+            const input  = document.getElementById("chatInput");
+            const btn    = document.getElementById("sendBtn");
+            const msg    = input.value.trim();
+
+            if (!msg || isSending) return;
+
+            // Hiện tin nhắn user
+            addMessage("user", msg);
+            input.value = "";
+
+            // Kiểm tra local reply trước (không cần gọi server)
+            const local = localReply(msg);
+            if (local) {
+                addMessage("bot", local);
+                return;
+            }
+
+            // Gọi server
+            isSending = true;
+            btn.disabled = true;
+            btn.style.opacity = '.5';
+            showTyping(true);
+
+            fetch("<%=request.getContextPath()%>/ChatServlet", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+                body: "message=" + encodeURIComponent(msg)
+            })
+            .then(res => {
+                if (!res.ok) {
+                    showTyping(false);
+                    addMessage("bot", "Lỗi server: " + res.status);
+                    return;
+                }
+                return res.text();
+            })
+            .then(data => {
+                showTyping(false);
+                if (!data || data.trim() === "") {
+                    addMessage("bot", "Xin lỗi, mình chưa tìm được thông tin phù hợp.");
+                } else {
+                    addMessage("bot", data);
+                }
+            })
+            .catch(() => {
+                showTyping(false);
+                addMessage("bot", "🌐 Lỗi kết nối Server, vui lòng thử lại!");
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    isSending = false;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }, 1500);
+            });
+        }
+
+            // ── Hiện/ẩn typing indicator ──
+            function showTyping(show) {
+                const el = document.getElementById("typingIndicator");
+                el.style.display = show ? 'flex' : 'none';
+                if (show) {
+                    const box = document.getElementById("chatMessages");
+                    box.scrollTop = box.scrollHeight;
+                }
+            }
+
+            // ── Thêm tin nhắn vào khung chat ──
+            function addMessage(sender, text) {
+            if (!text) return;
+            const box = document.getElementById("chatMessages");
+            const isUser = sender === "user";
+            const div = document.createElement("div");
+            div.style.cssText = `
+                background: ${isUser ? 'linear-gradient(135deg,#4e5c34,#6b7c4a)' : '#fff'};
+                color: ${isUser ? 'white' : '#2c2c2c'};
+                padding: 10px 14px;
+                border-radius: ${isUser ? '12px 12px 4px 12px' : '12px 12px 12px 4px'};
+                align-self: ${isUser ? 'flex-end' : 'flex-start'};
+                max-width: 85%; line-height: 1.6; font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,.08);
+                word-break: break-word;
+            `;
+            // Chuyển markdown link [text](url) -> HTML <a href="url">text</a>
+            let formatted = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:#4e5c34;text-decoration:underline;">$1</a>');
+            // Chuyển **bold** -> <b>
+            formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+            // Chuyển xuống dòng
+            formatted = formatted.replace(/\n/g, '<br>');
+            div.innerHTML = formatted;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+            // ── Local reply (không cần gọi API) ──
+            function localReply(msg) {
+                msg = msg.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+                if (/xin chao|hello|hi\b|chao/.test(msg)) {
+                    return "Xin chào! 👋 Bạn cần tư vấn sản phẩm gì ạ?";
+                }
+                if (/cam on|thanks|thank/.test(msg)) {
+                    return "Không có gì! Bạn cần thêm thông tin gì cứ hỏi nhé 😊";
+                }
+                return null;
+            }
+
+
         </script>
+    
     </body>
 </html>

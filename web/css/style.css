@@ -64,7 +64,8 @@ p, a, span, strong, button, li, ul {
 }
 
 .left-nav a:hover, .dropdown:hover .dropbtn {
-    color: #4e5c34;
+/*    color: #4e5c34;*/
+    font-weight: 900;
     transform: translateY(-1px);
 }
 
@@ -212,14 +213,6 @@ p, a, span, strong, button, li, ul {
     display: block;
 }
 
-.top-menu a:hover {
-    background-color: #f0f3ea;
-    color: #4e5c34;
-}
-
-.top-menu a:last-child {
-    border-right: none;
-}
 
 .auth-buttons {
     display: flex;
@@ -953,7 +946,6 @@ p, a, span, strong, button, li, ul {
     opacity: 1;
     transform: translateY(0);
 }
-
 /*==========Chat Box==========*/
 .chat-toggle {
     position: fixed;
@@ -964,7 +956,7 @@ p, a, span, strong, button, li, ul {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    font-size: 22px;
+    font-size: 18px;
     border: none;
     display: flex;
     align-items: center;
@@ -973,8 +965,10 @@ p, a, span, strong, button, li, ul {
     box-shadow: 0 4px 18px rgba(78,92,52,.38);
     transition: background .2s, transform .2s;
     z-index: 999;
+    
+    cursor: move; /* cho biết có thể kéo */
+    user-select: none;
 }
-
 .chat-toggle:hover {
     background: #3a4526;
     transform: scale(1.07);
@@ -989,15 +983,20 @@ p, a, span, strong, button, li, ul {
     background: white;
     border: 1px solid #d6ddc8;
     border-radius: 20px;
-    display: none;
+    display: flex;              /* Luôn là flex, không dùng display:none */
     flex-direction: column;
     overflow: hidden;
     box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    z-index: 998;
-}
+    z-index: 1010;
+     
+    /* Thêm để kéo thả */
+    cursor: default;
 
-.chat-sidebar.open {
-    display: flex;
+    /* Ẩn bằng opacity + pointer-events */
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(30px) scale(.95);
+    transition: opacity 0.3s, transform 0.3s;
 }
 
 .chat-header {
@@ -1010,6 +1009,14 @@ p, a, span, strong, button, li, ul {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    
+    /* Header dùng làm "tay cầm" kéo */
+    cursor: grab;
+    user-select: none;
+}
+
+.chat-header:active {
+    cursor: grabbing;
 }
 
 .chat-messages {
@@ -1018,15 +1025,12 @@ p, a, span, strong, button, li, ul {
     flex-direction: column;
     gap: 16px;
     padding: 16px;
-    
-    overflow-y: auto;
     overflow-y: auto;
     font-family: "Montserrat", sans-serif;
     font-size: 13px;
     color: #444;
     line-height: 1.6;
 }
-
 .typing-indicator {
     padding: 6px 14px;
     font-family: "Montserrat", sans-serif;
@@ -1035,7 +1039,6 @@ p, a, span, strong, button, li, ul {
     display: none;
     font-style: italic;
 }
-
 .quick-replies {
     display: flex;
     gap: 6px;
@@ -1043,7 +1046,6 @@ p, a, span, strong, button, li, ul {
     padding: 8px 14px;
     border-top: 1px solid #f0f3ea;
 }
-
 .quick-replies button {
     padding: 5px 12px;
     border-radius: 20px;
@@ -1056,17 +1058,14 @@ p, a, span, strong, button, li, ul {
     cursor: pointer;
     transition: .15s;
 }
-
 .quick-replies button:hover {
     background: #e8f0da;
     border-color: #4e5c34;
 }
-
 .chat-input {
     display: flex;
     border-top: 1px solid #e8eede;
 }
-
 .chat-input input {
     flex: 1;
     padding: 12px 16px;
@@ -1076,7 +1075,6 @@ p, a, span, strong, button, li, ul {
     outline: none;
     color: #2c2c2c;
 }
-
 .chat-input button {
     padding: 12px 24px;
     background: #4e5c34;
@@ -1089,7 +1087,6 @@ p, a, span, strong, button, li, ul {
     transition: background .15s;
     width: auto;
 }
-
 .chat-input button:hover {
     background: #3a4526;
 }

@@ -76,7 +76,7 @@
 </head>
 <body>
 
-<header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>
+<!--<header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>-->
 
 <nav class="top-menu">
     <div class="left-nav">
@@ -234,7 +234,11 @@
 <!-- Chat & Toast -->
 <button onclick="toggleChat()" class="chat-toggle"><i class="fa-solid fa-comments"></i></button>
 <div id="chatSidebar" class="chat-sidebar">
-    <div class="chat-header">Trợ lý DECOR LUXURY <span onclick="toggleChat()">✕</span></div>
+    <div class="chat-header">Trợ lý DECOR LUXURY 
+        <span onclick="toggleChat()">➖</span>
+        <span onclick="toggleChat()">✕</span>
+    </div>
+    
     <div id="chatMessages" class="chat-messages">
         <p><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất. Bạn cần tư vấn gì không?</p>
     </div>
@@ -292,94 +296,108 @@
 </div>
 
     <script>
-    function showToast(msg, isError = false) {
-        const t = document.getElementById('toast');
-        const icon = t.querySelector('i');
-
-        document.getElementById('toast-msg').textContent = msg;
-
-        if (isError) {
-            t.style.background = '#c0392b';
-            icon.className = 'fa-solid fa-circle-xmark';
-        } else {
-            t.style.background = '#4e5c34';
-            icon.className = 'fa-solid fa-circle-check';
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            const icon = t.querySelector('i');
+            document.getElementById('toast-msg').textContent = msg;
+            if (isError) {
+                t.style.background = '#c0392b';
+                icon.className = 'fa-solid fa-circle-xmark';
+            } else {
+                t.style.background = '#4e5c34';
+                icon.className = 'fa-solid fa-circle-check';
+            }
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
         }
 
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2800);
-    }
-
-            // ===== THÊM VÀO GIỎ =====
-    function addToCart(productId, productName) {
-        fetch('<%=request.getContextPath()%>/AddToCart?productId=' + productId + '&qty=1', {
-            method: 'GET'
-        })
-        .then(res => {
-            if (res.ok) {
-                // Cập nhật badge giỏ hàng
-                const badge = document.querySelector('.badge');
-                if (badge) {
-                    badge.textContent = parseInt(badge.textContent || 0) + 1;
+        function addToCart(productId, productName) {
+            fetch('<%=request.getContextPath()%>/AddToCart?productId=' + productId + '&qty=1', {
+                method: 'GET'
+            })
+            .then(res => {
+                if (res.ok) {
+                    const badge = document.querySelector('.badge');
+                    if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
+                    showToast('Đã thêm "' + productName + '" vào giỏ hàng!', false);
+                } else {
+                    showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
                 }
-                showToast('Đã thêm "' + productName + '" vào giỏ hàng!', false);
-            } else {
-                showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
-            }
-        })
-        .catch(() => {
-            showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
-        });
-    }
+            })
+            .catch(() => showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true));
+        }
 
-            // ===== QUẢN LÝ MODAL =====
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get("openModal") === "login")
-                openLogin();
-            if (urlParams.get("openModal") === "register")
-                openRegister();
+        // ===== MODAL =====
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("openModal") === "login") openLogin();
+        if (urlParams.get("openModal") === "register") openRegister();
 
-            function openLogin() {
-                document.getElementById("loginModal").style.display = "flex";
-            }
-            function openRegister() {
-                document.getElementById("registerModal").style.display = "flex";
-            }
-            function closeModal(id) {
-                document.getElementById(id).style.display = "none";
-            }
-            function switchModal(closeId, openId) {
-                closeModal(closeId);
-                document.getElementById(openId).style.display = "flex";
-            }
+        function openLogin() { 
+            document.getElementById("loginModal").style.display = "flex"; 
+        }
+        
+        function openRegister() { 
+            document.getElementById("registerModal").style.display = "flex"; 
+        }
+        
+        function closeModal(id) { 
+            document.getElementById(id).style.display = "none"; 
+        }
+        
+        function switchModal(closeId, openId) {
+            closeModal(closeId);
+            document.getElementById(openId).style.display = "flex";
+        }
 
-            // ===== CHATBOT =====
-             // ── Toggle mở/đóng chat ──
-    function toggleChat() {
-        const chat = document.getElementById("chatSidebar");
-        const isOpen = chat.style.opacity === '1';
-        if (isOpen) {
-            chat.style.opacity = '0';
-            chat.style.transform = 'translateY(30px) scale(.95)';
-            chat.style.pointerEvents = 'none';
+        function toggleChat() {
+            const chat = document.getElementById("chatSidebar");
+            const isOpen = chat.style.opacity === '1';
+            if (isOpen) {
+                chat.style.opacity = '0';
+                chat.style.transform = 'translateY(30px) scale(.95)';
+                chat.style.pointerEvents = 'none';
+           
+            localStorage.removeItem("chatHistory");
+            document.getElementById("chatMessages").innerHTML = `
+            <p style="
+                   background: #e8eddf; color: #2c2c2c;
+                   padding: 10px 14px; border-radius: 12px 12px 12px 4px;
+                   margin: 0; line-height: 1.5;
+                   "><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất DECOR LUXURY. Bạn cần tư vấn gì không?</p>
+    `;
         } else {
             chat.style.opacity = '1';
             chat.style.transform = 'translateY(0) scale(1)';
             chat.style.pointerEvents = 'all';
             document.getElementById("chatInput").focus();
-            // Ẩn quick replies sau khi đã chat
-            if (document.getElementById("chatMessages").children.length > 3) {
-                document.getElementById("quickReplies").style.display = 'none';
-            }
+             document.getElementById("quickReplies").style.display = 'flex';
         }
     }
-
+        
+        function minimize(){
+            const chat = document.getElementById("chatSidebar");
+            const isOpen = chat.style.opacity === '1';
+            if (isOpen) {
+               chat.style.opacity = '0';
+               chat.style.transform = 'translateY(30px) scale(.95)';
+               chat.style.pointerEvents = 'none';
+           } else {
+               chat.style.opacity = '1';
+               chat.style.transform = 'translateY(0) scale(1)';
+               chat.style.pointerEvents = 'all';
+               document.getElementById("chatInput").focus();
+               // Ẩn quick replies sau khi đã chat
+               if (document.getElementById("chatMessages").children.length > 3) {
+                   document.getElementById("quickReplies").style.display = 'none';
+               }
+           }
+        }
     let isSending = false;
 
     // ── Gửi tin nhắn quick reply ──
     function quickSend(text) {
         document.getElementById("chatInput").value = text;
-        document.getElementById("quickReplies").style.display = 'none';
+        document.getElementById("quickReplies").style.display = 'flex';
         sendMsg();
     }
 
@@ -490,6 +508,9 @@
         }
         return null;
     }
-        </script>
+    
+    
+    </script>
+    
     </body>
 </html>

@@ -17,7 +17,7 @@ public class dbConnect {
                 + "?useUnicode=true"
                 + "&characterEncoding=UTF-8"
                 + "&useSSL=false"
-                + "&serverTimezone=UTC"
+                + "&serverTimezone=Asia/Ho_Chi_Minh"
                 + "&useOldAliasMetadataBehavior=true"
                 + "&characterSetResults=UTF-8"
                 + "&connectionCollation=utf8mb4_general_ci";

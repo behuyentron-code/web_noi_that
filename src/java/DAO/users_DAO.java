@@ -21,19 +21,46 @@ import java.util.logging.Logger;
  * @author Admin
  */
 public class users_DAO {
+
+    // ======================== HELPER METHODS ========================
+    private boolean isFieldExist(String column, String value) {
+        String sql = "SELECT user_id FROM users WHERE " + column + " = ?";
+        try (Connection conn = new dbConnect().getConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, value);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception ex) {
+            Logger.getLogger(users_DAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+
+    private void appendUserSearchCondition(StringBuilder sql, List<Object> params, String keyword) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (username LIKE ? OR email LIKE ? OR phone LIKE ?)");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+    }
+
+    // ======================== PUBLIC METHODS ========================
     /**
      * Kiểm tra đăng nhập.
+     *
      * @return username nếu đúng, null nếu sai
      */
-    
     public String checkLogin(String username, String password) {
         String sql = "SELECT username FROM users WHERE username = ? AND password = ?";
         try (Connection conn = new dbConnect().getConnect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
- 
+
             ps.setString(1, username);
             ps.setString(2, password);   // nếu sau này dùng hash thì thay ở đây
- 
+
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getString("username");
@@ -45,41 +72,21 @@ public class users_DAO {
         }
         return null;
     }
- 
+
     /**
      * Kiểm tra username đã tồn tại chưa.
      */
     public boolean isUsernameExist(String username) {
-        String sql = "SELECT user_id FROM users WHERE username = ?";
-        try (Connection conn = new dbConnect().getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
- 
-            ps.setString(1, username);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (Exception ex) {
-            Logger.getLogger(users_DAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
+        return isFieldExist("username", username);
     }
- 
-       public boolean isEmailExist(String email) {
-        String sql = "SELECT user_id FROM users WHERE email = ?";
-        try (Connection conn = new dbConnect().getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
-        } catch (Exception ex) {
-            Logger.getLogger(users_DAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
+
+    public boolean isEmailExist(String email) {
+        return isFieldExist("email", email);
     }
-       
+
     /**
      * Đăng ký tài khoản mới.
+     *
      * @return true nếu thành công
      */
     public boolean register(String username, String email, String phone, String address, String password) {
@@ -97,7 +104,7 @@ public class users_DAO {
         }
         return false;
     }
-    
+
     public Map<String, Object> getUserById(int id) {
         Map<String, Object> user = new HashMap<>();
         String sql = "SELECT user_id, username, email, phone, role FROM users WHERE user_id = ?";
@@ -112,27 +119,29 @@ public class users_DAO {
                 user.put("phone", rs.getString("phone"));
                 user.put("role", rs.getString("role"));
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return user;
     }
-    
-      // Lấy user chỉ có role = 'user' (có phân trang, tìm kiếm)
+
+    // Lấy user chỉ có role = 'user' (có phân trang, tìm kiếm)
     public List<Map<String, Object>> getAllUsersOnly(String keyword, int page, int recordsPerPage) {
         List<Map<String, Object>> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT user_id, username, email, phone FROM users WHERE role = 'user'");
         List<Object> params = new ArrayList<>();
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (username LIKE ? OR email LIKE ? OR phone LIKE ?)");
-            String kw = "%" + keyword.trim() + "%";
-            params.add(kw); params.add(kw); params.add(kw);
-        }
+
+        appendUserSearchCondition(sql, params, keyword);
+
         sql.append(" ORDER BY user_id DESC LIMIT ? OFFSET ?");
         params.add(recordsPerPage);
         params.add((page - 1) * recordsPerPage);
 
         try (Connection conn = new dbConnect().getConnect();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) ps.setObject(i + 1, params.get(i));
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, Object> map = new HashMap<>();
@@ -142,7 +151,9 @@ public class users_DAO {
                 map.put("phone", rs.getString("phone"));
                 list.add(map);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
@@ -150,17 +161,21 @@ public class users_DAO {
         int count = 0;
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users WHERE role = 'user'");
         List<Object> params = new ArrayList<>();
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (username LIKE ? OR email LIKE ? OR phone LIKE ?)");
-            String kw = "%" + keyword.trim() + "%";
-            params.add(kw); params.add(kw); params.add(kw);
-        }
+
+        appendUserSearchCondition(sql, params, keyword);
+
         try (Connection conn = new dbConnect().getConnect();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) ps.setObject(i + 1, params.get(i));
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) count = rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return count;
     }
 
@@ -174,7 +189,9 @@ public class users_DAO {
             ps.setString(4, password);
             ps.setString(5, role);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateUser(int id, String username, String email, String phone, String password) {
@@ -187,7 +204,9 @@ public class users_DAO {
             ps.setString(4, password);
             ps.setInt(5, id);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void deleteUser(int id) {
@@ -196,34 +215,40 @@ public class users_DAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    
-    
+
     public String getRole(String username) {
         String role = "user";
-        
         String sql = "SELECT role FROM users WHERE username = ?";
         try (Connection conn = new dbConnect().getConnect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) role = rs.getString("role");
+                if (rs.next()) {
+                    role = rs.getString("role");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return role;
     }
-    
+
     public int getAllUsers() {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM users";
         try (Connection conn = new dbConnect().getConnect();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) count = rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return count;
     }
 }

@@ -62,7 +62,7 @@
     </style>
 </head>
 <body>
-    <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>
+<!--    <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>-->
     <nav class="top-menu">
             <div class="left-nav">
                 <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">

@@ -77,7 +77,20 @@ public class login extends HttpServlet {
             String address  = request.getParameter("address");
             String pass     = request.getParameter("password");
             String confirm  = request.getParameter("confirmPassword");
-
+            
+            //Kiểm tra email đã nhập đúng định dạng chưa
+            if (email == null || !email.contains("@") || !email.endsWith("@gmail.com") || email.indexOf("@") == 0 || email.indexOf("@") != email.lastIndexOf("@")) {
+                
+                HttpSession session = request.getSession();
+                session.setAttribute("registerError", "Email phải là Gmail hợp lệ!");
+                session.setAttribute("regUsername", username);
+                session.setAttribute("regEmail", email);
+                session.setAttribute("regPhone", phone);
+                session.setAttribute("regAddress", address);
+                response.sendRedirect("hienthi?openModal=register");
+                return;
+            }
+            
             // Kiểm tra mật khẩu nhập lại
             if (confirm == null || !confirm.equals(pass)) {
                 HttpSession session = request.getSession();

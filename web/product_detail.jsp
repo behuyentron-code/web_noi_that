@@ -21,8 +21,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title><%= p != null ? p.getProduct_name() : "Chi tiết sản phẩm"%> - Decor Luxury</title>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=account_circle" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/chitietsp.css">
     </head>
@@ -30,47 +31,63 @@
 
         <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>
 
+        
         <nav class="top-menu">
-            <div class="nav-links">
-                <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
-                <div class="dropdown">
-                <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
-                <div class="dropdown-content">
-                    <% 
-                        // Lấy lại list categories đã được gửi từ Servlet
-                        java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
-                        if(navCats != null) {
-                            for(String cat : navCats) {
-                    %>
-                        <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
-                    <% 
-                            }
-                        } 
-                    %>
-                </div>
-            </div>
-                <a href="khuyen_mai.jsp">Khuyến Mãi</a> 
-                <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
-
-            </div>
-
-            <div class="auth-buttons">
-                <a href="cart.jsp" class="cart-btn">
-                    <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
-                    <span class="cart-count" id="cartCount">
-                        <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0%>
-                    </span>
+            <div class="left-nav">
+                <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
+                    <i class="fa-solid fa-leaf"></i> Trang Chủ
                 </a>
+                <div class="dropdown">
+                    <a class="dropbtn">Sản phẩm <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-content">
+                        <% 
+                            java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                            if(navCats != null) {
+                                for(String cat : navCats) {
+                        %>
+                            <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                        <% 
+                                }
+                            } 
+                        %>
+                    </div>
+                </div>
+                <a href="khuyen_mai.jsp">Khuyến mãi</a>
+                <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
+            </div>
 
-                <% if (user != null) {%>
-                <span class="material-symbols-rounded">account_circle</span>
-                
-                <a href="login?action=logout">Đăng xuất</a>
-                <% } else { %>
-                <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
-                <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
-                <% } %>
+            <div class="right-nav">
+                <div class="search-container">
+                    <input type="text" placeholder="Tìm kiếm...">
+                    <button><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
 
+                <div class="auth-group">
+                    <a href="cart.jsp" class="icon-btn">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
+                    </a>
+
+                     <% if (user != null) { %>
+                        <%-- Kiểm tra vai trò --%>
+                        <% if ("admin".equals(session.getAttribute("role"))) { %>
+                            <a href="${pageContext.request.contextPath}/AdminDashboardServlet" class="admin-link">
+                                <i class="fa-solid fa-user-tie"></i> Quản trị
+                            </a>
+                        <% } else { %>
+                            <%-- Chỉ hiện icon account cho User, không dẫn link đi đâu cả --%>
+                            <div class="icon-btn" style="cursor: default;">
+                                <i class="fa-solid fa-circle-user"></i>
+                            </div>
+                        <% } %>
+
+                        <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
+
+                    <% } else { %>
+                        <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
+                        <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
+                    <% } %>
+                </div>
             </div>
         </nav>
 
@@ -199,9 +216,9 @@
                      alt="<%= p.getProduct_name()%>"
                      onerror="this.src='https://placehold.co/600x400/f0f3ea/6b7c4a?text=<%= java.net.URLEncoder.encode(p.getProduct_name(), "UTF-8")%>'">
                 <div class="detail-badge-row">
-                    <span class="badge badge-green"><i class="fa-solid fa-shield-halved"></i> Bảo hành 12 tháng</span>
-                    <span class="badge badge-blue"><i class="fa-solid fa-truck"></i> Miễn phí vận chuyển</span>
-                    <span class="badge badge-olive"><i class="fa-solid fa-rotate-left"></i> Đổi trả 7 ngày</span>
+                    <span class="detail-badge badge-green"><i class="fa-solid fa-shield-halved"></i> Bảo hành 12 tháng</span>
+                    <span class="detail-badge badge-blue"><i class="fa-solid fa-truck"></i> Miễn phí vận chuyển</span>
+                    <span class="detail-badge badge-olive"><i class="fa-solid fa-rotate-left"></i> Đổi trả 7 ngày</span>
                 </div>
             </div>
 
@@ -317,21 +334,25 @@
                 input.value = val;
             }
 
-            function addToCart(id, name, price) {
-                const qty = parseInt(document.getElementById('qty').value);
-                // Gọi servlet AddToCart
-                fetch('${pageContext.request.contextPath}/AddToCart?productId=' + id + '&qty=' + qty, {method: 'POST'})
-                        .then(res => res.json())
-                        .then(data => {
-                            document.getElementById('cartCount').textContent = data.cartCount;
-                            showToast('Đã thêm ' + qty + ' sản phẩm vào giỏ hàng!');
-                        })
-                        .catch(() => {
-                            // Fallback: cập nhật UI tạm thời
-                            const cur = parseInt(document.getElementById('cartCount').textContent) || 0;
-                            document.getElementById('cartCount').textContent = cur + qty;
-                            showToast('Đã thêm ' + qty + ' × ' + name + ' vào giỏ!');
-                        });
+            function addToCart(productId, productName) {
+                fetch('<%=request.getContextPath()%>/AddToCart?productId=' + productId + '&qty=1', {
+                    method: 'GET'
+                })
+                .then(res => {
+                    if (res.ok) {
+                        // Cập nhật badge giỏ hàng
+                        const badge = document.querySelector('.badge');
+                        if (badge) {
+                            badge.textContent = parseInt(badge.textContent || 0) + 1;
+                        }
+                        showToast('Đã thêm "' + productName + '" vào giỏ hàng!', false);
+                    } else {
+                        showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
+                    }
+                })
+                .catch(() => {
+                    showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
+                });
             }
 
             function buyNow(id) {
@@ -348,9 +369,20 @@
                 event.target.classList.add('active');
             }
 
-            function showToast(msg) {
+            function showToast(msg, isError = false) {
                 const t = document.getElementById('toast');
+                const icon = t.querySelector('i');
+
                 document.getElementById('toast-msg').textContent = msg;
+
+                if (isError) {
+                    t.style.background = '#c0392b';
+                    icon.className = 'fa-solid fa-circle-xmark';
+                } else {
+                    t.style.background = '#4e5c34';
+                    icon.className = 'fa-solid fa-circle-check';
+                }
+
                 t.classList.add('show');
                 setTimeout(() => t.classList.remove('show'), 2800);
             }

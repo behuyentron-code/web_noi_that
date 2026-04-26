@@ -55,7 +55,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giỏ hàng - Decor Luxury</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/giohang.css">
 
@@ -65,48 +67,50 @@
 <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>
 
         <nav class="top-menu">
-            <div class="nav-links">
-                <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
-                <div class="dropdown">
-                <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
-                <div class="dropdown-content">
-                    <% 
-                        // Lấy lại list categories đã được gửi từ Servlet
-                        java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
-                        if(navCats != null) {
-                            for(String cat : navCats) {
-                    %>
-                        <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
-                    <% 
-                            }
-                        } 
-                    %>
-                </div>
+    <div class="left-nav">
+        <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
+            <i class="fa-solid fa-leaf"></i> Trang Chủ
+        </a>
+        <div class="dropdown">
+            <a class="dropbtn">Sản phẩm <i class="fas fa-chevron-down"></i></a>
+            <div class="dropdown-content">
+                <% 
+                    java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                    if(navCats != null) {
+                        for(String cat : navCats) {
+                %>
+                    <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                <% 
+                        }
+                    } 
+                %>
             </div>
-                <a href="khuyen_mai.jsp">Khuyến Mãi</a> 
-                <a href="${pageContext.request.contextPath}/ContactServlet">Liên hệ</a> 
+        </div>
+        <a href="khuyen_mai.jsp">Khuyến mãi</a>
+        <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
+    </div>
 
-            </div>
+    <div class="right-nav">
+        <div class="search-container">
+            <input type="text" placeholder="Tìm kiếm...">
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
 
-            <div class="auth-buttons">
-                <a href="cart.jsp" class="cart-btn">
-                    <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
-                    <span class="cart-count" id="cartCount">
-                        <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0%>
-                    </span>
-                </a>
-
-                <% if (user != null) {%>
-                <span class="material-symbols-rounded">account_circle</span>
-                
-                <a href="login?action=logout">Đăng xuất</a>
-                <% } else { %>
-                <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
-                <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
-                <% } %>
-
-            </div>
-        </nav>
+        <div class="auth-group">
+            <a href="cart.jsp" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
+            </a>
+            
+            <% if (session.getAttribute("user") == null) { %>
+                <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
+                <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
+            <% } else { %>
+                <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
+            <% } %>
+        </div>
+    </div>
+</nav>
 
 <div class="breadcrumb">
     <a href="${pageContext.request.contextPath}/hienthi"><i class="fa-solid fa-house"></i> Trang chủ</a>

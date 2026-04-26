@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 public class ChatServlet extends HttpServlet {
-//    private static final String API_KEY = "AIzaSyAUPHW_KydhmY5ZLdkTGkWvWJBZ1I4mmWg";
+    private static final String API_KEY = "AIzaSyAUPHW_KydhmY5ZLdkTGkWvWJBZ1I4mmWg";
     private static final int MAX_PRODUCTS = 10;
 
     private static class ConversationState {
@@ -67,10 +67,10 @@ public class ChatServlet extends HttpServlet {
         }
 
         // Thiếu thông tin -> hỏi lại
-        if (pq.intent.equals("find_product") && products.isEmpty() && pq.priceMin == 0 && pq.priceMax == 0 && pq.category == null) {
+        if (pq.intent.equals("find_product") && pq.productType != null && pq.priceMin == 0 && pq.priceMax == 0 && pq.category == null) {
             state.lastQuery = message;
             session.setAttribute("chatState", state);
-            response.getWriter().write("🔍 Bạn muốn tìm **" + pq.productType + "**? Hãy cho mình biết thêm:\n• 💰 Khoảng giá\n• 🛋️ Danh mục (phòng khách, phòng ngủ, đèn, bàn ghế làm việc...)\n👉 Ví dụ: \"Giường ngủ dưới 3 triệu phòng ngủ\"");
+            response.getWriter().write("🔍 Bạn muốn tìm **" + pq.productType + "**? Hãy cho mình biết thêm:\n• 💰 Khoảng giá\n• 🛋️ Danh mục (phòng khách, phòng ngủ, đèn, bàn ghế làm việc...)\n👉 Ví dụ: \"Tôi cần tư vấn " + pq.productType + " giá dưới 6 triệu\"  ");
             return;
         }
 
@@ -96,6 +96,7 @@ public class ChatServlet extends HttpServlet {
             return;
         }
 
+        
         // Không tìm thấy sản phẩm hoặc câu hỏi chung -> gọi Gemini
         System.out.println("[ChatServlet] Gọi Gemini API cho câu: " + message);
         String aiReply = callGemini(message, products, request, response);
@@ -115,18 +116,38 @@ public class ChatServlet extends HttpServlet {
     private ParsedQuery parseQuery(String message) {
         ParsedQuery pq = new ParsedQuery();
         String lower = message.toLowerCase();
-        if (lower.contains("tìm") || lower.contains("muốn mua") || lower.contains("cho tôi") || 
-            lower.contains("sản phẩm") || lower.contains("tư vấn") || lower.contains("hỗ trợ") || 
-            lower.contains("giải đáp") || lower.contains("check")  || lower.contains("biết")) {
+        String[] keywords = {"giường", "đèn", "bàn", "ghế", "sofa", "tủ", "kệ", "trà", "máy giặt"};
+        
+        boolean hasIntentKeyword =
+        lower.contains("tìm") || lower.contains("muốn mua") || lower.contains("cho tôi") ||
+        lower.contains("sản phẩm") || lower.contains("tư vấn") || lower.contains("hỗ trợ") ||
+        lower.contains("giải đáp") || lower.contains("check") || lower.contains("biết");
+
+        boolean hasProductKeyword = false;
+        for (String kw : keywords) {
+            if (lower.contains(kw)) {
+                pq.productType = kw;
+                hasProductKeyword = true;
+                break;
+            }
+        }
+
+        if (hasIntentKeyword || hasProductKeyword) {
             pq.intent = "find_product";
         } else {
             pq.intent = "general";
             return pq;
         }
-        String[] keywords = {"giường", "đèn", "bàn", "ghế", "sofa", "tủ", "kệ", "trà", "máy giặt"};
+        
         for (String kw : keywords) {
             if (lower.contains(kw)) { pq.productType = kw; break; }
         }
+        
+        //Nếu user chỉ gõ 1 từ
+        if (message.split("\\s+").length <= 2 && hasProductKeyword) {
+            pq.intent = "find_product";
+        }
+        
         // Giá
         Pattern pricePattern = Pattern.compile("(\\d+(?:\\.\\d+)?)\\s*(k|triệu|tr|ngàn|nghìn)");
         Matcher m = pricePattern.matcher(lower);

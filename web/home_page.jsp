@@ -1,17 +1,12 @@
-
 <%@page import="Model.products"%>
 <%@page import="DAO.products_DAO"%>
 <%@page import="java.text.NumberFormat"%>
 <%@page import="java.util.Locale"%>
 <%@page import="javax.servlet.http.HttpSession"%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
-
 <!DOCTYPE html>
-
 <html>
-    
 <%
     String user = (String) session.getAttribute("user");
     
@@ -32,426 +27,310 @@
         session.removeAttribute("regUsername");
         session.removeAttribute("regEmail");
         session.removeAttribute("regPhone");
-        session.removeAttribute("regAddress");
     }
 %>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Nội Thất Hiện Đại - Trang Chủ</title>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=account_circle" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-        <link rel="stylesheet" href="css/style.css">
-    </head>
-    <body>
-        <header class="banner">
-            DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG
-        </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nội Thất Hiện Đại - Trang Chủ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Banner ảnh full width, chữ nổi giữa không nền đen */
+        .banner-image-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        .banner-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .banner-overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            text-align: center;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+            background: transparent;
+            padding: 0;
+            white-space: nowrap;
+        }
+        @media (max-width: 768px) {
+            .banner-overlay-text {
+                font-size: 20px;
+                white-space: normal;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
 
-        <nav class="top-menu">
-            <div class="nav-links">
-                <a href="${pageContext.request.contextPath}/hienthi">Trang Chủ</a>
-                <div class="dropdown">
-                <a class="dropbtn">Sản Phẩm <i class="fas fa-chevron-down"></i></a>
-                <div class="dropdown-content">
-                    <% 
-                        // Lấy lại list categories đã được gửi từ Servlet
-                        java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
-                        if(navCats != null) {
-                            for(String cat : navCats) {
-                    %>
-                        <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
-                    <% 
-                            }
-                        } 
-                    %>
-                </div>
+<header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>
+
+<nav class="top-menu">
+    <div class="left-nav">
+        <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
+            <i class="fa-solid fa-leaf"></i> Trang Chủ
+        </a>
+        <div class="dropdown">
+            <a class="dropbtn">Sản phẩm <i class="fas fa-chevron-down"></i></a>
+            <div class="dropdown-content">
+                <% 
+                    java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                    if(navCats != null) {
+                        for(String cat : navCats) {
+                %>
+                    <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                <% 
+                        }
+                    } 
+                %>
             </div>
-                <a href="khuyen_mai.jsp">Khuyến Mãi</a> 
-                <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a> 
+        </div>
+        <a href="khuyen_mai.jsp">Khuyến mãi</a>
+        <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
+    </div>
 
-            </div>
+    <div class="right-nav">
+        <div class="search-container">
+            <input type="text" placeholder="Tìm kiếm...">
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
 
-            <div class="auth-buttons">
-                <a href="cart.jsp" class="cart-btn">
-                    <i class="fa-solid fa-cart-shopping"></i> Giỏ Hàng
-                    <span class="cart-count" id="cartCount">
-                        <%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0%>
-                    </span>
-                </a>
-
-               <% if (user != null) { %>
-                    <% if ("admin".equals(session.getAttribute("role"))) { %>
-                        <a href="${pageContext.request.contextPath}/admin/dashboard" class="admin-link">
-                            <i class="fa-solid fa-user-tie"></i> Quản trị
-                        </a>
-                    <% } %>
-                <span class="material-symbols-rounded">account_circle</span>
-                
-                <a href="login?action=logout">Đăng Xuất</a>
+        <div class="auth-group">
+            <a href="cart.jsp" class="icon-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
+            </a>
+            
+             <% if (user != null) { %>
+                <%-- Kiểm tra vai trò --%>
+                <% if ("admin".equals(session.getAttribute("role"))) { %>
+                    <a href="${pageContext.request.contextPath}/AdminDashboardServlet" class="admin-link">
+                        <i class="fa-solid fa-user-tie"></i> Quản trị
+                    </a>
                 <% } else { %>
-                <a href="#" class="btn-login" onclick="openLogin()" >Đăng Nhập</a>
-                <a href="#" class="btn-register" onclick="openRegister()">Đăng Ký</a>
+                    <%-- Chỉ hiện icon account cho User, không dẫn link đi đâu cả --%>
+                    <div class="icon-btn" style="cursor: default;">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </div>
                 <% } %>
 
-            </div>
-        </nav>
+                <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
 
-
-        <div class="container">
-            <aside class="left-menu">
-                <h3>DANH MỤC</h3>
-                <ul>
-                    <li onclick="location.href = '${pageContext.request.contextPath}/hienthi'">Tất Cả</li>
-                        <%
-                            java.util.List<String> categories = (java.util.List<String>) request.getAttribute("categories");
-                            if (categories != null && !categories.isEmpty()) {
-                                for (String cat : categories) {
-                        %>
-
-                    <li onclick="location.href = '${pageContext.request.contextPath}/hienthi?category=<%= cat%>'"><%= cat%></li>
-
-                    <%
-                        }
-                    } else {
-                    %>
-
-                    <li>Không có danh mục</li>
-
-                    <%
-                        }
-                    %>
-                </ul>
-            </aside>
-
-            <main class="content">
-                <h2 style="margin-bottom: 20px; color: #333;">
-                    <%
-                        String selectedCategory = (String) request.getAttribute("selectedCategory");
-                        if (selectedCategory != null && !selectedCategory.isEmpty()) {
-                            out.print(selectedCategory);
-                        } else {
-                            out.print("Tất cả sản phẩm");
-                        }
-                    %>
-                </h2>
-
-                <div class="product-grid">
-                    <%
-                        java.util.List<products> productList = (java.util.List<products>) request.getAttribute("products");
-                        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-
-                        if (productList == null || productList.isEmpty()) {
-                    %>
-                    <p style="color:#888; text-align:center; margin-top:40px;">Không có sản phẩm nào trong danh mục này.</p>
-                    <%
-                    } else {
-                        for (products p : productList) {
-                            String formattedPrice = currencyFormat.format(p.getPrice());
-                    %>
-
-                    <div class="product">
-                        <img src="${pageContext.request.contextPath}/images/<%= p.getImage() != null ? p.getImage() : "default.jpg"%>"
-                             alt="<%= p.getProduct_name()%>"
-                             onerror="this.src='https://placehold.co/500x300?text=<%= p.getProduct_name()%>'">
-                        <h4><%= p.getProduct_name()%></h4>
-                        
-                        <p style="color:#6b7c4a"><%= formattedPrice%></p>
-                        <button onclick="addToCart(<%= p.getProduct_id()%>, '<%= p.getProduct_name()%>')">
-                            Thêm vào giỏ
-                        </button>
-
-                        <button onclick="location.href = '${pageContext.request.contextPath}/ProductDetail?id=<%= p.getProduct_id()%>'">Chi tiết</button>    
-
-                    </div>
-
-                    <%
-                } %>
-                </div>       
-                <%
-                    }
-                %>
-
-            </main>
+            <% } else { %>
+                <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
+                <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
+            <% } %>
         </div>
-
-<!-- ===== NÚT MỞ CHAT ===== -->
-        <button onclick="toggleChat()" style="
-                position: fixed; bottom: 28px; left: 28px; z-index: 9998;
-                width: 56px; height: 56px; border-radius: 50%;
-                background: #4e5c34; color: white; border: none;
-                font-size: 22px; cursor: pointer;
-                box-shadow: 0 6px 20px rgba(78,92,52,.4);
-                display: flex; align-items: center; justify-content: center;
-                transition: background .2s, transform .2s;
-                " onmouseover="this.style.background = '#6b7c4a';this.style.transform = 'scale(1.08)'"
-                onmouseout="this.style.background = '#4e5c34';this.style.transform = 'scale(1)'">
-            <i class="fa-solid fa-comments"></i>
-        </button>
-
-<!-- ===== CHATBOX SIDEBAR ===== -->
-        <div id="chatSidebar" style="
-             position: fixed; bottom: 96px; left: 28px; z-index: 9997;
-             width: 340px; height: 480px;
-             background: #fff; border-radius: 16px;
-             box-shadow: 0 12px 40px rgba(0,0,0,.18);
-             display: flex; flex-direction: column;
-             overflow: hidden;
-             transform: translateY(30px) scale(.95);
-             opacity: 0; pointer-events: none;
-             transition: opacity .3s, transform .3s;
-             ">
-            <!-- Header -->
-            <div style="
-                 background: #4e5c34; color: white;
-                 padding: 14px 18px;
-                 font-family: 'Montserrat', sans-serif;
-                 font-size: 15px; font-weight: 700;
-                 display: flex; align-items: center; gap: 10px;
-                 ">
-                <i class="fa-solid fa-robot"></i>
-                Trợ lý DECOR LUXURY
-                <span onclick="toggleChat()" style="margin-left:auto; cursor:pointer; font-size:18px; opacity:.8;">✕</span>
-            </div>
-
-
-    
-
-
-    <!-- Messages -->
-            <div id="chatMessages" style="
-                 flex: 1; overflow-y: auto;
-                 padding: 14px; display: flex; flex-direction: column; gap: 8px;
-                 background: #f8f9fa;
-                 font-family: 'Montserrat', sans-serif; font-size: 13px;
-                 ">
-                <p style="
-                   background: #e8eddf; color: #2c2c2c;
-                   padding: 10px 14px; border-radius: 12px 12px 12px 4px;
-                   margin: 0; line-height: 1.5;
-                   "><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất DECOR LUXURY. Bạn cần tư vấn gì không?</p>
-            </div>
-
-             
-             <!-- Typing indicator (ẩn mặc định) -->
-    <div id="typingIndicator" style="
-        padding: 0 14px 6px; display:none; align-items:center; gap:6px;
-        font-size:12px; color:#888;">
-        <span style="
-            display:inline-flex; gap:3px; align-items:center;">
-            <span class="dot" style="width:6px;height:6px;border-radius:50%;background:#aaa;
-                animation:bounce .9s infinite ease-in-out;"></span>
-            <span class="dot" style="width:6px;height:6px;border-radius:50%;background:#aaa;
-                animation:bounce .9s .2s infinite ease-in-out;"></span>
-            <span class="dot" style="width:6px;height:6px;border-radius:50%;background:#aaa;
-                animation:bounce .9s .4s infinite ease-in-out;"></span>
-        </span>
-        <span>Đang soạn tin...</span>
     </div>
+</nav>
 
-    <!-- Quick replies -->
-    <div id="quickReplies" style="padding:6px 14px; display:flex; gap:6px; flex-wrap:wrap;">
-        <button onclick="quickSend('Sofa phòng khách')" class="quick-btn">🛋️ Sofa</button>
-        <button onclick="quickSend('Giường ngủ')" class="quick-btn">🛏️ Giường</button>
-        <button onclick="quickSend('Bàn làm việc')" class="quick-btn">🖥️ Bàn làm việc</button>
-        <button onclick="quickSend('Sản phẩm rẻ nhất')" class="quick-btn">💰 Giá rẻ</button>
-    </div>
-
-            <!-- Input -->
-            <div style="
-                 display: flex; gap: 8px;
-                 padding: 12px; border-top: 1px solid #e2e8d8;
-                 background: #fff;
-                 ">
-                <input id="chatInput" type="text"
-                       placeholder="Nhập câu hỏi..."
-                       onkeydown="if (event.key === 'Enter')
-                                   sendMsg()"
-                       style="
-                       flex: 1; padding: 10px 14px;
-                       border: 1px solid #d6ddc8; border-radius: 10px;
-                       font-family: 'Montserrat', sans-serif; font-size: 13px;
-                       outline: none;
-                       ">
-                <button onclick="sendMsg()" id="sendBtn" style="
-                        padding: 10px 16px;
-                        background: #4e5c34; color: white; border: none;
-                        border-radius: 10px; cursor: pointer;
-                        font-family: 'Montserrat', sans-serif;
-                        font-size: 13px; font-weight: 700;
-                        ">Gửi</button>
-            </div>
-        </div>
+<!-- ===== BANNER ẢNH FULL WIDTH + CHỮ GIỮA (KHÔNG NỀN) ===== -->
+<div class="banner-image-container">
+    <img src="${pageContext.request.contextPath}/images/hero.jpg" alt="Banner nội thất">
+    <div class="banner-overlay-text">CHÀO MỪNG ĐẾN VỚI WEBSITE CỦA NHÓM 2</div>
 </div>
 
-<style>
-.quick-btn {
-    background: #f0f4e8; border: 1.5px solid #c8d5a8;
-    color: #4e5c34; border-radius: 20px;
-    padding: 4px 10px; font-size: 12px; cursor: pointer;
-    transition: background .2s;
-}
-.quick-btn:hover { background: #dce8c0; }
+<div class="container">
+    <aside class="left-menu new-sidebar">
+        <h3>DANH MỤC</h3>
+        <ul>
+            <li onclick="location.href='${pageContext.request.contextPath}/hienthi'">Tất Cả</li>
+            <%
+                java.util.List<String> categories = (java.util.List<String>) request.getAttribute("categories");
+                if (categories != null && !categories.isEmpty()) {
+                    for (String cat : categories) {
+            %>
+            <li onclick="location.href='${pageContext.request.contextPath}/hienthi?category=<%= cat %>'"><%= cat %></li>
+            <%
+                    }
+                } else {
+            %>
+            <li>Không có danh mục</li>
+            <%
+                }
+            %>
+        </ul>
+    </aside>
 
-@keyframes bounce {
-    0%, 80%, 100% { transform: scale(0.6); opacity:.5; }
-    40%            { transform: scale(1.0); opacity:1; }
-}
-
-#chatMessages::-webkit-scrollbar { width: 4px; }
-#chatMessages::-webkit-scrollbar-thumb { background:#ccc; border-radius:4px; }
-</style>
-
-        <!-- ===== TOAST ===== -->
-        <div id="toast" style="
-             position: fixed; bottom: 28px; right: 28px; z-index: 9999;
-             background: #4e5c34; color: white;
-             padding: 14px 20px; border-radius: 12px;
-             font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600;
-             display: flex; align-items: center; gap: 10px;
-             box-shadow: 0 8px 24px rgba(78,92,52,.35);
-             opacity: 0; transform: translateY(20px);
-             transition: opacity .35s, transform .35s;
-             pointer-events: none;
-             ">
-            <i id="toast-icon" class="fa-solid fa-circle-check" style="font-size:18px; color:white;"></i>
-            <span id="toast-msg">Đã thêm vào giỏ hàng!</span>
+    <main class="content">
+        <div class="content-header">
+            <h2 class="section-title">
+                <%
+                    String selectedCategory = (String) request.getAttribute("selectedCategory");
+                    if (selectedCategory != null && !selectedCategory.isEmpty()) {
+                        out.print(selectedCategory);
+                    } else {
+                        out.print("Tất cả sản phẩm");
+                    }
+                %>
+            </h2>
         </div>
+        <div class="product-grid" id="productGrid">
+            <%
+                java.util.List<products> productList = (java.util.List<products>) request.getAttribute("products");
+                NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
-        <footer class="footer">
-            <div>
-                <h3>Nhóm 3</h3>
-                <p>Lã Ngọc Huyền    | 29-08-2005 </p>
-                <p>Trần Anh Đức     | 11-11-2005 </p>
-                <p>Nguyễn Phi Long  | 14-06-2005 </p>
-            </div>
-
-            <div class="footer-logo">
-                <img src="./images/logo.png">
-            </div>
-
-        </footer>
-
-        <!-- ================= MODAL LOGIN ================= -->
-
-        <div id="loginModal" class="modal">
-            <div class="modal-box">
-                <span class="close" onclick="closeModal('loginModal')" style="color: #333">&times;</span>
-
-                <h2>Đăng nhập</h2>
-                
-                <form action="login" method="post" >
-                    <input type="text" name="username" placeholder="Tên đăng nhập"
-                           value="<%= loginUsername != null ? loginUsername : "" %>" required>
-                    <input type="password" name="password" placeholder="Mật khẩu" required>
-                    <button type="submit" name="action" value="login" class="btn-submit">Đăng nhập</button>
-                </form>
-
-                <% if (loginError != null) { %>
-                <div style="
-                    background: #fff3f3;
-                    border: 1px solid #f5c6cb;
-                    color: #c0392b;
-                    padding: 10px 14px;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    margin-top: 12px;
-                    margin-bottom: 12px;
-                    font-family: Montserrat, sans-serif;
-                ">
-                    <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= loginError %>
+                if (productList == null || productList.isEmpty()) {
+            %>
+            <p class="empty-state">Không có sản phẩm nào trong danh mục này.</p>
+            <%
+                } else {
+                    for (products p : productList) {
+                        String formattedPrice = currencyFormat.format(p.getPrice());
+            %>
+            <div class="product-card">
+                <div class="product-img">
+                    <img src="${pageContext.request.contextPath}/images/<%= p.getImage() != null ? p.getImage() : "default.jpg"%>"
+                         alt="<%= p.getProduct_name()%>"
+                         onerror="this.src='https://placehold.co/500x300?text=Nội+Thất'">
+<!--                    <span class="product-badge">-10%</span>-->
                 </div>
-                <% } %>
-                
-                <p style="color: #333">
-
-                    <a style="color: #333">Chưa có tài khoản</a>
-                    <span>|</span>
-                    <a href="#" onclick="switchModal('loginModal', 'registerModal')" style="color: #333">Đăng ký</a>
-                </p>
-                
-
+                <div class="product-info">
+                    <h4 class="product-name"><%= p.getProduct_name()%></h4>
+                    <div style="text-align: right !important;" class="product-price"><%= formattedPrice%></div>
+                    <div class="product-actions">
+                        <button class="btn-add-to-cart" onclick="addToCart(<%= p.getProduct_id()%>, '<%= p.getProduct_name()%>')">
+                            <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
+                        </button>
+                        <button class="btn-detail" onclick="location.href='${pageContext.request.contextPath}/ProductDetail?id=<%= p.getProduct_id()%>'">
+                            Chi tiết
+                        </button>
+                    </div>
+                </div>
             </div>
+            <%
+                    }
+                }
+            %>
         </div>
+    </main>
+</div>
 
-        <!-- ================= MODAL REGISTER ================= -->
-        <div id="registerModal" class="modal">
-            <div class="modal-box">
-                <span class="close" onclick="closeModal('registerModal')" style="color: #333">&times;</span>
+<footer class="footer">
+    <div>
+        <h3>Nhóm 3</h3>
+        <p>Lã Ngọc Huyền    | 29-08-2005 </p>
+        <p>Trần Anh Đức     | 11-11-2005 </p>
+        <p>Nguyễn Phi Long  | 14-06-2005 </p>
+    </div>
+    <div class="footer-logo">
+        <img src="./images/logo.png">
+    </div>
+</footer>
 
-                <h2>Đăng ký</h2>
+<!-- Chat & Toast -->
+<button onclick="toggleChat()" class="chat-toggle"><i class="fa-solid fa-comments"></i></button>
+<div id="chatSidebar" class="chat-sidebar">
+    <div class="chat-header">Trợ lý DECOR LUXURY <span onclick="toggleChat()">✕</span></div>
+    <div id="chatMessages" class="chat-messages">
+        <p><b>Bot:</b> Xin chào! 👋 Mình là trợ lý nội thất. Bạn cần tư vấn gì không?</p>
+    </div>
+    <div id="typingIndicator" class="typing-indicator">Đang soạn tin...</div>
+    <div id="quickReplies" class="quick-replies">
+        <button onclick="quickSend('Sofa phòng khách')">🛋️ Sofa</button>
+        <button onclick="quickSend('Giường ngủ')">🛏️ Giường</button>
+        <button onclick="quickSend('Bàn làm việc')">🖥️ Bàn</button>
+        <button onclick="quickSend('Sản phẩm rẻ nhất')">💰 Giá rẻ</button>
+    </div>
+    <div class="chat-input">
+        <input id="chatInput" type="text" placeholder="Nhập câu hỏi..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <button id="sendBtn" onclick="sendMsg()">Gửi</button>
+    </div>
+</div>
 
+<div id="toast" class="toast"><i class="fa-solid fa-circle-check"></i><span id="toast-msg"></span></div>
+
+<!-- MODAL LOGIN / REGISTER -->
+<div id="loginModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('loginModal')">&times;</span>
+        <h2>Đăng nhập</h2>
         <form action="login" method="post">
-            <input type="text" name="username" placeholder="Tên đăng nhập"
-                   value="<%= regUsername != null ? regUsername : "" %>" required>
-            <input type="email" name="email" placeholder="Email"
-                   value="<%= regEmail != null ? regEmail : "" %>" required>
-            <input type="tel" name="phone" placeholder="Số điện thoại"
-                   value="<%= regPhone != null ? regPhone : "" %>">
+            <input type="text" name="username" placeholder="Tên đăng nhập" value="<%= loginUsername != null ? loginUsername : "" %>" required>
+            <input type="password" name="password" placeholder="Mật khẩu" required>
+            <button type="submit" name="action" value="login" class="btn-submit">Đăng nhập</button>
+        </form>
+        <% if (loginError != null) { %>
+            <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i> <%= loginError %></div>
+        <% } %>
+        <p>Chưa có tài khoản? <a href="#" onclick="switchModal('loginModal', 'registerModal')">Đăng ký</a></p>
+    </div>
+</div>
 
+<div id="registerModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('registerModal')">&times;</span>
+        <h2>Đăng ký</h2>
+        <form action="login" method="post">
+            <input type="text" name="username" placeholder="Tên đăng nhập" value="<%= regUsername != null ? regUsername : "" %>" required>
+            <input type="email" name="email" placeholder="Email" value="<%= regEmail != null ? regEmail : "" %>" required>
+            <input type="tel" name="phone" placeholder="Số điện thoại" value="<%= regPhone != null ? regPhone : "" %>"required>
+            <input type="add" name="address" placeholder="Địa chỉ" value="<%= regAddress != null ? regAddress : "" %>" required>
+            
             <input type="password" name="password" placeholder="Mật khẩu" required>
             <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
             <button type="submit" name="action" value="register" class="btn-submit">Đăng ký</button>
         </form>
+        <% if (registerError != null) { %>
+            <div class="error-message"><i class="fa-solid fa-circle-exclamation"></i> <%= registerError %></div>
+        <% } %>
+        <p>Đã có tài khoản? <a href="#" onclick="switchModal('registerModal', 'loginModal')">Đăng nhập</a></p>
+    </div>
+</div>
 
-                <% if (registerError != null) { %>
-                <div style="
-                    background: #fff3f3;
-                    border: 1px solid #f5c6cb;
-                    color: #c0392b;
-                    padding: 10px 14px;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    margin-top: 12px;
-                    margin-bottom: 12px;
-                    font-family: Montserrat, sans-serif;
-                ">
-                    <i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i><%= registerError %>
-                </div>
-                <% } %>
-        
-                <p style="color: #333" >Đã có tài khoản?
-                    <a href="#" onclick="switchModal('registerModal', 'loginModal')" style="color: #333">Đăng nhập</a>
-                </p>
-            </div>
-        </div>
+    <script>
+    function showToast(msg, isError = false) {
+        const t = document.getElementById('toast');
+        const icon = t.querySelector('i');
 
+        document.getElementById('toast-msg').textContent = msg;
 
-        <script>
-            function showToast(msg, isError) {
-                const t = document.getElementById('toast');
-                const ic = document.getElementById('toast-icon');
-                const m = document.getElementById('toast-msg');
-                ic.className = isError
-                        ? 'fa-solid fa-circle-xmark'
-                        : 'fa-solid fa-circle-check';
-                ic.style.color = 'white';
-                t.style.background = isError ? '#b91c1c' : '#4e5c34';
-                m.textContent = msg;
-                t.style.opacity = '1';
-                t.style.transform = 'translateY(0)';
-                clearTimeout(window._toastTimer);
-                window._toastTimer = setTimeout(() => {
-                    t.style.opacity = '0';
-                    t.style.transform = 'translateY(20px)';
-                }, 2800);
-            }
+        if (isError) {
+            t.style.background = '#c0392b';
+            icon.className = 'fa-solid fa-circle-xmark';
+        } else {
+            t.style.background = '#4e5c34';
+            icon.className = 'fa-solid fa-circle-check';
+        }
+
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2800);
+    }
 
             // ===== THÊM VÀO GIỎ =====
-            function addToCart(productId, productName) {
-                fetch('<%=request.getContextPath()%>/AddToCart?productId=' + productId + '&qty=1', {
-                    method: 'GET'
-                })
-                        .then(res => res.json())
-                        .then(data => {
-                            document.getElementById('cartCount').textContent = data.cartCount;
-                            showToast('Đã thêm "' + productName + '" vào giỏ hàng!', false);
-                        })
-                        .catch(() => {
-                            showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
-                        });
+    function addToCart(productId, productName) {
+        fetch('<%=request.getContextPath()%>/AddToCart?productId=' + productId + '&qty=1', {
+            method: 'GET'
+        })
+        .then(res => {
+            if (res.ok) {
+                // Cập nhật badge giỏ hàng
+                const badge = document.querySelector('.badge');
+                if (badge) {
+                    badge.textContent = parseInt(badge.textContent || 0) + 1;
+                }
+                showToast('Đã thêm "' + productName + '" vào giỏ hàng!', false);
+            } else {
+                showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
             }
+        })
+        .catch(() => {
+            showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true);
+        });
+    }
 
             // ===== QUẢN LÝ MODAL =====
             const urlParams = new URLSearchParams(window.location.search);
@@ -612,3 +491,5 @@
         return null;
     }
         </script>
+    </body>
+</html>

@@ -1,0 +1,20 @@
+
+Chào bạn | Chào bạn! Tôi là trợ lý ảo của cửa hàng nội thất Luxury. tôi có thể giúp gì cho bạn?
+Bạn có những loại sản phẩm nào? | Hiện tại cửa hàng chúng tôi có: Phòng Khách, Phòng Ngủ, Phòng Bếp, Bàn Ghế Làm Việc, Trang Trí Decor và Đèn.
+Bàn ăn gỗ giá bao nhiêu? | Bàn ăn gỗ dành cho gia đình 4 ghế có giá là 320.000đ.
+Ghế ăn gỗ có đặc điểm gì? | Ghế ăn gỗ của chúng tôi được thiết kế rất chắc chắn với giá 700.000đ/chiếc.
+Tôi muốn mua bàn làm việc | Chúng tôi có mẫu bàn làm việc hiện đại bằng gỗ MDF với giá 1.500.000đ.
+Ghế xoay văn phòng giá thế nào? | Ghế xoay văn phòng tiện lợi có giá là 1.200.000đ.
+Cửa hàng có giường ngủ không? | chúng tôi có mẫu giường ngủ đôi hiện đại 1m6 của chúng tôi có giá 4.000.000đ.
+Tủ quần áo giá bao nhiêu? | Tủ quần áo 3 cánh bằng gỗ tự nhiên có giá là 3.500.000đ.
+Sofa phòng khách giá bao nhiêu? | Bộ Sofa phòng khách nỉ cao cấp có giá là 5.500.000đ.
+Kệ tivi gỗ giá thế nào? | Kệ tivi gỗ phòng khách hiện đại có giá là 2.000.000đ.
+Có mẫu đèn nào đẹp không? | Bạn có thể tham khảo Đèn trần phòng khách sang trọng giá 1.500.000đ hoặc Đèn bàn học chống cận giá 400.000đ.
+Tủ bếp giá bao nhiêu? | Tủ bếp trên hiện đại có giá là 3.000.000đ.
+Bàn trang điểm giá bao nhiêu? | Bàn trang điểm có gương của chúng tôi giá là 2.000.000đ.
+Kệ sách có mấy tầng? | Chúng tôi có kệ sách gỗ 5 tầng rất tiện lợi với giá 1.200.000đ.
+Cửa hàng có bán tủ lạnh không? | Dạ có, tủ lạnh gia đình 2 cửa có giá là 8.000.000đ.
+Máy giặt giá bao nhiêu? | Máy giặt cửa ngang hiện đại có giá là 7.000.000đ.
+Có kệ trang trí không? | Dạ có, kệ decor trang trí có giá là 900.000đ.
+Ghế thư giãn giá bao nhiêu? | Ghế lười thư giãn thoải mái có giá là 2.000.000đ.
+Địa chỉ cửa hàng ở đâu? | Bạn có thể liên hệ trực tiếp qua số điện thoại hoặc để lại tin nhắn trong phần Liên hệ trên website nhé.

@@ -90,4 +90,41 @@ public class contacts_DAO {
         }
         return false;
     }
+    
+    public int countContactsByEmail(String email) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM contacts WHERE email = ?";
+        try (Connection conn = new dbConnect().getConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) count = rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+      
+    public List<Map<String, Object>> getContactsByEmail(String email) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT contact_id, name, email, phone, message, created_at FROM contacts WHERE email = ? ORDER BY created_at DESC";
+        try (Connection conn = new dbConnect().getConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("contact_id", rs.getInt("contact_id"));
+                map.put("name", rs.getString("name"));
+                map.put("email", rs.getString("email"));
+                map.put("phone", rs.getString("phone"));
+                map.put("message", rs.getString("message"));
+                map.put("created_at", rs.getTimestamp("created_at"));
+                list.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

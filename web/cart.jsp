@@ -510,7 +510,7 @@
                 <!-- Checkout -->
                 <div class="checkout-section">
                     <% if(!cart.isEmpty()) { %>
-                        <form action="${pageContext.request.contextPath}/checkout" method="post">
+                        <form action="${pageContext.request.contextPath}/checkout.jsp" method="post">
                             <button type="submit" class="btn-checkout">
                                 <i class="fa-solid fa-shield-halved"></i>
                                 Đặt hàng ngay

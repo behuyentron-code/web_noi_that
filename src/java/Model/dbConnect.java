@@ -10,7 +10,8 @@ import java.sql.*;
  * @author Admin
  */
 public class dbConnect {
-    public Connection getConnect() throws Exception {
+
+    public static Connection getConnect() throws Exception {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             String cn = "jdbc:mysql://localhost:3306/furniture_web";

@@ -1,0 +1,224 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Apr 24, 2026, 10:45:16 PM
+    Author     : Admin
+*/
+
+/* ===== HERO ===== */
+        .promo-hero {
+            background: linear-gradient(135deg, #4e5c34 0%, #6b7c4a 55%, #8a9a62 100%);
+            padding: 56px 50px; display: flex; align-items: center;
+            justify-content: space-between; gap: 40px;
+            position: relative; overflow: hidden;
+        }
+        .promo-hero::before {
+            content:''; position:absolute; top:-90px; right:-90px;
+            width:360px; height:360px; border-radius:50%;
+            background:rgba(255,255,255,0.05);
+        }
+        .promo-hero::after {
+            content:''; position:absolute; bottom:-60px; left:35%;
+            width:240px; height:240px; border-radius:50%;
+            background:rgba(255,255,255,0.04);
+        }
+        .hero-text { flex:1; z-index:1; }
+        .hero-eyebrow {
+            display:inline-flex; align-items:center; gap:8px;
+            background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
+            color:#e8f0da; font-size:12px; font-weight:700;
+            letter-spacing:.12em; text-transform:uppercase;
+            padding:6px 16px; border-radius:30px; margin-bottom:18px;
+        }
+        .hero-title {
+            font-size:50px; font-weight:900; color:white;
+            line-height:1.1; margin-bottom:14px; letter-spacing:-1px;
+        }
+        .hero-title span { color:#c8e06b; }
+        .hero-subtitle {
+            font-size:15px; color:rgba(255,255,255,0.8);
+            margin-bottom:28px; line-height:1.7; max-width:400px;
+        }
+        .hero-cta {
+            display:inline-flex; align-items:center; gap:10px;
+            background:white; color:#4e5c34; padding:14px 30px; border-radius:50px;
+            font-size:14px; font-weight:700; text-decoration:none;
+            transition:.3s; box-shadow:0 8px 24px rgba(0,0,0,.2);
+        }
+        .hero-cta:hover { background:#c8e06b; transform:translateY(-2px); box-shadow:0 12px 32px rgba(0,0,0,.25); }
+        .hero-stats { display:flex; gap:28px; margin-top:32px; }
+        .stat-num  { font-size:26px; font-weight:900; color:#c8e06b; display:block; }
+        .stat-label{ font-size:11px; color:rgba(255,255,255,.7); font-weight:500; }
+
+        .hero-countdown { z-index:1; text-align:center; flex-shrink:0; }
+        .countdown-label {
+            color:rgba(255,255,255,.8); font-size:12px; font-weight:600;
+            text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px;
+        }
+        .countdown-boxes { display:flex; gap:10px; }
+        .cd-box {
+            background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
+            border-radius:12px; padding:14px 18px; min-width:70px;
+            text-align:center; backdrop-filter:blur(6px);
+        }
+        .cd-num  { font-size:30px; font-weight:900; color:white; display:block; line-height:1; }
+        .cd-unit { font-size:10px; color:rgba(255,255,255,.6); font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-top:5px; display:block; }
+
+        /* ===== WRAP ===== */
+        .promo-wrap { max-width:1400px; margin:0 auto; padding:36px 50px; }
+
+        .section-title {
+            font-size:21px; font-weight:800; color:#2c2c2c;
+            margin-bottom:20px; display:flex; align-items:center; gap:10px;
+        }
+        .section-title i { color:#4e5c34; }
+        .section-title::after { content:''; flex:1; height:2px; background:linear-gradient(to right,#d6ddc8,transparent); margin-left:14px; }
+
+        /* ===== FEATURED ===== */
+        .featured-deal {
+            background:white; border-radius:20px; overflow:hidden;
+            display:flex; margin-bottom:32px;
+            box-shadow:0 4px 24px rgba(78,92,52,.1);
+            border:1px solid #e2e8d8; position:relative;
+        }
+        .featured-deal .deal-img { width:44%; height:320px; object-fit:cover; flex-shrink:0; }
+        .featured-deal .deal-body { padding:34px 38px; display:flex; flex-direction:column; justify-content:center; flex:1; }
+        .deal-tag {
+            display:inline-flex; align-items:center; gap:6px;
+            background:#fff0e0; color:#c4620a; font-size:11px; font-weight:700;
+            letter-spacing:.08em; text-transform:uppercase;
+            padding:5px 14px; border-radius:20px; border:1px solid #f5c99a;
+            margin-bottom:14px; width:fit-content;
+        }
+        .deal-name { font-size:24px; font-weight:800; color:#2c2c2c; margin-bottom:8px; line-height:1.3; }
+        .deal-desc { font-size:13px; color:#6b7280; line-height:1.7; margin-bottom:20px; }
+        .deal-price-row { display:flex; align-items:baseline; gap:14px; margin-bottom:22px; }
+        .deal-price-new { font-size:32px; font-weight:900; color:#4e5c34; }
+        .deal-price-old { font-size:17px; color:#9ca3af; text-decoration:line-through; font-weight:500; }
+        .deal-save { background:#e8f5e9; color:#2e7d32; font-size:12px; font-weight:700; padding:4px 12px; border-radius:20px; }
+        .btn-deal {
+            display:inline-flex; align-items:center; gap:10px;
+            background:#4e5c34; color:white; padding:12px 26px; border-radius:50px;
+            font-size:14px; font-weight:700; border:none; cursor:pointer; transition:.25s;
+            font-family:"Montserrat",sans-serif; width:fit-content;
+        }
+        .btn-deal:hover { background:#6b7c4a; transform:translateY(-2px); box-shadow:0 8px 20px rgba(78,92,52,.3); }
+        .featured-ribbon {
+            position:absolute; top:18px; left:18px;
+            background:#e53935; color:white; font-size:11px; font-weight:800;
+            padding:5px 14px; border-radius:20px; letter-spacing:.05em; text-transform:uppercase;
+        }
+
+        /* ===== FILTER ===== */
+        .filter-bar {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:28px; flex-wrap:wrap; gap:14px;
+        }
+        .filter-tabs { display:flex; gap:8px; flex-wrap:wrap; }
+        .filter-tab {
+            padding:8px 20px; border-radius:50px; border:2px solid #d6ddc8;
+            background:white; color:#6b7280;
+            font-family:"Montserrat",sans-serif; font-size:13px; font-weight:600;
+            cursor:pointer; transition:.2s; text-decoration:none; display:inline-block;
+        }
+        .filter-tab:hover { border-color:#6b7c4a; color:#4e5c34; }
+        .filter-tab.active { background:#4e5c34; border-color:#4e5c34; color:white; }
+        .result-count { font-size:13px; color:#6b7280; font-weight:500; }
+        .result-count strong { color:#4e5c34; }
+
+        /* ===== GRID ===== */
+        .promo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+        .promo-card {
+            background:white; border-radius:16px; overflow:hidden;
+            border:1px solid #e2e8d8; box-shadow:0 2px 12px rgba(78,92,52,.07);
+            transition:.3s; position:relative;
+        }
+        .promo-card:hover { transform:translateY(-6px); box-shadow:0 12px 32px rgba(78,92,52,.15); }
+        .promo-card-img { width:100%; height:210px; object-fit:cover; display:block; }
+        .discount-badge {
+            position:absolute; top:12px; right:12px;
+            background:#e53935; color:white; font-size:14px; font-weight:900;
+            width:52px; height:52px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            box-shadow:0 4px 12px rgba(229,57,53,.4); letter-spacing:-.5px;
+        }
+        .promo-card-body { padding:18px; }
+        .promo-card-cat  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#6b7c4a; margin-bottom:6px; }
+        .promo-card-name { font-size:15px; font-weight:700; color:#2c2c2c; margin-bottom:5px; line-height:1.35; }
+        .promo-card-desc { font-size:12px; color:#9ca3af; margin-bottom:12px; line-height:1.5; }
+        .promo-price-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+        .price-new { font-size:19px; font-weight:900; color:#4e5c34; }
+        .price-old { font-size:13px; color:#d1d5db; text-decoration:line-through; font-weight:500; }
+        .card-btn-row { display:flex; gap:8px; }
+        .btn-cart {
+            flex:1; padding:9px; background:#4e5c34; color:white;
+            border:none; border-radius:8px; font-size:13px; font-weight:600;
+            cursor:pointer; transition:.2s; font-family:"Montserrat",sans-serif;
+            display:flex; align-items:center; justify-content:center; gap:6px;
+        }
+        .btn-cart:hover { background:#6b7c4a; }
+        .btn-detail {
+            width:40px; background:#f0f3ea; color:#4e5c34;
+            border:1px solid #d6ddc8; border-radius:8px; font-size:13px;
+            cursor:pointer; transition:.2s; display:flex; align-items:center;
+            justify-content:center; text-decoration:none;
+        }
+        .btn-detail:hover { background:#d6ddc8; }
+
+        .empty-state { grid-column:1/-1; text-align:center; padding:60px 20px; color:#9ca3af; }
+        .empty-state i { font-size:48px; margin-bottom:14px; display:block; color:#d6ddc8; }
+
+        /* ===== VOUCHER ===== */
+        .voucher-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:50px; }
+        .voucher-card {
+            background:white; border-radius:14px; border:2px dashed #d6ddc8;
+            display:flex; overflow:hidden; transition:.3s; cursor:pointer;
+        }
+        .voucher-card:hover { border-color:#6b7c4a; box-shadow:0 6px 20px rgba(78,92,52,.12); transform:translateY(-3px); }
+        .voucher-left {
+            width:86px; background:linear-gradient(180deg,#4e5c34,#6b7c4a);
+            display:flex; flex-direction:column; align-items:center;
+            justify-content:center; padding:14px 8px; flex-shrink:0; position:relative;
+        }
+        .voucher-left::after {
+            content:''; position:absolute; right:-8px; top:50%; transform:translateY(-50%);
+            width:16px; height:16px; background:#f5f6f0;
+            border-radius:50%; border:2px dashed #d6ddc8; border-left:none;
+        }
+        .voucher-pct   { font-size:22px; font-weight:900; color:#c8e06b; line-height:1; }
+        .voucher-off   { font-size:10px; color:rgba(255,255,255,.7); font-weight:600; text-transform:uppercase; }
+        .voucher-icon  { font-size:20px; color:rgba(255,255,255,.5); margin-bottom:4px; }
+        .voucher-right { padding:14px 16px; flex:1; }
+        .voucher-title { font-size:13px; font-weight:700; color:#2c2c2c; margin-bottom:4px; }
+        .voucher-cond  { font-size:11px; color:#9ca3af; margin-bottom:10px; line-height:1.5; }
+        .voucher-code-row { display:flex; align-items:center; gap:8px; }
+        .voucher-code {
+            background:#f0f3ea; border:1px dashed #b5c48a; color:#4e5c34;
+            font-size:12px; font-weight:700; padding:4px 10px; border-radius:6px;
+            letter-spacing:.05em; font-family:monospace;
+        }
+        .btn-copy {
+            background:#4e5c34; color:white; border:none; border-radius:6px;
+            padding:4px 9px; font-size:11px; font-weight:600;
+            cursor:pointer; transition:.2s; font-family:"Montserrat",sans-serif;
+        }
+        .btn-copy:hover  { background:#6b7c4a; }
+        .btn-copy.copied { background:#2e7d32; }
+        .voucher-expiry { font-size:10px; color:#d97706; font-weight:600; margin-top:8px; display:flex; align-items:center; gap:4px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media(max-width:1100px){
+            .promo-grid   { grid-template-columns:repeat(2,1fr); }
+            .voucher-grid { grid-template-columns:repeat(2,1fr); }
+        }
+        @media(max-width:720px){
+            .promo-hero { flex-direction:column; padding:32px 20px; }
+            .hero-title  { font-size:34px; }
+            .promo-grid   { grid-template-columns:1fr; }
+            .voucher-grid { grid-template-columns:1fr; }
+            .featured-deal { flex-direction:column; }
+            .featured-deal .deal-img { width:100%; height:220px; }
+            .promo-wrap { padding:20px; }
+        }

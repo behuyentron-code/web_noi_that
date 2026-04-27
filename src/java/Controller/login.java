@@ -1,3 +1,8 @@
+///*
+// * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+// * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+// */
+
 package Controller;
 
 import DAO.users_DAO;
@@ -7,14 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-
-import DAO.users_DAO;
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 public class login extends HttpServlet {
 
@@ -39,7 +36,7 @@ public class login extends HttpServlet {
 
             if (!dao.isUsernameExist(username)) {
                 HttpSession session = request.getSession();
-                session.setAttribute("loginError", "Bạn chưa có tài khoản!");
+                session.setAttribute("loginError", "Tài khoản không tồn tại!");
                 session.setAttribute("loginUsername", username);
                 response.sendRedirect("hienthi?openModal=login");
                 return;
@@ -57,7 +54,18 @@ public class login extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", us);
             session.setMaxInactiveInterval(50000);
-            response.sendRedirect("hienthi");
+            
+            // Lấy role từ database 
+            String role = dao.getRole(us);
+            session.setAttribute("role", role);
+
+            // Điều hướng theo role
+            if ("admin".equals(role)) {
+                System.out.println("Redirect to: " + request.getContextPath() + "/AdminOrderServlet");
+                response.sendRedirect(request.getContextPath() + "/AdminDashboardServlet");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/hienthi");
+            }
             return;
         }
 
@@ -69,11 +77,24 @@ public class login extends HttpServlet {
             String address  = request.getParameter("address");
             String pass     = request.getParameter("password");
             String confirm  = request.getParameter("confirmPassword");
-
+            
+            //Kiểm tra email đã nhập đúng định dạng chưa
+            if (email == null || !email.contains("@") || !email.endsWith("@gmail.com") || email.indexOf("@") == 0 || email.indexOf("@") != email.lastIndexOf("@")) {
+                
+                HttpSession session = request.getSession();
+                session.setAttribute("registerError", "Email phải là Gmail hợp lệ!");
+                session.setAttribute("regUsername", username);
+                session.setAttribute("regEmail", email);
+                session.setAttribute("regPhone", phone);
+                session.setAttribute("regAddress", address);
+                response.sendRedirect("hienthi?openModal=register");
+                return;
+            }
+            
             // Kiểm tra mật khẩu nhập lại
             if (confirm == null || !confirm.equals(pass)) {
                 HttpSession session = request.getSession();
-                session.setAttribute("registerError", "Mật khẩu không hợp lệ!");
+                session.setAttribute("registerError", "Mật khẩu nhập lại không khớp!");
                 session.setAttribute("regUsername", username);
                 session.setAttribute("regEmail", email);
                 session.setAttribute("regPhone", phone);

@@ -12,7 +12,7 @@ public class ChatServlet extends HttpServlet {
     private static final int MAX_RESULTS = 10;
 
     // Chỉnh lại route này nếu trang liên hệ của bạn khác
-    private static final String CONTACT_URL = "/Contact";
+    private static final String CONTACT_URL = "/ContactServlet";
 
     // Từ điển đồng nghĩa: key là từ dùng tìm trong DB, value là những gì user hay gõ
     private static final Map<String, String[]> KeyWord = new LinkedHashMap<>();

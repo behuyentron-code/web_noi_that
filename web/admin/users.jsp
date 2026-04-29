@@ -31,6 +31,31 @@
     </head>
     
     <body>
+           <%
+    String msg = request.getParameter("msg");
+%>
+
+<div id="toast" class="toast"></div>
+
+<style>
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4e5c34;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: 0.4s;
+    z-index: 9999;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
         <div class="admin-wrapper">
             <jsp:include page="sidebar.jsp"/>
             <div class="admin-content">
@@ -42,7 +67,7 @@
                     <form method="get" style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <input type="text" name="keyword" placeholder="Tìm theo tên, email, số điện thoại" value="<%= keyword %>">
                         <button type="submit"><i class="fas fa-search"></i> Lọc</button>
-                        <a href="${pageContext.request.contextPath}/admin/users" class="btn-secondary">Xóa lọc</a>
+                        <a href="${pageContext.request.contextPath}/admin/users?page=1" class="btn-secondary">Tất cả</a>
                     </form>
                 </div>
                 <table class="data-table">
@@ -88,4 +113,23 @@
             </div>
         </div>
     </body>
+
+<script>
+    const msg = "<%= msg %>";
+    if (msg && msg !== "null") {
+        const toast = document.getElementById("toast");
+
+        let text = "";
+        if (msg === "updated") text = "✅ Cập nhật thành công";
+        if (msg === "deleted") text = "✅️ Xóa thành công";
+
+        toast.innerText = text;
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 3000);
+    }
+    
+</script>
 </html>

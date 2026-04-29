@@ -68,6 +68,38 @@ public class contacts_DAO {
         return list;
     }
 
+    public boolean update(int id, String name, String phone, String message) {
+        String sql = "UPDATE contacts SET name = ?, phone = ?, message = ? WHERE contact_id = ?";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = new dbConnect().getConnect();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setString(2, phone);
+            ps.setString(3, message);
+            ps.setInt(4, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("[contacts_DAO] insert error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try { 
+                if (ps != null) ps.close(); 
+            } catch (Exception e) {
+                
+            }
+            
+            try { 
+                if (conn != null) 
+                    conn.close(); 
+            } catch (Exception e) {
+            
+            }
+        }
+        return false;
+    }
+    
     /**
      * Admin xóa liên hệ theo ID
      * @return true nếu xóa thành công
@@ -126,5 +158,30 @@ public class contacts_DAO {
             e.printStackTrace();
         }
         return list;
+    }
+    
+        public Map<String, Object> getContactById(int id) {
+        Map<String, Object> contact = null;
+        String sql = "SELECT contact_id, name, email, phone, message, created_at FROM contacts WHERE contact_id = ?";
+
+        try (Connection conn = new dbConnect().getConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    contact = new java.util.HashMap<>();
+                    contact.put("contact_id", rs.getInt("contact_id"));
+                    contact.put("name", rs.getString("name"));
+                    contact.put("email", rs.getString("email"));
+                    contact.put("phone", rs.getString("phone"));
+                    contact.put("message", rs.getString("message"));
+                    contact.put("created_at", rs.getTimestamp("created_at"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contact;
     }
 }

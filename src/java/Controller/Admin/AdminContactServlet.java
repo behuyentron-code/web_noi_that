@@ -21,80 +21,107 @@ import java.util.Map;
  */
 public class AdminContactServlet extends HttpServlet {
    
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-   
-        contacts_DAO contactDao = new contacts_DAO();
-        
+    private contacts_DAO dao = new contacts_DAO();
+    
+    // ================= GET =================
+    private void handleGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+
+        // ===== XÓA =====
+        if ("delete".equals(action)) {
+            int id = Integer.parseInt(request.getParameter("id"));
+            String email = request.getParameter("email"); // để quay lại đúng danh sách
+
+            boolean ok = dao.delete(id);
+            if (ok) {
+                request.getSession().setAttribute("toast", "✅ Xóa liên hệ thành công");
+            } else {
+                request.getSession().setAttribute("toast", "❌ Xóa liên hệ thất bại");
+            }
+
+            response.sendRedirect(request.getContextPath() + "/AdminContactServlet?email=" + email);
+            return;
+        }
+
+        // ===== EDIT =====
+        if ("edit".equals(action)) {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Map<String, Object> contact = dao.getContactById(id);
+
+            request.setAttribute("contact", contact);
+            request.getRequestDispatcher("/admin/contact_form.jsp").forward(request, response);
+            return;
+        }
+
+        // ===== LIST (theo email) =====
         String email = request.getParameter("email");
         if (email == null || email.trim().isEmpty()) {
+            // Nếu không có email, chuyển về trang danh sách users
             response.sendRedirect(request.getContextPath() + "/admin/users");
             return;
         }
 
-        // Lấy danh sách contact theo email
-        List<Map<String, Object>> contacts = contactDao.getContactsByEmail(email);
-        request.setAttribute("contacts", contacts);
+        List<Map<String, Object>> list = dao.getContactsByEmail(email);
+        request.setAttribute("contacts", list);
         request.setAttribute("userEmail", email);
+
         request.getRequestDispatcher("/admin/contact_list.jsp").forward(request, response);
- 
-        
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AdminContactServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AdminContactServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+    }
+
+    // ================= POST =================
+    private void handlePost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+        String idParam = request.getParameter("id");
+        String email = request.getParameter("email"); // để redirect lại list
+
+        if ("update".equals(action) && idParam != null) {
+            int id = Integer.parseInt(idParam);
+            String name = request.getParameter("name");
+            String phone = request.getParameter("phone");
+            String message = request.getParameter("message");
+
+            boolean ok = dao.update(id, name, phone, message);
+            if (ok) {
+                request.getSession().setAttribute("toast", "✅ Cập nhật liên hệ thành công");
+            } else {
+                request.getSession().setAttribute("toast", "❌ Cập nhật thất bại");
+            }
+        }
+
+        response.sendRedirect(request.getContextPath() + "/AdminContactServlet?email=" + email);
+    }
+    
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        String method = request.getMethod();
+        if ("POST".equals(method)) {
+            handlePost(request, response);
+        } else {
+            handleGet(request, response);
         }
     } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods.">
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     } 
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Admin Contact Servlet - quản lý liên hệ người dùng";
+    }
 }

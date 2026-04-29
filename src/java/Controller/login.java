@@ -1,7 +1,7 @@
-///*
-// * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-// * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
-// */
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
 
 package Controller;
 
@@ -12,9 +12,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.PrintWriter;
 
+/**
+ *
+ * @author Admin
+ */
 public class login extends HttpServlet {
 
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -50,15 +62,17 @@ public class login extends HttpServlet {
                 response.sendRedirect("hienthi?openModal=login");
                 return;
             }
-
+// ===== LOGIN thành công =====
             HttpSession session = request.getSession();
             session.setAttribute("user", us);
             session.setMaxInactiveInterval(50000);
-            
-            // Lấy role từ database 
-            String role = dao.getRole(us);
-            session.setAttribute("role", role);
 
+            // Lấy role từ database
+            String role = dao.getRole(us);
+            session.setAttribute("role", role); 
+            
+            //Thông báo đăng nhập thành công
+            session.setAttribute("loginSuccess", "Đăng nhập thành công! Chào mừng " + us + " 👋");
             // Điều hướng theo role
             if ("admin".equals(role)) {
                 System.out.println("Redirect to: " + request.getContextPath() + "/AdminOrderServlet");
@@ -77,10 +91,11 @@ public class login extends HttpServlet {
             String address  = request.getParameter("address");
             String pass     = request.getParameter("password");
             String confirm  = request.getParameter("confirmPassword");
-            
-            //Kiểm tra email đã nhập đúng định dạng chưa
-            if (email == null || !email.contains("@") || !email.endsWith("@gmail.com") || email.indexOf("@") == 0 || email.indexOf("@") != email.lastIndexOf("@")) {
-                
+
+            // Kiểm tra email đã nhập đúng định dạng chưa
+            if (email == null || !email.contains("@") || !email.endsWith("@gmail.com")
+                    || email.indexOf("@") == 0
+                    || email.indexOf("@") != email.lastIndexOf("@")) {
                 HttpSession session = request.getSession();
                 session.setAttribute("registerError", "Email phải là Gmail hợp lệ!");
                 session.setAttribute("regUsername", username);
@@ -90,7 +105,7 @@ public class login extends HttpServlet {
                 response.sendRedirect("hienthi?openModal=register");
                 return;
             }
-            
+
             // Kiểm tra mật khẩu nhập lại
             if (confirm == null || !confirm.equals(pass)) {
                 HttpSession session = request.getSession();
@@ -131,6 +146,9 @@ public class login extends HttpServlet {
             if (success) {
                 HttpSession session = request.getSession();
                 session.setAttribute("user", username);
+                
+                //Thông báo đăng ký thành công
+                session.setAttribute("registerSuccess", "Đăng ký thành công! Chào mừng " + username + " 🎉");
                 response.sendRedirect("hienthi");
             } else {
                 HttpSession session = request.getSession();
@@ -138,13 +156,55 @@ public class login extends HttpServlet {
                 response.sendRedirect("hienthi?openModal=register");
             }
         }
+
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet login</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet login at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
     }
 
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException { processRequest(request, response); }
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException { processRequest(request, response); }
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
 }

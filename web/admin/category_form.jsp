@@ -23,7 +23,7 @@
     <jsp:include page="sidebar.jsp"/>
     <div class="admin-content">
         <h1><%= isEdit ? "Chỉnh sửa" : "Thêm mới" %> danh mục</h1>
-        <form method="post">
+        <form method="post" action="AdminCategoryServlet">
             <% if (isEdit) { %>
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" name="category_id" value="<%= cat.get("category_id") %>">
@@ -32,7 +32,7 @@
             <% } %>
             <div><label>Tên danh mục</label><input type="text" name="category_name" value="<%= isEdit ? cat.get("category_name") : "" %>" required></div>
             <button type="submit" class="btn-primary">Lưu</button>
-            <a href="${pageContext.request.contextPath}/admin/categories" class="btn">Hủy</a>
+            <a href="${pageContext.request.contextPath}/AdminCategoryServlet" class="btn">Hủy</a>
         </form>
     </div>
 </div>

@@ -139,25 +139,49 @@ public class CheckoutServlet extends HttpServlet {
             request.setAttribute("error", "Đặt hàng thất bại: " + e.getMessage());
             request.getRequestDispatcher("/checkout.jsp").forward(request, response);
         } finally {
-            try { if (rs != null) rs.close(); } catch (Exception e) {}
-            try { if (psUser != null) psUser.close(); } catch (Exception e) {}
-            try { if (psOrder != null) psOrder.close(); } catch (Exception e) {}
-            try { if (psDetail != null) psDetail.close(); } catch (Exception e) {}
-            try { if (conn != null) conn.close(); } catch (Exception e) {}
+            try { 
+                if (rs != null) rs.close(); 
+            } catch (Exception e) {
+                
+            }
+            
+            try { 
+                if (psUser != null) psUser.close(); 
+            } catch (Exception e) {
+                
+            }
+            
+            try { 
+                if (psOrder != null) psOrder.close(); 
+            } catch (Exception e) {
+            
+            }
+            
+            try { 
+                if (psDetail != null) psDetail.close(); 
+            } catch (Exception e) {
+                
+            }
+            
+            try { 
+                if (conn != null) conn.close(); 
+            } catch (Exception e) {
+                
+            }
         }
     
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet CheckoutServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet CheckoutServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+//        try (PrintWriter out = response.getWriter()) {
+//            /* TODO output your page here. You may use following sample code. */
+//            out.println("<!DOCTYPE html>");
+//            out.println("<html>");
+//            out.println("<head>");
+//            out.println("<title>Servlet CheckoutServlet</title>");  
+//            out.println("</head>");
+//            out.println("<body>");
+//            out.println("<h1>Servlet CheckoutServlet at " + request.getContextPath () + "</h1>");
+//            out.println("</body>");
+//            out.println("</html>");
+//        }
     } 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

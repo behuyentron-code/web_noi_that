@@ -4,6 +4,7 @@
     Author     : TRANG ANH LAPTOP
 --%>
 
+<%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -46,7 +47,7 @@
 
         <nav class="top-menu">
             <div class="left-nav">
-                <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
+                <a href="${pageContext.request.contextPath}/home" class="logo-brand">
                     <i class="fa-solid fa-leaf"></i> Trang Chủ
                 </a>
                 <div class="dropdown">
@@ -64,16 +65,39 @@
                         %>
                     </div>
                 </div>
-                <a href="khuyen_mai.jsp">Khuyến mãi</a>
+
                 <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
             </div>
 
             <div class="right-nav">
                 <div class="search-container">
-                    <input type="text" placeholder="Tìm kiếm...">
-                    <button><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <form action="hienthi" method="post">  
+                        <input name="txtSearch" type="text" placeholder="Tìm kiếm..." 
+                               value="<%= (request.getParameter("txtSearch")== null) ? "" : request.getParameter("txtSearch") %>">
+                            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </form>    
                 </div>
 
+<!-- Hiển thị đăng ký/đăng nhập thành công -->
+<%
+    String loginSuccess   = (String) session.getAttribute("loginSuccess");
+    if (loginSuccess != null) session.removeAttribute("loginSuccess");
+
+    String registerSuccess = (String) session.getAttribute("registerSuccess");
+    if (registerSuccess != null) session.removeAttribute("registerSuccess");
+%>
+
+<% if (loginSuccess != null || registerSuccess != null) { %>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        <% if (loginSuccess != null) { %>
+            showToast('<%= loginSuccess %>');
+        <% } else { %>
+            showToast('<%= registerSuccess %>');
+        <% } %>
+    });
+</script>
+<% } %> 
                 <div class="auth-group">
                     <a href="cart.jsp" class="icon-btn">
                         <i class="fa-solid fa-cart-shopping"></i>
@@ -102,7 +126,8 @@
                 </div>
             </div>
         </nav>
-
+   
+      
  <div id="loginModal" class="modal">
             <div class="modal-box">
                 <span class="close" onclick="closeModal('loginModal')" style="color: #333">&times;</span>
@@ -237,28 +262,35 @@
 
     </div>
 
-    <!-- FORM -->
-    <div class="form-box">
-        <h2>Ask a question</h2>
+        <!-- FORM LIÊN HỆ -->
+        <div class="form-box">
+            <h2>Gửi câu hỏi cho chúng tôi</h2>
 
-        <form action="ContactServlet" method="post">
-            <input type="text" name="name" placeholder="Họ và tên *">
-            <input type="email" name="email" placeholder="Email">
-            <input type="text" name="phone" placeholder="Số điện thoại">
-           
-            <textarea name="message" placeholder="Nội dung"></textarea>
-            <button class="btn" type="submit" style="background-color:#4e5c34; 
-                    color:#fff;
-                    padding:10px;
-                    font-weight: bold;
-                    font-size: 15px;
-                    margin-top:25px;"
-                    >GỬI</button>
+            <%-- Kiểm tra đăng nhập --%>
+            <%
+                String loggedUser = (String) session.getAttribute("user");
+                if (loggedUser == null) {
+            %>
+                <div class="login-required">
+                    <i class="fa-solid fa-lock"></i>
+                    <p>Bạn cần <a href="#" onclick="openLogin()">đăng nhập</a> để gửi liên hệ.</p>
+                </div>
+            <% } else { %>
+                <form action="ContactServlet" method="post">
+                    <input type="text" name="name" placeholder="Họ và tên" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="text" name="phone" placeholder="Số điện thoại">
+                    <textarea name="message" placeholder="Nội dung" rows="5" required></textarea>
+                    <button class="btn-submit" type="submit">GỬI</button>
+                </form>
+            <% } %>
+        </div>
             
-        </form>
+        <div class="toast" id="toast">
+            <i class="fa-solid fa-circle-check"></i>
+            <span id="toast-msg">Bạn đã gửi Liên Hệ thành công!</span>
+        </div>
     </div>
-
-</div>
 </div>
 
 <!-- Footer -->
@@ -303,6 +335,47 @@
 
 
 <script>
+    
+// Hàm showToast (nếu chưa có)
+    function showToast(msg, isError = false) {
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            // Tạo toast nếu chưa tồn tại
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.className = 'toast';
+            toast.innerHTML = '<i></i><span id="toast-msg"></span>';
+            document.body.appendChild(toast);
+        }
+        const icon = toast.querySelector('i');
+        const span = toast.querySelector('#toast-msg');
+        span.textContent = msg;
+        if (isError) {
+            toast.style.background = '#c0392b';
+            icon.className = 'fa-solid fa-circle-xmark';
+        } else {
+            toast.style.background = '#4e5c34';
+            icon.className = 'fa-solid fa-circle-check';
+        }
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // Hiển thị thông báo từ request attribute
+    <% 
+        String successMsg = (String) request.getAttribute("success");
+        String errorMsg   = (String) request.getAttribute("error");
+        if (successMsg != null) { 
+    %>
+        window.addEventListener('DOMContentLoaded', function() {
+            showToast('<%= successMsg %>', false);
+        });
+    <% } else if (errorMsg != null) { %>
+        window.addEventListener('DOMContentLoaded', function() {
+            showToast('<%= errorMsg %>', true);
+        });
+    <% } %>
+            
             function showPhone() {
                 let text = document.getElementById("support-text");
 
@@ -322,12 +395,15 @@
             function openLogin() {
                 document.getElementById("loginModal").style.display = "flex";
             }
+            
             function openRegister() {
                 document.getElementById("registerModal").style.display = "flex";
             }
+            
             function closeModal(id) {
                 document.getElementById(id).style.display = "none";
             }
+            
             function switchModal(closeId, openId) {
                 closeModal(closeId);
                 document.getElementById(openId).style.display = "flex";

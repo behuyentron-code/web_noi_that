@@ -16,7 +16,7 @@
 <head>
     <title>Danh sách liên hệ - <%= userEmail %></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
+    <link rel="stylesheet" href="css/admin.css">
     <style>
         .message-content { max-width: 400px; white-space: pre-wrap; word-break: break-word; }
         .back-link { margin-bottom: 20px; display: inline-block; }
@@ -36,13 +36,24 @@
                     <tr><th>ID</th><th>Họ tên</th><th>Điện thoại</th><th>Nội dung</th><th>Ngày gửi</th></tr>
                 </thead>
                 <tbody>
-                <% for (Map<String,Object> c : contacts) { %>
+                <% for (Map<String,Object> c : contacts) { 
+                    int contactId = (Integer) c.get("contact_id");
+                %>
                     <tr>
-                        <td><%= c.get("contact_id") %></td>
+                        <td><%= contactId %></td>
                         <td><%= c.get("name") != null ? c.get("name") : "" %></td>
                         <td><%= c.get("phone") != null ? c.get("phone") : "" %></td>
                         <td class="message-content"><%= c.get("message") != null ? c.get("message") : "" %></td>
                         <td><%= sdf.format(c.get("created_at")) %></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="${pageContext.request.contextPath}/AdminContactServlet?action=edit&id=<%= contactId %>&email=<%= userEmail %>" 
+   class="btn btn-warning btn-sm">Sửa</a>
+
+<a href="${pageContext.request.contextPath}/AdminContactServlet?action=delete&id=<%= contactId %>&email=<%= userEmail %>" 
+   class="btn btn-danger btn-sm" onclick="return confirm('Xóa?')">Xóa</a>
+                            </div>
+                         </td>
                     </tr>
                 <% } %>
                 </tbody>

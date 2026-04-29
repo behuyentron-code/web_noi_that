@@ -21,7 +21,7 @@
     <jsp:include page="sidebar.jsp"/>
     <div class="admin-content">
         <h1><%= isEdit ? "Chỉnh sửa" : "Thêm mới" %> người dùng</h1>
-        <form method="post">
+        <form method="post" action="${pageContext.request.contextPath}/admin/users">
             <% if (isEdit) { %>
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" name="user_id" value="<%= user.get("user_id") %>">
@@ -34,7 +34,7 @@
             <div><label>Mật khẩu</label><input type="password" name="password" <% if(!isEdit) out.print("required"); %>></div>
             <!-- Đã bỏ phần chọn role -->
             <button type="submit" class="btn btn-primary">Lưu</button>
-            <a href="${pageContext.request.contextPath}/admin/users" class="btn">Hủy</a>
+            <a href="${pageContext.request.contextPath}/admin/users" class="btn-primary">Hủy</a>
         </form>
     </div>
 </div>

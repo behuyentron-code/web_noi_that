@@ -9,6 +9,7 @@
 <%@page import="java.util.Map"%>
 <%@page import="Model.products"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <%
     String user = (String) session.getAttribute("user");
     if (user == null) {
@@ -40,32 +41,138 @@
     
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .checkout-wrapper { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: flex; gap: 30px; flex-wrap: wrap; }
-        .checkout-form { flex: 2; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8d8; }
-        .order-summary { flex: 1.2; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8d8; height: fit-content; }
-        .form-group { margin-bottom: 20px; }
-        label { font-weight: 600; display: block; margin-bottom: 8px; color: #2c2c2c; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #d6ddc8; border-radius: 10px; font-family: 'Montserrat', sans-serif; }
-        .pay-method { display: flex; gap: 20px; margin-top: 10px; }
-        .pay-method label { display: flex; align-items: center; gap: 8px; font-weight: normal; }
-        .btn-place-order { background: #4e5c34; color: white; border: none; width: 100%; padding: 14px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 20px; }
-        .btn-place-order:hover { background: #6b7c4a; }
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
-        .summary-total { font-size: 20px; font-weight: bold; border-top: 1px solid #ddd; padding-top: 15px; margin-top: 10px; }
-        .cart-items-preview { max-height: 300px; overflow-y: auto; margin-bottom: 20px; }
-        .preview-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f3ea; }
-        .preview-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
-        .preview-info { flex: 1; font-size: 13px; }
-        .preview-name { font-weight: 600; }
-        h3 { margin-top: 0; color: #4e5c34; }
-        hr { margin: 20px 0; }
+        .checkout-wrapper { 
+            max-width: 1200px; 
+            margin: 40px auto; 
+            padding: 0 20px; 
+            display: flex; 
+            gap: 30px; 
+            flex-wrap: wrap; 
+        }
+
+        .checkout-form { 
+            flex: 2; 
+            background: white; 
+            padding: 25px; 
+            border-radius: 16px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            border: 1px solid #e2e8d8; 
+        }
+        .order-summary { 
+            flex: 1.2; 
+            background: white; 
+            padding: 25px; 
+            border-radius: 16px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            border: 1px solid #e2e8d8; 
+            height: fit-content; 
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        
+        label { 
+            font-weight: 600; 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #2c2c2c; 
+        }
+        
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #d6ddc8; 
+            border-radius: 10px; 
+            font-family: 'Montserrat', sans-serif; 
+        }
+        
+        .pay-method { 
+            display: flex; 
+            gap: 20px; 
+            margin-top: 10px; 
+        }
+        
+        .pay-method label { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            font-weight: normal; 
+        }
+        
+        .btn-place-order { 
+            background: #4e5c34;
+            color: white; 
+            border: none; 
+            width: 100%;
+            padding: 14px; 
+            border-radius: 40px;
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            margin-top: 20px; 
+        }
+        
+        .btn-place-order:hover { 
+            background: #6b7c4a; 
+        }
+        .summary-row { 
+            display: flex;
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+        }
+        
+        .summary-total { 
+            font-size: 20px;
+            font-weight: bold; 
+            border-top: 1px solid #ddd;
+            padding-top: 15px; 
+            margin-top: 10px; 
+        }
+        
+        .cart-items-preview { 
+            max-height: 300px; 
+            overflow-y: auto; 
+            margin-bottom: 20px; 
+        }
+        
+        .preview-item { 
+            display: flex;
+            gap: 12px; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #f0f3ea;
+        }
+        
+        .preview-item img { 
+            width: 50px; 
+            height: 50px; 
+            object-fit: cover; 
+            border-radius: 8px; 
+        }
+        
+        .preview-info { 
+            flex: 1;
+            font-size: 13px; 
+        }
+        
+        .preview-name { 
+            font-weight: 600; 
+        }
+        
+        h3 { 
+            margin-top: 0; 
+            color: #4e5c34;
+        }
+        
+        hr { 
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
 <!--    <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>-->
     <nav class="top-menu">
             <div class="left-nav">
-                <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
+                <a href="${pageContext.request.contextPath}/home" class="logo-brand">
                     <i class="fa-solid fa-leaf"></i> Trang Chủ
                 </a>
                 <div class="dropdown">
@@ -83,16 +190,39 @@
                         %>
                     </div>
                 </div>
-                <a href="khuyen_mai.jsp">Khuyến mãi</a>
+
                 <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
             </div>
 
             <div class="right-nav">
                 <div class="search-container">
-                    <input type="text" placeholder="Tìm kiếm...">
-                    <button><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <form action="hienthi" method="post">  
+                        <input name="txtSearch" type="text" placeholder="Tìm kiếm..." 
+                               value="<%= (request.getParameter("txtSearch")== null) ? "" : request.getParameter("txtSearch") %>">
+                            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </form>  
                 </div>
 
+<!-- Hiển thị đăng ký/đăng nhập thành công -->
+<%
+    String loginSuccess   = (String) session.getAttribute("loginSuccess");
+    if (loginSuccess != null) session.removeAttribute("loginSuccess");
+
+    String registerSuccess = (String) session.getAttribute("registerSuccess");
+    if (registerSuccess != null) session.removeAttribute("registerSuccess");
+%>
+
+<% if (loginSuccess != null || registerSuccess != null) { %>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        <% if (loginSuccess != null) { %>
+            showToast('<%= loginSuccess %>');
+        <% } else { %>
+            showToast('<%= registerSuccess %>');
+        <% } %>
+    });
+</script>
+<% } %>                           
                 <div class="auth-group">
                     <a href="cart.jsp" class="icon-btn">
                         <i class="fa-solid fa-cart-shopping"></i>
@@ -173,12 +303,23 @@
             <div class="summary-row"><span>Tạm tính</span><span id="subtotal"><%= fmt.format(subtotal) %></span></div>
             <div class="summary-row"><span>Phí vận chuyển</span><span><% if(shipping==0){ %>Miễn phí<% }else{ %><%= fmt.format(shipping) %><% } %></span></div>
             <div class="summary-row"><span>Giảm giá</span><span>-0đ</span></div>
-            <div class="summary-total"><span>Tổng cộng</span><span><%= fmt.format(total) %></span></div>
+            <div class="summary-total"><span>Tổng cộng</span> <span> <%= fmt.format(total) %></span></div>
             <hr>
             <div class="secure-note"><i class="fa-solid fa-lock"></i> Thông tin của bạn được bảo mật tuyệt đối.</div>
         </div>
     </div>
-    <footer class="footer"><!-- giống các trang --></footer>
+    <footer class="footer">
+        <div>
+            <h3>Nhóm 3</h3>
+            <p>Lã Ngọc Huyền    | 29-08-2005 </p>
+            <p>Trần Anh Đức     | 11-11-2005 </p>
+            <p>Nguyễn Phi Long  | 14-06-2005 </p>
+        </div>
+        <div class="footer-logo">
+            <img src="./images/logo.png">
+        </div>
+    </footer>
+            
     <script>
         // Đảm bảo người dùng đã đăng nhập (kiểm tra lại phía client nếu cần)
     </script>

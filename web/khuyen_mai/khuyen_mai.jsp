@@ -32,7 +32,7 @@
 
 <nav class="top-menu">
     <div class="left-nav">
-        <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
+        <a href="${pageContext.request.contextPath}/home" class="logo-brand">
             <i class="fa-solid fa-leaf"></i> Trang Chủ
         </a>
         <div class="dropdown">

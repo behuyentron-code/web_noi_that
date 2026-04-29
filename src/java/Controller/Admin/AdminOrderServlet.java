@@ -5,13 +5,14 @@
 
 package Controller.Admin;
 
+import DAO.orders_DAO;
 import Model.dbConnect;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,151 +21,106 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ *
+ * @author Admin
+ */
 public class AdminOrderServlet extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String action = req.getParameter("action");
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+
+        orders_DAO dao = new orders_DAO();
+        String action = request.getParameter("action");
         if ("detail".equals(action)) {
-            int orderId = Integer.parseInt(req.getParameter("id"));
-            Map<String, Object> order = getOrderDetail(orderId);
-            req.setAttribute("order", order);
-            req.getRequestDispatcher("/admin/order_detail.jsp").forward(req, resp);
+            int orderId = Integer.parseInt(request.getParameter("id"));
+            Map<String, Object> order = dao.getOrderDetail(orderId);
+            request.setAttribute("order", order);
+            request.getRequestDispatcher("/admin/order_detail.jsp").forward(request, response);
         } else {
-            // Lấy tham số tìm kiếm, lọc
-            String keyword = req.getParameter("keyword");
-            String status = req.getParameter("status");
+            String keyword = request.getParameter("keyword");
+            String status = request.getParameter("status");
             int page = 1;
             int recordsPerPage = 10;
-            if (req.getParameter("page") != null) page = Integer.parseInt(req.getParameter("page"));
+            if (request.getParameter("page") != null) page = Integer.parseInt(request.getParameter("page"));
 
-            List<Map<String, Object>> orders = getAllOrders(keyword, status, page, recordsPerPage);
-            int totalRecords = countOrders(keyword, status);
+            List<Map<String, Object>> orders = dao.getAllOrders(keyword, status, page, recordsPerPage);
+            int totalRecords = dao.countOrders(keyword, status);
             int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
 
-            req.setAttribute("orders", orders);
-            req.setAttribute("currentPage", page);
-            req.setAttribute("totalPages", totalPages);
-            req.setAttribute("keyword", keyword);
-            req.setAttribute("statusFilter", status);
-            req.getRequestDispatcher("/admin/orders.jsp").forward(req, resp);
+            request.setAttribute("orders", orders);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("keyword", keyword);
+            request.setAttribute("statusFilter", status);
+            request.getRequestDispatcher("/admin/orders.jsp").forward(request, response);
+        }
+
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet AdminOrderServlet</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet AdminOrderServlet at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
         }
     }
 
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        int orderId = Integer.parseInt(req.getParameter("orderId"));
-        String status = req.getParameter("status");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int orderId = Integer.parseInt(request.getParameter("orderId"));
+        String status = request.getParameter("status");
         try (Connection conn = new dbConnect().getConnect();
              PreparedStatement ps = conn.prepareStatement("UPDATE orders SET status = ? WHERE order_id = ?")) {
             ps.setString(1, status);
             ps.setInt(2, orderId);
             ps.executeUpdate();
         } catch (Exception e) { e.printStackTrace(); }
-        resp.sendRedirect(req.getContextPath() + "/admin/orders");
+        response.sendRedirect(request.getContextPath() + "/AdminOrderServlet");
     }
 
-    private List<Map<String, Object>> getAllOrders(String keyword, String status, int page, int recordsPerPage) {
-        List<Map<String, Object>> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder(
-            "SELECT o.order_id, u.username, o.order_date, o.total_price, o.status " +
-            "FROM orders o JOIN users u ON o.user_id = u.user_id WHERE 1=1"
-        );
-        List<Object> params = new ArrayList<>();
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (u.username LIKE ? OR o.order_id LIKE ?)");
-            String kw = "%" + keyword.trim() + "%";
-            params.add(kw);
-            params.add(kw);
-        }
-        if (status != null && !status.trim().isEmpty() && !"all".equals(status)) {
-            sql.append(" AND o.status = ?");
-            params.add(status);
-        }
-        sql.append(" ORDER BY o.order_id DESC LIMIT ? OFFSET ?");
-        params.add(recordsPerPage);
-        params.add((page - 1) * recordsPerPage);
+    /**
+     * Returns a short description of the servlet.
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
 
-        try (Connection conn = new dbConnect().getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("order_id", rs.getInt("order_id"));
-                map.put("username", rs.getString("username"));
-                map.put("order_date", rs.getTimestamp("order_date"));
-                map.put("total_price", rs.getDouble("total_price"));
-                map.put("status", rs.getString("status"));
-                list.add(map);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return list;
-    }
-
-    private int countOrders(String keyword, String status) {
-        int count = 0;
-        StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) FROM orders o JOIN users u ON o.user_id = u.user_id WHERE 1=1"
-        );
-        List<Object> params = new ArrayList<>();
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (u.username LIKE ? OR o.order_id LIKE ?)");
-            String kw = "%" + keyword.trim() + "%";
-            params.add(kw);
-            params.add(kw);
-        }
-        if (status != null && !status.trim().isEmpty() && !"all".equals(status)) {
-            sql.append(" AND o.status = ?");
-            params.add(status);
-        }
-        try (Connection conn = new dbConnect().getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) count = rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
-        return count;
-    }
-
-    private Map<String, Object> getOrderDetail(int orderId) {
-        Map<String, Object> order = new HashMap<>();
-        String sql = "SELECT o.*, u.username, u.email, u.phone FROM orders o JOIN users u ON o.user_id = u.user_id WHERE o.order_id = ?";
-        try (Connection conn = new dbConnect().getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                order.put("order_id", rs.getInt("order_id"));
-                order.put("username", rs.getString("username"));
-                order.put("shipping_address", rs.getString("shipping_address"));
-                order.put("payment_method", rs.getString("payment_method"));
-                order.put("total_price", rs.getDouble("total_price"));
-                order.put("status", rs.getString("status"));
-                order.put("order_date", rs.getTimestamp("order_date"));
-            }
-            rs.close();
-        } catch (Exception e) { e.printStackTrace(); }
-        List<Map<String, Object>> items = new ArrayList<>();
-        String sql2 = "SELECT od.*, p.product_name, p.image FROM order_details od JOIN products p ON od.product_id = p.product_id WHERE od.order_id = ?";
-        try (Connection conn = new dbConnect().getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql2)) {
-            ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("product_name", rs.getString("product_name"));
-                item.put("quantity", rs.getInt("quantity"));
-                item.put("price", rs.getDouble("price"));
-                item.put("image", rs.getString("image"));
-                items.add(item);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        order.put("items", items);
-        return order;
-    }
+  
 }

@@ -26,7 +26,7 @@
         <div class="admin-content">
             <h1><%= isEdit ? "Chỉnh sửa sản phẩm" : "Thêm mới sản phẩm" %></h1>
 
-            <form method="post">
+            <form method="post" action="${pageContext.request.contextPath}/admin/products">
                 <% if (isEdit) { %>
                     <input type="hidden" name="action" value="update">
                     <input type="hidden" name="product_id" value="<%= p.getProduct_id() %>">
@@ -69,11 +69,9 @@
                         </select>
                     </div>
                 </div>
-
-                <div>
+ 
                     <button type="submit" class="btn-primary">Lưu sản phẩm</button>
                     <a href="${pageContext.request.contextPath}/admin/products" class="btn">Hủy bỏ</a>
-                </div>
             </form>
         </div>
     </div>

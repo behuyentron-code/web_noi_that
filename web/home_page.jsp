@@ -1,3 +1,4 @@
+<%@page import="java.util.List"%>
 <%@page import="Model.products"%>
 <%@page import="DAO.products_DAO"%>
 <%@page import="java.text.NumberFormat"%>
@@ -28,120 +29,113 @@
         session.removeAttribute("regEmail");
         session.removeAttribute("regPhone");
     }
+    
 %>
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nội Thất Hiện Đại - Trang Chủ</title>
+    <title>Nội Thất Hiện Đại - Sản Phẩm</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* Banner ảnh full width, chữ nổi giữa không nền đen */
-        .banner-image-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 30px;
-        }
-        .banner-image-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .banner-overlay-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 42px;
-            font-weight: 800;
-            text-align: center;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-            letter-spacing: 1px;
-            background: transparent;
-            padding: 0;
-            white-space: nowrap;
-        }
-        @media (max-width: 768px) {
-            .banner-overlay-text {
-                font-size: 20px;
-                white-space: normal;
-                width: 90%;
-            }
-        }
-    </style>
+    
+
 </head>
 <body>
 
 <!--<header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>-->
 
-<nav class="top-menu">
-    <div class="left-nav">
-        <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
-            <i class="fa-solid fa-leaf"></i> Trang Chủ
-        </a>
-        <div class="dropdown">
-            <a class="dropbtn">Sản phẩm <i class="fas fa-chevron-down"></i></a>
-            <div class="dropdown-content">
-                <% 
-                    java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
-                    if(navCats != null) {
-                        for(String cat : navCats) {
-                %>
-                    <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
-                <% 
-                        }
-                    } 
-                %>
-            </div>
-        </div>
-        <a href="khuyen_mai.jsp">Khuyến mãi</a>
-        <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
-    </div>
 
-    <div class="right-nav">
-        <div class="search-container">
-            <input type="text" placeholder="Tìm kiếm...">
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
-
-        <div class="auth-group">
-            <a href="cart.jsp" class="icon-btn">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
-            </a>
-            
-             <% if (user != null) { %>
-                <%-- Kiểm tra vai trò --%>
-                <% if ("admin".equals(session.getAttribute("role"))) { %>
-                    <a href="${pageContext.request.contextPath}/AdminDashboardServlet" class="admin-link">
-                        <i class="fa-solid fa-user-tie"></i> Quản trị
-                    </a>
-                <% } else { %>
-                    <%-- Chỉ hiện icon account cho User, không dẫn link đi đâu cả --%>
-                    <div class="icon-btn" style="cursor: default;">
-                        <i class="fa-solid fa-circle-user"></i>
+        <nav class="top-menu">
+            <div class="left-nav">
+                <a href="${pageContext.request.contextPath}/home" class="logo-brand">
+                    <i class="fa-solid fa-leaf"></i> Trang Chủ
+                </a>
+                <div class="dropdown">
+                    <a class="dropbtn">Sản phẩm <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-content">
+                        <% 
+                            java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                            if(navCats != null) {
+                                for(String cat : navCats) {
+                        %>
+                            <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                        <% 
+                                }
+                            } 
+                        %>
                     </div>
-                <% } %>
+                </div>
 
-                <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
+                <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
+            </div>
 
-            <% } else { %>
-                <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
-                <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
-            <% } %>
-        </div>
-    </div>
-</nav>
+            <div class="right-nav">
+                <div class="search-container">
+                    <form action="hienthi" method="post">  
+                        <input name="txtSearch" type="text" placeholder="Tìm kiếm..." 
+                               value="<%= (request.getParameter("txtSearch")== null) ? "" : request.getParameter("txtSearch") %>">
+                            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </form>    
+                </div>
+                            
+<!-- Hiển thị đăng ký/đăng nhập thành công -->
+<%
+    String loginSuccess   = (String) session.getAttribute("loginSuccess");
+    if (loginSuccess != null) session.removeAttribute("loginSuccess");
 
-<!-- ===== BANNER ẢNH FULL WIDTH + CHỮ GIỮA (KHÔNG NỀN) ===== -->
+    String registerSuccess = (String) session.getAttribute("registerSuccess");
+    if (registerSuccess != null) session.removeAttribute("registerSuccess");
+%>
+
+<% if (loginSuccess != null || registerSuccess != null) { %>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        <% if (loginSuccess != null) { %>
+            showToast('<%= loginSuccess %>');
+        <% } else { %>
+            showToast('<%= registerSuccess %>');
+        <% } %>
+    });
+</script>
+<% } %>                     
+                <div class="auth-group">
+                    <a href="cart.jsp" class="icon-btn">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
+                    </a>
+                    
+                    
+                     <% if (user != null) { %>
+                        <%-- Kiểm tra vai trò --%>
+                        <% if ("admin".equals(session.getAttribute("role"))) { %>
+                            <a href="${pageContext.request.contextPath}/AdminDashboardServlet" class="admin-link">
+                                <i class="fa-solid fa-user-tie"></i> Quản trị
+                            </a>
+                        <% } else { %>
+                            <%-- Chỉ hiện icon account cho User, không dẫn link đi đâu cả --%>
+                            <div class="icon-btn" style="cursor: default;">
+                                <i class="fa-solid fa-circle-user"></i>
+                            </div>
+                            
+                        <% } %>
+
+                        <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
+
+                    <% } else { %>
+                        <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
+                        <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
+                    <% } %>
+                </div>
+            </div>
+        </nav>
+
+<!-- ===== BANNER ẢNH FULL WIDTH + CHỮ GIỮA (KHÔNG NỀN) ===== 
 <div class="banner-image-container">
     <img src="${pageContext.request.contextPath}/images/hero.jpg" alt="Banner nội thất">
     <div class="banner-overlay-text">CHÀO MỪNG ĐẾN VỚI WEBSITE CỦA NHÓM 2</div>
-</div>
+</div>-->
 
 <div class="container">
     <aside class="left-menu new-sidebar">
@@ -149,7 +143,7 @@
         <ul>
             <li onclick="location.href='${pageContext.request.contextPath}/hienthi'">Tất Cả</li>
             <%
-                java.util.List<String> categories = (java.util.List<String>) request.getAttribute("categories");
+                List<String> categories = (List<String>) request.getAttribute("categories");
                 if (categories != null && !categories.isEmpty()) {
                     for (String cat : categories) {
             %>
@@ -198,6 +192,7 @@
                          onerror="this.src='https://placehold.co/500x300?text=Nội+Thất'">
 <!--                    <span class="product-badge">-10%</span>-->
                 </div>
+                         
                 <div class="product-info">
                     <h4 class="product-name"><%= p.getProduct_name()%></h4>
                     <div style="text-align: right !important;" class="product-price"><%= formattedPrice%></div>

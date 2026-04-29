@@ -20,7 +20,7 @@ import java.util.Map;
 public class categories_DAO {
      public List<Map<String, Object>> getAllCategories(String keyword, int page, int recordsPerPage) {
         List<Map<String, Object>> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT category_id, category_name FROM categories WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT * FROM categories WHERE 1=1");
         List<Object> params = new ArrayList<>();
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append(" AND category_name LIKE ?");
@@ -63,7 +63,7 @@ public class categories_DAO {
 
     public Map<String, Object> getCategoryById(int id) {
         Map<String, Object> map = new HashMap<>();
-        String sql = "SELECT category_id, category_name FROM categories WHERE category_id = ?";
+        String sql = "SELECT * FROM categories WHERE category_id = ?";
         try (Connection conn = new dbConnect().getConnect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -95,13 +95,31 @@ public class categories_DAO {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void deleteCategory(int id) {
-        String sql = "DELETE FROM categories WHERE category_id = ?";
-        try (Connection conn = new dbConnect().getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+   public boolean deleteCategory(int id) {
+    String sql = "DELETE FROM categories WHERE category_id = ?";
+    try (Connection conn = new dbConnect().getConnect();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, id);
+        return ps.executeUpdate() > 0; // ✅ check có xóa thật không
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
     }
+}
+   
+   public boolean hasProducts(int categoryId) {
+    String sql = "SELECT COUNT(*) FROM products WHERE category_id = ?";
+    try (Connection conn = new dbConnect().getConnect();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, categoryId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
 }

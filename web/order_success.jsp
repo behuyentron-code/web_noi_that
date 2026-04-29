@@ -8,6 +8,7 @@
 <%@page import="java.util.Locale"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
+    
     Integer orderId = (Integer) request.getAttribute("orderId");
     Double total = (Double) request.getAttribute("total");
     if (orderId == null) response.sendRedirect("cart.jsp");
@@ -34,7 +35,7 @@
 <!--    <header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>-->
     <nav class="top-menu">
         <div class="left-nav">
-            <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
+            <a href="${pageContext.request.contextPath}/home" class="logo-brand">
                 <i class="fa-solid fa-leaf"></i> Trang Chủ
             </a>
             <div class="dropdown">
@@ -52,7 +53,7 @@
                     %>
                 </div>
             </div>
-            <a href="khuyen_mai.jsp">Khuyến mãi</a>
+
             <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
         </div>
 
@@ -102,6 +103,17 @@
         <p>Chúng tôi sẽ liên hệ xác nhận đơn hàng trong thời gian sớm nhất.</p>
         <a href="${pageContext.request.contextPath}/hienthi" class="btn-continue"><i class="fa-solid fa-arrow-left"></i> Tiếp tục mua sắm</a>
     </div>
-    <footer class="footer"><!-- giống các trang --></footer>
+    
+    <footer class="footer">
+        <div>
+            <h3>Nhóm 3</h3>
+            <p>Lã Ngọc Huyền    | 29-08-2005 </p>
+            <p>Trần Anh Đức     | 11-11-2005 </p>
+            <p>Nguyễn Phi Long  | 14-06-2005 </p>
+        </div>
+        <div class="footer-logo">
+            <img src="./images/logo.png">
+        </div>
+    </footer>
 </body>
 </html>

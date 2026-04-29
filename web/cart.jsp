@@ -65,7 +65,7 @@
 <body>
 
 
-        <nav class="top-menu">
+<nav class="top-menu">
     <div class="left-nav">
         <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
             <i class="fa-solid fa-leaf"></i> Trang Chủ
@@ -85,27 +85,58 @@
                 %>
             </div>
         </div>
-        <a href="khuyen_mai.jsp">Khuyến mãi</a>
+
         <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
     </div>
 
     <div class="right-nav">
         <div class="search-container">
-            <input type="text" placeholder="Tìm kiếm...">
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+            <form action="hienthi" method="post">  
+                <input name="txtSearch" type="text" placeholder="Tìm kiếm..." 
+                           value="<%= (request.getParameter("txtSearch")== null) ? "" : request.getParameter("txtSearch") %>">
+                 <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>    
         </div>
 
+<!-- Hiển thị đăng ký/đăng nhập thành công -->
+<%
+    String loginSuccess   = (String) session.getAttribute("loginSuccess");
+    if (loginSuccess != null) session.removeAttribute("loginSuccess");
+
+    String registerSuccess = (String) session.getAttribute("registerSuccess");
+    if (registerSuccess != null) session.removeAttribute("registerSuccess");
+%>
+
+<% if (loginSuccess != null || registerSuccess != null) { %>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        <% if (loginSuccess != null) { %>
+            showToast('<%= loginSuccess %>');
+        <% } else { %>
+            showToast('<%= registerSuccess %>');
+        <% } %>
+    });
+</script>
+<% } %>                  
         <div class="auth-group">
             <a href="cart.jsp" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
             </a>
-            
-            <% if (session.getAttribute("user") == null) { %>
-                <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
-                <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
-            <% } else { %>
+            <% if (user != null) { %>
+                <% if ("admin".equals(session.getAttribute("role"))) { %>
+                    <a href="${pageContext.request.contextPath}/AdminDashboardServlet" class="admin-link">
+                        <i class="fa-solid fa-user-tie"></i> Quản trị
+                    </a>
+                <% } else { %>
+                    <div class="icon-btn" style="cursor:default;">
+                        <i class="fa-solid fa-circle-user"></i>
+                    </div>
+                <% } %>
                 <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
+            <% } else { %>
+                <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
+                <a href="#" class="btn-pill solid"  onclick="openRegister()">Đăng ký</a>
             <% } %>
         </div>
     </div>
@@ -259,7 +290,7 @@
                 <!-- Checkout -->
                 <div class="checkout-section">
                     <% if(!cart.isEmpty()) { %>
-                        <form action="${pageContext.request.contextPath}/CheckoutServlet" method="post">
+                        <form action="${pageContext.request.contextPath}/checkout.jsp" method="post">
                             <button type="submit" class="btn-checkout">
                                 <i class="fa-solid fa-shield-halved"></i>
                                 Đặt hàng ngay

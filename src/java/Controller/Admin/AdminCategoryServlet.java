@@ -22,6 +22,7 @@ import java.util.Map;
  */
 public class AdminCategoryServlet extends HttpServlet {
    
+    private categories_DAO dao = new categories_DAO();
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -29,59 +30,101 @@ public class AdminCategoryServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        categories_DAO dao = new categories_DAO();
-        
+    
+    // ================= GET =================
+    private void handleGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String action = request.getParameter("action");
+
+        // ===== XÓA =====
         if ("delete".equals(action)) {
+    int id = Integer.parseInt(request.getParameter("id"));
+
+    if (dao.hasProducts(id)) {
+        request.getSession().setAttribute("toast", "⚠️ Danh mục đang chứa sản phẩm, không thể xóa");
+    } else {
+        boolean ok = dao.deleteCategory(id);
+        if (ok) {
+            request.getSession().setAttribute("toast", "✅ Xóa thành công");
+        } else {
+            request.getSession().setAttribute("toast", "❌ Xóa thất bại");
+        }
+    }
+
+    response.sendRedirect(request.getContextPath() + "/AdminCategoryServlet");
+    return;
+}
+
+        // ===== EDIT =====
+        if ("edit".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
-            dao.deleteCategory(id);
-            response.sendRedirect(request.getContextPath() + "/admin/categories");
-            return;
-        } else if ("edit".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("id"));
-            Map<String, Object> cat = dao.getCategoryById(id);
-            request.setAttribute("category", cat);
-            request.getRequestDispatcher("/admin/category_form.jsp").forward(request, response);
-            return;
-        } else if ("add".equals(action)) {
+            Map<String, Object> cate = dao.getCategoryById(id);
+
+            request.setAttribute("category", cate);
             request.getRequestDispatcher("/admin/category_form.jsp").forward(request, response);
             return;
         }
-  
-         // Xử lý hiển thị danh sách + tìm kiếm + phân trang
+
+        // ===== ADD =====
+        if ("add".equals(action)) {
+            request.getRequestDispatcher("/admin/category_form.jsp").forward(request, response);
+            return;
+        }
+
+        // ===== LIST + FILTER =====
         String keyword = request.getParameter("keyword");
+        if (keyword == null) keyword = "";
+
         int page = 1;
         int recordsPerPage = 10;
         if (request.getParameter("page") != null) {
             page = Integer.parseInt(request.getParameter("page"));
         }
 
-        // Gọi DAO
-        java.util.List<Map<String, Object>> cats = dao.getAllCategories(keyword, page, recordsPerPage);
-        int totalRecords = dao.countCategories(keyword);
-        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-        
-        request.setAttribute("categories", cats);
+        List<Map<String, Object>> list = dao.getAllCategories(keyword, page, recordsPerPage);
+        int total = dao.countCategories(keyword);
+        int totalPages = (int) Math.ceil((double) total / recordsPerPage);
+
+        request.setAttribute("categories", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("keyword", keyword);
+
         request.getRequestDispatcher("/admin/categories.jsp").forward(request, response);
+    }
+
+    // ================= POST =================
+    private void handlePost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+        String idParam = request.getParameter("category_id");
+        String name = request.getParameter("category_name");
+
+        if ("create".equals(action)) {
+            dao.addCategory(name);
+            request.getSession().setAttribute("toast", "Thêm danh mục thành công");
+        } else if ("update".equals(action) && idParam != null) {
+            dao.updateCategory(Integer.parseInt(idParam), name);
+            request.getSession().setAttribute("toast", "Cập nhật danh mục thành công");
+        }
+
+        response.sendRedirect(request.getContextPath() + "/AdminCategoryServlet");
+    }
+    
+    
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        String method = request.getMethod();
+        if ("POST".equals(method)) {
+            handlePost(request, response);
+        } else {
+            handleGet(request, response);
+        }
         
-        
-//        String action = request.getParameter("action");
-//        String idParam = request.getParameter("category_id");
-//        String name = request.getParameter("category_name");
-//
-//        if ("create".equals(action)) {
-//            dao.addCategory(name);
-//        } else if ("update".equals(action) && idParam != null) {
-//            int id = Integer.parseInt(idParam);
-//            dao.updateCategory(id, name);
-//        }
-//        response.sendRedirect(request.getContextPath() + "/admin/categories");
         
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
@@ -95,6 +138,8 @@ public class AdminCategoryServlet extends HttpServlet {
             out.println("</body>");
             out.println("</html>");
         }
+        
+        
     } 
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

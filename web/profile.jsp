@@ -9,14 +9,102 @@
 <head>
     <title>Thông tin cá nhân</title>
     <link rel="stylesheet" href="css/profile.css">
+        <link rel="stylesheet" href="css/style.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body style="background: #f4f7f1; margin: 0; padding: 0; min-height: 100vh;">
 
-    <div class="banner" style="background-color: #4e5c34; color: white; padding: 30px; text-align: center;">
-        HỒ SƠ CÁ NHÂN
-    </div>
+<%
+    String user = (String) session.getAttribute("user");
+%>
+<body>
+    <!-- Hồ sơ cá nhân cuả người dùng -->
+    
+    <nav class="top-menu">
+            <div class="left-nav">
+                <a href="${pageContext.request.contextPath}/home" class="logo-brand">
+                    <i class="fa-solid fa-leaf"></i> Trang Chủ
+                </a>
+                <div class="dropdown">
+                    <a class="dropbtn">Sản phẩm <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown-content">
+                        <% 
+                            java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
+                            if(navCats != null) {
+                                for(String cat : navCats) {
+                        %>
+                            <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                        <% 
+                                }
+                            } 
+                        %>
+                    </div>
+                </div>
 
+                <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
+            </div>
+
+            <div class="right-nav">
+                <div class="search-container">
+                    <form action="hienthi" method="post">  
+                        <input name="txtSearch" type="text" placeholder="Tìm kiếm..." 
+                               value="<%= (request.getParameter("txtSearch")== null) ? "" : request.getParameter("txtSearch") %>">
+                            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </form>    
+                </div>
+                            
+<!-- Hiển thị đăng ký/đăng nhập thành công -->
+<%
+    String loginSuccess   = (String) session.getAttribute("loginSuccess");
+    if (loginSuccess != null) session.removeAttribute("loginSuccess");
+
+    String registerSuccess = (String) session.getAttribute("registerSuccess");
+    if (registerSuccess != null) session.removeAttribute("registerSuccess");
+%>
+
+<% if (loginSuccess != null || registerSuccess != null) { %>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        <% if (loginSuccess != null) { %>
+            showToast('<%= loginSuccess %>');
+        <% } else { %>
+            showToast('<%= registerSuccess %>');
+        <% } %>
+    });
+</script>
+<% } %>                     
+                <div class="auth-group">
+                    <a href="cart.jsp" class="icon-btn">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
+                    </a>
+   
+                     <% if (user != null) { %>
+                        <%-- Kiểm tra vai trò --%>
+                        <% if ("admin".equals(session.getAttribute("role"))) { %>
+                            <a href="${pageContext.request.contextPath}/AdminDashboardServlet" class="admin-link">
+                                <i class="fa-solid fa-user-tie"></i> Quản trị
+                            </a>
+                        <% } else { %>
+                            <%-- Chỉ hiện icon account cho User --%>
+                            <div class="icon-btn" style="cursor: default;">
+                                <a  href="${pageContext.request.contextPath}/ProfileServlet">
+                                    <i class="fa-solid fa-circle-user"></i>
+                                </a>
+                            </div>
+                            
+                        <% } %>
+
+                        <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
+
+                    <% } else { %>
+                        <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
+                        <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
+                    <% } %>
+                </div>
+            </div>
+        </nav>
+   
     <div class="container" style="display: flex; justify-content: center; gap: 20px; margin: 40px auto; max-width: 1100px; background: transparent; box-shadow: none;">
         
         <div class="left-menu" style="width: 250px; flex-shrink: 0; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); align-self: flex-start;">
@@ -59,18 +147,17 @@
         </div>
     </div>
 
-    <div class="footer-modern" style="background: #2c3520; color: white; padding: 40px; margin-top: 50px;">
-        <div style="max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between;">
-            <div>
-                <div style="font-weight: bold; font-size: 20px;">ECOSHOP</div>
-                <p style="font-size: 13px; opacity: 0.7;">Hệ thống cung cấp sản phẩm sạch cho gia đình bạn.</p>
-            </div>
-            <div style="font-size: 13px;">
-                <a href="trangchu.jsp" style="color: #c8e06b; text-decoration: none;">Trang chủ</a> | 
-                <a href="#" style="color: white; text-decoration: none; margin-left: 10px;">Sản phẩm</a>
-            </div>
-        </div>
+    <footer class="footer">
+    <div>
+        <h3>Nhóm 3</h3>
+        <p>Lã Ngọc Huyền    | 29-08-2005 </p>
+        <p>Trần Anh Đức     | 11-11-2005 </p>
+        <p>Nguyễn Phi Long  | 14-06-2005 </p>
     </div>
+    <div class="footer-logo">
+        <img src="./images/logo.png">
+    </div>
+</footer>
 
 </body>
 </html>

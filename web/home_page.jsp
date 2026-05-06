@@ -44,9 +44,6 @@
 </head>
 <body>
 
-<!--<header class="banner">DECOR LUXURY - NÂNG TẦM KHÔNG GIAN SỐNG</header>-->
-
-
         <nav class="top-menu">
             <div class="left-nav">
                 <a href="${pageContext.request.contextPath}/home" class="logo-brand">
@@ -105,8 +102,7 @@
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
                     </a>
-                    
-                    
+   
                      <% if (user != null) { %>
                         <%-- Kiểm tra vai trò --%>
                         <% if ("admin".equals(session.getAttribute("role"))) { %>
@@ -133,11 +129,6 @@
             </div>
         </nav>
 
-<!-- ===== BANNER ẢNH FULL WIDTH + CHỮ GIỮA (KHÔNG NỀN) ===== 
-<div class="banner-image-container">
-    <img src="${pageContext.request.contextPath}/images/hero.jpg" alt="Banner nội thất">
-    <div class="banner-overlay-text">CHÀO MỪNG ĐẾN VỚI WEBSITE CỦA NHÓM 2</div>
-</div>-->
 
 <div class="container">
     <aside class="left-menu new-sidebar">

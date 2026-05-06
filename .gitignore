@@ -1,0 +1,29 @@
+# --- IDE Specific (Quan trọng nhất để tránh xung đột) ---
+.settings/
+.classpath
+.project
+nbproject/private/
+nbproject/project.properties
+nbproject/genfiles.properties
+.externalToolBuilders/
+*.launch
+.factorypath
+
+# --- Build Folders (Các file máy tự biên dịch) ---
+build/
+dist/
+nbbuild/
+nbdist/
+bin/
+target/
+out/
+
+# --- Compiled files ---
+*.class
+*.war
+*.ear
+*.jar
+
+# --- OS generated files ---
+.DS_Store
+Thumbs.db

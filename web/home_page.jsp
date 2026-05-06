@@ -125,17 +125,13 @@
 
                     <% } else { %>
                         <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
-                        <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
+                        <a href="#" class="btn-pill outline" onclick="openRegister()">Đăng ký</a>
                     <% } %>
                 </div>
             </div>
         </nav>
 
-<!-- ===== BANNER ẢNH FULL WIDTH + CHỮ GIỮA (KHÔNG NỀN) ===== 
-<div class="banner-image-container">
-    <img src="${pageContext.request.contextPath}/images/hero.jpg" alt="Banner nội thất">
-    <div class="banner-overlay-text">CHÀO MỪNG ĐẾN VỚI WEBSITE CỦA NHÓM 2</div>
-</div>-->
+
 
 <div class="container">
     <aside class="left-menu new-sidebar">
@@ -289,6 +285,10 @@
         <p>Đã có tài khoản? <a href="#" onclick="switchModal('registerModal', 'loginModal')">Đăng nhập</a></p>
     </div>
 </div>
+
+        <button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+    <i class="fa-solid fa-chevron-up"></i>
+</button>
 
     <script>
         function showToast(msg, isError = false) {
@@ -504,6 +504,15 @@
         return null;
     }
     
+    
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            scrollTopBtn.classList.add('show');
+        } else {
+            scrollTopBtn.classList.remove('show');
+        }
+    });
     
     </script>
     

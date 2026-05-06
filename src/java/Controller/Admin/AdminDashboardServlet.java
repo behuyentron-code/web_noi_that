@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 
 public class AdminDashboardServlet extends HttpServlet {
@@ -38,10 +40,14 @@ public class AdminDashboardServlet extends HttpServlet {
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) totalRevenue = rs.getDouble("revenue");
         } catch (Exception e) { e.printStackTrace(); }
+        
+        NumberFormat fmt = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+        String totalRevenueFormatted = fmt.format(totalRevenue);
+        
         req.setAttribute("totalProducts", totalProducts);
         req.setAttribute("totalUsers", totalUsers);
         req.setAttribute("totalOrders", totalOrders);
-        req.setAttribute("totalRevenue", totalRevenue);
+        req.setAttribute("totalRevenueFormatted", totalRevenueFormatted);
         req.getRequestDispatcher("/admin/dashboard.jsp").forward(req, resp);
     }
 }

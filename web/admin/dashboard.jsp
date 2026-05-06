@@ -21,7 +21,7 @@
             <div class="stat-card"><i class="fa-solid fa-box"></i><span>Sản phẩm</span><strong>${totalProducts}</strong></div>
             <div class="stat-card"><i class="fa-solid fa-users"></i><span>Người dùng</span><strong>${totalUsers}</strong></div>
             <div class="stat-card"><i class="fa-solid fa-cart-shopping"></i><span>Đơn hàng</span><strong>${totalOrders}</strong></div>
-            <div class="stat-card"><i class="fa-solid fa-dollar-sign"></i><span>Doanh thu</span><strong>${totalRevenue}₫</strong></div>
+            <div class="stat-card"><i class="fa-solid fa-dollar-sign"></i><span>Doanh thu</span><strong>${totalRevenueFormatted}₫</strong></div>
         </div>
     </div>
 </div>

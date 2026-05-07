@@ -65,7 +65,7 @@
 <body>
 
 
-<nav class="top-menu">
+<nav class="top-menu" style="overflow: visible !important;">
     <div class="left-nav">
         <a href="${pageContext.request.contextPath}/hienthi" class="logo-brand">
             <i class="fa-solid fa-leaf"></i> Trang Chủ
@@ -75,13 +75,21 @@
             <div class="dropdown-content">
                 <% 
                     java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
-                    if(navCats != null) {
+                    if(navCats != null && !navCats.isEmpty()) {
                         for(String cat : navCats) {
                 %>
                     <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
                 <% 
                         }
-                    } 
+                    } else {
+                        // Fallback: hardcode các phòng
+                        String[] defaultCats = {"Phòng khách", "Phòng ngủ", "Phòng bếp", "Phòng tắm", "Phòng làm việc"};
+                        for(String cat : defaultCats) {
+                %>
+                    <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
+                <%
+                        }
+                    }
                 %>
             </div>
         </div>

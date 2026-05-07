@@ -15,8 +15,7 @@
 
     NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
-    // Mảng tỉ lệ giảm demo – thêm cột discount_rate vào DB để dùng thực tế
-    int[] discountRates = {10, 15, 20, 25, 30, 35, 40, 45, 50};
+    
 %>
 <head>
     <meta charset="UTF-8">
@@ -25,12 +24,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/khuyen_mai.css"
+     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/khuyen_mai.css">
 </head>
 <body>
 
-<nav class="top-menu">
+<nav class="top-menu">s
     <div class="left-nav">
         <a href="${pageContext.request.contextPath}/home" class="logo-brand">
             <i class="fa-solid fa-leaf"></i> Trang Chủ
@@ -83,47 +82,12 @@
 
             <% } else { %>
                 <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
-                <a href="#" class="btn-pill solid" onclick="openRegister()">Đăng ký</a>
+                <a href="#" class="btn-pill outline" onclick="openRegister()">Đăng ký</a>
             <% } %>
         </div>
     </div>
 </nav>
 
-<!-- ===== HERO ===== -->
-<section class="promo-hero">
-    <div class="hero-text">
-        <div class="hero-eyebrow">
-            <i class="fa-solid fa-fire"></i> Sự kiện khuyến mãi lớn nhất năm
-        </div>
-        <h1 class="hero-title">
-            Giảm giá<br>đến <span>50%</span><br>toàn bộ sản phẩm
-        </h1>
-        <p class="hero-subtitle">
-            Cơ hội vàng để sở hữu nội thất cao cấp với mức giá tốt nhất.
-            Hàng trăm mẫu thiết kế hiện đại đang chờ bạn!
-        </p>
-        <a href="#san-pham" class="hero-cta">
-            <i class="fa-solid fa-bolt"></i> Mua ngay hôm nay
-        </a>
-        <div class="hero-stats">
-            <div>
-                <span class="stat-num"><%= promoProducts != null ? promoProducts.size() : 0 %>+</span>
-                <span class="stat-label">Sản phẩm giảm giá</span>
-            </div>
-            <div><span class="stat-num">50%</span><span class="stat-label">Giảm tối đa</span></div>
-            <div><span class="stat-num">Free</span><span class="stat-label">Giao hàng toàn quốc</span></div>
-        </div>
-    </div>
-    <div class="hero-countdown">
-        <div class="countdown-label"><i class="fa-regular fa-clock"></i> Kết thúc sau</div>
-        <div class="countdown-boxes">
-            <div class="cd-box"><span class="cd-num" id="cd-days">00</span><span class="cd-unit">Ngày</span></div>
-            <div class="cd-box"><span class="cd-num" id="cd-hours">00</span><span class="cd-unit">Giờ</span></div>
-            <div class="cd-box"><span class="cd-num" id="cd-mins">00</span><span class="cd-unit">Phút</span></div>
-            <div class="cd-box"><span class="cd-num" id="cd-secs">00</span><span class="cd-unit">Giây</span></div>
-        </div>
-    </div>
-</section>
 
 <!-- ===== MAIN ===== -->
 <div class="promo-wrap">
@@ -198,8 +162,11 @@
     <% } else {
         int idx = 0;
         for (products p : promoProducts) {
-            int rate = discountRates[idx % discountRates.length];
-            double origPrice = p.getPrice() * 100.0 / (100.0 - rate);
+            long rate = p.getDiscount_price();  // lấy từ DB
+            double origPrice = rate > 0
+                ? p.getPrice() * 100.0 / (100.0 - rate)
+                : p.getPrice();
+            int stock = p.getQuantity();
             idx++;
     %>
         <div class="promo-card">
@@ -233,115 +200,7 @@
     <% } } %>
     </div><!-- /promo-grid -->
 
-    <!-- ===== VOUCHER ===== -->
-    <h2 class="section-title" style="margin-top:50px;">
-        <i class="fa-solid fa-ticket"></i> Mã Giảm Giá
-    </h2>
-    <div class="voucher-grid">
-
-        <div class="voucher-card">
-            <div class="voucher-left">
-                <i class="fa-solid fa-couch voucher-icon"></i>
-                <span class="voucher-pct">10%</span>
-                <span class="voucher-off">Giảm</span>
-            </div>
-            <div class="voucher-right">
-                <div class="voucher-title">Giảm 10% toàn bộ đơn hàng</div>
-                <div class="voucher-cond">Áp dụng đơn từ 5.000.000đ · Không kết hợp KM khác</div>
-                <div class="voucher-code-row">
-                    <span class="voucher-code">DECOR10</span>
-                    <button class="btn-copy" onclick="copyCode(this,'DECOR10')">Sao chép</button>
-                </div>
-                <div class="voucher-expiry"><i class="fa-regular fa-clock"></i> Hết hạn: 30/06/2026</div>
-            </div>
-        </div>
-
-        <div class="voucher-card">
-            <div class="voucher-left" style="background:linear-gradient(180deg,#c4620a,#e07830);">
-                <i class="fa-solid fa-truck voucher-icon"></i>
-                <span class="voucher-pct" style="font-size:14px;font-weight:900;">FREE</span>
-                <span class="voucher-off">Ship</span>
-            </div>
-            <div class="voucher-right">
-                <div class="voucher-title">Miễn phí vận chuyển toàn quốc</div>
-                <div class="voucher-cond">Áp dụng tất cả đơn hàng · Giao trong 3–5 ngày</div>
-                <div class="voucher-code-row">
-                    <span class="voucher-code">FREESHIP</span>
-                    <button class="btn-copy" onclick="copyCode(this,'FREESHIP')">Sao chép</button>
-                </div>
-                <div class="voucher-expiry"><i class="fa-regular fa-clock"></i> Hết hạn: 31/05/2026</div>
-            </div>
-        </div>
-
-        <div class="voucher-card">
-            <div class="voucher-left" style="background:linear-gradient(180deg,#1565c0,#1e88e5);">
-                <i class="fa-solid fa-gift voucher-icon"></i>
-                <span class="voucher-pct">500K</span>
-                <span class="voucher-off">Giảm</span>
-            </div>
-            <div class="voucher-right">
-                <div class="voucher-title">Giảm 500.000đ cho khách mới</div>
-                <div class="voucher-cond">Chỉ áp dụng lần đầu · Đơn tối thiểu 3.000.000đ</div>
-                <div class="voucher-code-row">
-                    <span class="voucher-code">NEWBIE500</span>
-                    <button class="btn-copy" onclick="copyCode(this,'NEWBIE500')">Sao chép</button>
-                </div>
-                <div class="voucher-expiry"><i class="fa-regular fa-clock"></i> Hết hạn: 15/05/2026</div>
-            </div>
-        </div>
-
-        <div class="voucher-card">
-            <div class="voucher-left" style="background:linear-gradient(180deg,#6a1b9a,#9c27b0);">
-                <i class="fa-solid fa-bed voucher-icon"></i>
-                <span class="voucher-pct">15%</span>
-                <span class="voucher-off">Giảm</span>
-            </div>
-            <div class="voucher-right">
-                <div class="voucher-title">Giảm 15% danh mục Phòng Ngủ</div>
-                <div class="voucher-cond">Chỉ áp dụng Phòng Ngủ · Đơn từ 8.000.000đ</div>
-                <div class="voucher-code-row">
-                    <span class="voucher-code">SLEEP15</span>
-                    <button class="btn-copy" onclick="copyCode(this,'SLEEP15')">Sao chép</button>
-                </div>
-                <div class="voucher-expiry"><i class="fa-regular fa-clock"></i> Hết hạn: 20/06/2026</div>
-            </div>
-        </div>
-
-        <div class="voucher-card">
-            <div class="voucher-left" style="background:linear-gradient(180deg,#2e7d32,#43a047);">
-                <i class="fa-solid fa-utensils voucher-icon"></i>
-                <span class="voucher-pct">20%</span>
-                <span class="voucher-off">Giảm</span>
-            </div>
-            <div class="voucher-right">
-                <div class="voucher-title">Giảm 20% bộ bàn ăn</div>
-                <div class="voucher-cond">Áp dụng bộ bàn + ghế · Không giới hạn đơn</div>
-                <div class="voucher-code-row">
-                    <span class="voucher-code">DINE20</span>
-                    <button class="btn-copy" onclick="copyCode(this,'DINE20')">Sao chép</button>
-                </div>
-                <div class="voucher-expiry"><i class="fa-regular fa-clock"></i> Hết hạn: 28/06/2026</div>
-            </div>
-        </div>
-
-        <div class="voucher-card">
-            <div class="voucher-left" style="background:linear-gradient(180deg,#b71c1c,#e53935);">
-                <i class="fa-solid fa-crown voucher-icon"></i>
-                <span class="voucher-pct">VIP</span>
-                <span class="voucher-off">30%</span>
-            </div>
-            <div class="voucher-right">
-                <div class="voucher-title">Ưu đãi VIP – Giảm 30%</div>
-                <div class="voucher-cond">Chỉ dành cho thành viên VIP · Đơn từ 20.000.000đ</div>
-                <div class="voucher-code-row">
-                    <span class="voucher-code">VIP30</span>
-                    <button class="btn-copy" onclick="copyCode(this,'VIP30')">Sao chép</button>
-                </div>
-                <div class="voucher-expiry"><i class="fa-regular fa-clock"></i> Hết hạn: 01/07/2026</div>
-            </div>
-        </div>
-
-    </div><!-- /voucher-grid -->
+    
 </div><!-- /promo-wrap -->
 
 <!-- ===== TOAST ===== -->
@@ -360,12 +219,30 @@
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
     <div>
-        <h3>Nhóm 3</h3>
-        <p>Lã Ngọc Huyền &nbsp;&nbsp;&nbsp;| 29-08-2005</p>
-        <p>Trần Anh Đức &nbsp;&nbsp;&nbsp;&nbsp;| 11-11-2005</p>
-        <p>Nguyễn Phi Long | 14-06-2005</p>
+        <table>
+            <tr>
+                <td><h3>Nhóm 3</h3></td>
+            </tr>
+            <tr>
+                <td><p>Lã Ngọc Huyền</p></td>
+                <td><p> |  29-08-2005</p></td>
+            </tr>
+            
+            <tr>
+                <td><p>Trần Anh Đức</p></td>
+                <td><p> |  11-11-2005</p></td>
+            </tr>
+            
+            <tr>
+                <td><p>Nguyễn Phi Long</p></td>
+                <td><p> |  14-06-2005</p></td>
+            </tr>
+        </table>
+
     </div>
-    <div class="footer-logo"><img src="./images/logo.png" alt="Logo"></div>
+    <div class="footer-logo">
+        <img src="images/logo.png">
+    </div>
 </footer>
 
 <!-- ===== MODAL LOGIN ===== -->
@@ -404,23 +281,6 @@
 </div>
 
 <script>
-// ===== COUNTDOWN =====
-const deadline = new Date();
-deadline.setDate(deadline.getDate() + 5);
-deadline.setHours(deadline.getHours() + 12);
-function updateCountdown() {
-    const diff = deadline - new Date();
-    if (diff <= 0) return;
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000)  / 60000);
-    const s = Math.floor((diff % 60000)    / 1000);
-    document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
-    document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
-    document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
-    document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
-}
-updateCountdown(); setInterval(updateCountdown, 1000);
 
 // ===== TOAST =====
 let _tt;
@@ -446,13 +306,7 @@ function addToCart(productId, productName) {
     .catch(() => showToast('Không thể thêm vào giỏ, thử lại sau!', true));
 }
 
-// ===== COPY VOUCHER =====
-function copyCode(btn, code) {
-    navigator.clipboard.writeText(code).catch(() => {});
-    btn.textContent = 'Đã sao chép!'; btn.classList.add('copied');
-    showToast('✅ Đã sao chép mã: ' + code, false);
-    setTimeout(() => { btn.textContent = 'Sao chép'; btn.classList.remove('copied'); }, 2500);
-}
+
 
 // ===== MODAL =====
 const urlParams = new URLSearchParams(window.location.search);

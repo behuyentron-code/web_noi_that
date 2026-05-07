@@ -16,6 +16,11 @@ public class products {
     private String image;
     private int category_id;
     private String categoryName; 
+
+    private long discount_price; 
+    private int quantity;
+
+
     
     public products() {
     }
@@ -28,6 +33,18 @@ public class products {
         this.image = image;
         this.category_id = category_id;
         this.categoryName = categoryName;
+    }
+
+    public products(int product_id, String product_name, double price, String description, String image, int category_id, String categoryName, long discount_price, int quantity) {
+        this.product_id = product_id;
+        this.product_name = product_name;
+        this.price = price;
+        this.description = description;
+        this.image = image;
+        this.category_id = category_id;
+        this.categoryName = categoryName;
+        this.discount_price = discount_price;
+        this.quantity = quantity;
     }
 
     public int getProduct_id() {
@@ -86,6 +103,18 @@ public class products {
         this.categoryName = categoryName;
     }
     
-    
+        public long getDiscount_price() { 
+        return discount_price; 
+    }
+    public void setDiscount_price(long discount_price) { 
+        this.discount_price = discount_price; 
+    }
+
+    public int getQuantity() { 
+        return quantity; 
+    }
+    public void setQuantity(int quantity) { 
+        this.quantity = quantity; 
+    }
 }
 

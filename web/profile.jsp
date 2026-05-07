@@ -112,7 +112,7 @@
             <ul style="list-style: none; padding: 10px 0;">
                 <li style="padding: 12px 20px; background: #f0f3ea; color: #4e5c34; font-weight: bold;"><i class="fas fa-user-alt"></i> Thông tin cá nhân</li>
               
-                <li style="padding: 12px 20px; cursor: pointer;" onclick="location.href='trangchu.jsp'"><i class="fas fa-sign-out-alt"></i> Quay lại chủ</li>
+                <li style="padding: 12px 20px; cursor: pointer;" onclick="location.href='home'"><i class="fas fa-sign-out-alt"></i> Quay lại trang chủ</li>
             </ul>
         </div>
 
@@ -141,8 +141,7 @@
                 </table>
 
             <div style="margin-top: 30px; display: flex; gap: 15px;">
-                <button class="btn-pill solid" style="cursor: pointer; padding: 10px 25px;">Cập nhật hồ sơ</button>
-                <button class="btn-pill solid" style="cursor: pointer; padding: 10px 25px;" onclick="history.back()">Quay lại</button>
+                <button class="btn-pill solid" style="cursor: pointer; padding: 10px 25px;" onclick="location.href='home'">Quay lại</button>
             </div>
         </div>
     </div>

@@ -173,7 +173,7 @@ p, a, span, strong, button, li, ul {
     border: 1px solid #e2e8d8;
     top: 100%;
     overflow: hidden;
-    margin-top: 0; /* Xóa margin-top nếu có để tránh tạo khoảng trống */
+/*    margin-top: 0;  Xóa margin-top nếu có để tránh tạo khoảng trống */
     padding-top: 10px; /* Thay vì margin, hãy dùng padding để giữ vùng hover */
 }
 

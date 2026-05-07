@@ -19,7 +19,8 @@ public class products_DAO {
 
     private static final String BASE_SQL =
         "SELECT p.product_id, p.product_name, p.price, p.description, " +
-        "       p.image, p.category_id, c.category_name " +
+        "       p.image, p.category_id, c.category_name, " +
+        "       p.discount_price, p.quantity " +   
         "FROM products p " +
         "JOIN categories c ON p.category_id = c.category_id ";
  
@@ -194,7 +195,9 @@ public boolean deleteProduct(int id) {
                     rs.getString("description"),
                     rs.getString("image"),
                     rs.getInt("category_id"),
-                    rs.getString("category_name")
+                    rs.getString("category_name"),
+                    rs.getLong("discount_price"), 
+                    rs.getInt("quantity")         
                 );
                 list.add(p);
                 System.out.println("Loaded product: " + p.getProduct_name());
@@ -207,10 +210,6 @@ public boolean deleteProduct(int id) {
         } catch (Exception ex) {
             System.err.println("[ProductDAO] query Error: " + ex.getMessage());
             ex.printStackTrace();
-        } finally {
-            try { if (rs != null) rs.close(); } catch(Exception e) {}
-            try { if (ps != null) ps.close(); } catch(Exception e) {}
-            try { if (conn != null) conn.close(); } catch(Exception e) {}
         }
         return list;
     }
@@ -224,7 +223,7 @@ public boolean deleteProduct(int id) {
         */
       public List<products> getProductsOnSale() {
         String sql = BASE_SQL +
-                "WHERE p.price <= 2000000 " +
+                "WHERE p.discount_price > 0 " +
                 "ORDER BY p.price ASC";
         return query(sql, null);
       }
@@ -235,7 +234,7 @@ public boolean deleteProduct(int id) {
         */
     public List<products> getProductsOnSaleByCategory(String categoryName) {
         String sql = BASE_SQL +
-                "WHERE p.price <= 2000000 AND c.category_name = ? " +
+                "WHERE p.discount_price > 0 AND c.category_name = ? " +
                 "ORDER BY p.price ASC";
         return query(sql, categoryName);
     }

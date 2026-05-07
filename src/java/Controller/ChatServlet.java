@@ -5,7 +5,7 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.*;
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 public class ChatServlet extends HttpServlet {
 

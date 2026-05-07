@@ -233,12 +233,12 @@ p, a, span, strong, button, li, ul {
     justify-content: center;
 }
 
-.btn-login, .btn-register {
+/*.btn-login, .btn-register {
     font-weight: bold;
     margin-left: 10px;
     transition: 0.3s;
     cursor: pointer;
-}
+}*/
 
 /*==========Left menu==========*/
 .left-menu {
@@ -377,15 +377,10 @@ p, a, span, strong, button, li, ul {
     font-family: "Montserrat", sans-serif;
 }
 
-.footer-info {
-    display: flex;
-    text-align: left;
-}
-
 .footer-logo {
     margin-right: 30px;
     margin-left: 1000px;
-    margin-top: 25px;
+    margin-top: 60px;
 }
 
 .footer-logo img {
@@ -934,8 +929,8 @@ p, a, span, strong, button, li, ul {
 /*==========Chat Box==========*/
 .chat-toggle {
     position: fixed;
-    bottom: 120px;
-    right: 30px;
+    bottom: 24px;
+    right: 24px;
     background: #4e5c34;
     color: white;
     width: 56px;
@@ -1394,10 +1389,10 @@ p, a, span, strong, button, li, ul {
 /*==========Scroll To Top==========*/
 .scroll-top {
     position: fixed;
-    bottom: 60px;
-    right: 30px;
-    width: 44px;
-    height: 44px;
+    bottom: 120px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
     background: #4e5c34;
     color: white;
     border: none;

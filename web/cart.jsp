@@ -130,13 +130,15 @@
                     </a>
                 <% } else { %>
                     <div class="icon-btn" style="cursor:default;">
-                        <i class="fa-solid fa-circle-user"></i>
+                        <a  href="ProfileServlet">
+                            <i class="fa-solid fa-circle-user"></i>
+                        </a>
                     </div>
                 <% } %>
                 <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
             <% } else { %>
                 <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
-                <a href="#" class="btn-pill solid"  onclick="openRegister()">Đăng ký</a>
+                <a href="#" class="btn-pill outline"  onclick="openRegister()">Đăng ký</a>
             <% } %>
         </div>
     </div>
@@ -320,12 +322,30 @@
 
 <footer class="footer">
     <div>
-        <h3>Nhóm 3</h3>
-        <p>Lã Ngọc Huyền    | 29-08-2005</p>
-        <p>Trần Anh Đức     | 11-11-2005</p>
-        <p>Nguyễn Phi Long  | 14-06-2005</p>
+        <table>
+            <tr>
+                <td><h3>Nhóm 3</h3></td>
+            </tr>
+            <tr>
+                <td><p>Lã Ngọc Huyền</p></td>
+                <td><p> |  29-08-2005</p></td>
+            </tr>
+            
+            <tr>
+                <td><p>Trần Anh Đức</p></td>
+                <td><p> |  11-11-2005</p></td>
+            </tr>
+            
+            <tr>
+                <td><p>Nguyễn Phi Long</p></td>
+                <td><p> |  14-06-2005</p></td>
+            </tr>
+        </table>
+
     </div>
-    <div class="footer-logo"><img src="./images/logo.png"></div>
+    <div class="footer-logo">
+        <img src="images/logo.png">
+    </div>
 </footer>
 
  <!-- ================= MODAL LOGIN ================= -->

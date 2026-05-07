@@ -5,6 +5,7 @@
 package DAO;
 
 import Model.dbConnect;
+import Model.users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -250,5 +251,28 @@ public class users_DAO {
             e.printStackTrace();
         }
         return count;
+    }
+    
+    public users getUserInfo (String username) {
+        users user = null;
+        String sql = "SELECT email, phone, address FROM users WHERE username = ? ";
+        try (Connection conn = new dbConnect().getConnect();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setString(1, username);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                user = new users();
+                // Gán các giá trị lấy từ DB vào đối tượng user
+                user.setUsername(username);
+                user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                user.setAddress(rs.getString("address")); 
+            }
+        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return user; // Nếu không tìm thấy, user sẽ là null
     }
 }

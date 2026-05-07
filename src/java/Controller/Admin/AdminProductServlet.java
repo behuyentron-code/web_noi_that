@@ -7,9 +7,9 @@ package Controller.Admin;
 
 import DAO.products_DAO;
 import Model.products;
-import javax.servlet.ServletException;
-import javax.servlet.http.*;
-import javax.servlet.annotation.WebServlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;

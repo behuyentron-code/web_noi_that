@@ -39,6 +39,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=keyboard_double_arrow_up" />
     
 
 </head>
@@ -114,9 +115,11 @@
                                 <i class="fa-solid fa-user-tie"></i> Quản trị
                             </a>
                         <% } else { %>
-                            <%-- Chỉ hiện icon account cho User, không dẫn link đi đâu cả --%>
+                            <%-- Chỉ hiện icon account cho User--%>
                             <div class="icon-btn" style="cursor: default;">
-                                <i class="fa-solid fa-circle-user"></i>
+                                <a  href="ProfileServlet">
+                                    <i class="fa-solid fa-circle-user"></i>
+                                </a>
                             </div>
                             
                         <% } %>
@@ -212,13 +215,29 @@
 
 <footer class="footer">
     <div>
-        <h3>Nhóm 3</h3>
-        <p>Lã Ngọc Huyền    | 29-08-2005 </p>
-        <p>Trần Anh Đức     | 11-11-2005 </p>
-        <p>Nguyễn Phi Long  | 14-06-2005 </p>
+        <table>
+            <tr>
+                <td><h3>Nhóm 3</h3></td>
+            </tr>
+            <tr>
+                <td><p>Lã Ngọc Huyền</p></td>
+                <td><p> |  29-08-2005</p></td>
+            </tr>
+            
+            <tr>
+                <td><p>Trần Anh Đức</p></td>
+                <td><p> |  11-11-2005</p></td>
+            </tr>
+            
+            <tr>
+                <td><p>Nguyễn Phi Long</p></td>
+                <td><p> |  14-06-2005</p></td>
+            </tr>
+        </table>
+
     </div>
     <div class="footer-logo">
-        <img src="./images/logo.png">
+        <img src="images/logo.png">
     </div>
 </footer>
 
@@ -287,7 +306,7 @@
 </div>
 
         <button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-    <i class="fa-solid fa-chevron-up"></i>
+    <i  class="material-symbols-outlined">keyboard_double_arrow_up</i>
 </button>
 
     <script>

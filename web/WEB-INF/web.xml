@@ -76,6 +76,10 @@
         <servlet-name>home</servlet-name>
         <servlet-class>Controller.home</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-class>Controller.ProfileServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>hienthi</servlet-name>
         <url-pattern>/hienthi</url-pattern>
@@ -154,6 +158,10 @@
     <servlet-mapping>
         <servlet-name>home</servlet-name>
         <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileServlet</servlet-name>
+        <url-pattern>/ProfileServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

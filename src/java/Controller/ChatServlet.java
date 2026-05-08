@@ -255,14 +255,16 @@ public class ChatServlet extends HttpServlet {
     }
 
     private Map<String, Object> rowToMap(ResultSet rs) throws SQLException {
-        float original   = rs.getFloat("price");
-        float discounted = rs.getFloat("discount_price");
-        boolean hasDiscount = discounted > 0 && discounted < original;
+        float original    = rs.getFloat("price");
+        int  discountPct = rs.getInt("discount_price"); 
+        
+        boolean hasDiscount = discountPct > 0 && discountPct < 100;
+        float discounted  = hasDiscount ? original * (100 - discountPct) / 100f : original;
 
         Map<String, Object> row = new HashMap<>();
         row.put("id",       rs.getInt("product_id"));
         row.put("name",     rs.getString("product_name"));
-        row.put("price",    hasDiscount ? discounted : original);
+        row.put("price",    discounted);
         row.put("priceOld", original);
         row.put("desc",     rs.getString("description"));
         row.put("category", rs.getString("category_name"));

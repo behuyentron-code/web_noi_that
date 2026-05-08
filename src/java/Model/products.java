@@ -17,8 +17,8 @@ public class products {
     private int category_id;
     private String categoryName; 
 
-    private long discount_price; 
-    private int quantity;
+    private int discount_price; 
+    private long quantity;
 
 
     
@@ -35,7 +35,7 @@ public class products {
         this.categoryName = categoryName;
     }
 
-    public products(int product_id, String product_name, double price, String description, String image, int category_id, String categoryName, long discount_price, int quantity) {
+    public products(int product_id, String product_name, double price, String description, String image, int category_id, String categoryName, int discount_price, long quantity) {
         this.product_id = product_id;
         this.product_name = product_name;
         this.price = price;
@@ -102,19 +102,23 @@ public class products {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-    
-    public long getDiscount_price() { 
-        return discount_price; 
-    }
-    public void setDiscount_price(long discount_price) { 
-        this.discount_price = discount_price; 
+
+    public int getDiscount_price() {
+        return discount_price;
     }
 
-    public int getQuantity() { 
-        return quantity; 
+    public void setDiscount_price(int discount_price) {
+        this.discount_price = discount_price;
     }
-    public void setQuantity(int quantity) { 
-        this.quantity = quantity; 
+
+    public long getQuantity() {
+        return quantity;
     }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
+    }
+    
+
 }
 

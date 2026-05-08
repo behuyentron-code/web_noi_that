@@ -132,8 +132,8 @@ public class AdminProductServlet extends HttpServlet {
             String desc = request.getParameter("description");
             String image = request.getParameter("image");
             int categoryId = Integer.parseInt(request.getParameter("category_id"));
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
-            long discountPrice = Long.parseLong(request.getParameter("discount_price"));
+            long quantity = Long.parseLong(request.getParameter("quantity"));
+            int discountPrice = Integer.parseInt(request.getParameter("discount_price"));
 
             // Tạo đối tượng model
             products p = new products();

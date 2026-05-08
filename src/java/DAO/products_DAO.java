@@ -89,8 +89,8 @@ public class products_DAO {
                     rs.getString("image"),
                     rs.getInt("category_id"),
                     rs.getString("category_name"),
-                    rs.getLong("discount_price"),   
-                    rs.getInt("quantity")
+                    rs.getInt("discount_price"),   
+                    rs.getLong("quantity")
                 );
             }
         } catch (Exception e) {
@@ -112,8 +112,8 @@ public class products_DAO {
             ps.setString(3, p.getDescription());
             ps.setString(4, p.getImage());
             ps.setInt(5, p.getCategory_id());
-            ps.setInt(6, p.getQuantity());
-            ps.setLong(7, p.getDiscount_price());
+            ps.setLong(6, p.getQuantity());
+            ps.setInt(7, p.getDiscount_price());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,8 +131,8 @@ public class products_DAO {
             ps.setString(3, p.getDescription());
             ps.setString(4, p.getImage());
             ps.setInt(5, p.getCategory_id());
-            ps.setInt(6, p.getQuantity());        
-            ps.setLong(7, p.getDiscount_price());  
+            ps.setLong(6, p.getQuantity());        
+            ps.setInt(7, p.getDiscount_price());  
             ps.setInt(8, p.getProduct_id());     
             
             return ps.executeUpdate() > 0;
@@ -202,8 +202,8 @@ public class products_DAO {
                     rs.getString("image"),
                     rs.getInt("category_id"),
                     rs.getString("category_name"),
-                    rs.getLong("discount_price"), 
-                    rs.getInt("quantity")         
+                    rs.getInt("discount_price"), 
+                    rs.getLong("quantity")         
                 );
                 list.add(p);
                 System.out.println("Loaded product: " + p.getProduct_name());

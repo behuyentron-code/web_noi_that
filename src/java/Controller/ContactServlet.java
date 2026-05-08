@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.sql.ResultSet;
 import java.util.List;
-import static sun.jvm.hotspot.HelloWorld.e;
+//import static sun.jvm.hotspot.HelloWorld.e;
 
 /**
  *
@@ -40,52 +40,46 @@ public class ContactServlet extends HttpServlet {
    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         
-       //Tiếng Việt
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        // Lấy danh sách categories cho dropdown (luôn lấy)
         products_DAO dao = new products_DAO();
         List<String> categories = dao.getAllCategoryNames();
         request.setAttribute("categories", categories);
 
-        // Lấy session kiểm tra đăng nhập
         HttpSession session = request.getSession();
-        String loggedUser = (String) session.getAttribute("user"); // tên đăng nhập
+        String loggedUser = (String) session.getAttribute("user");
 
-        // Nếu là GET -> chỉ hiển thị trang
         if (request.getMethod().equalsIgnoreCase("GET")) {
             request.getRequestDispatcher("/lienhe.jsp").forward(request, response);
             return;
         }
 
-        // ========== XỬ LÝ POST GỬI LIÊN HỆ ==========
-        // Kiểm tra đăng nhập
         if (loggedUser == null) {
-            request.setAttribute("error", "Bạn cần đăng nhập để gửi liên hệ!");
+            request.setAttribute("error", "Báº¡n cáº§n Ä‘Äƒng nháº­p Ä‘á»ƒ gá»­i liĂªn há»‡!");
             request.getRequestDispatcher("/lienhe.jsp").forward(request, response);
             return;
         }
 
-        // Lấy dữ liệu từ form
+
         String inputName = request.getParameter("name");
         String inputEmail = request.getParameter("email");
         String phone = request.getParameter("phone");
         String message = request.getParameter("message");
 
-        // Validate cơ bản
+
         if (inputName == null || inputName.trim().isEmpty() ||
             inputEmail == null || inputEmail.trim().isEmpty() ||
             message == null || message.trim().isEmpty()) {
 
-            request.setAttribute("error", "Vui lòng điền đầy đủ họ tên, email, số điện thoại và nội dung!");
+            request.setAttribute("error", "Vui lĂ²ng Ä‘iá»�n Ä‘áº§y Ä‘á»§ há»� tĂªn, email, sá»‘ Ä‘iá»‡n thoáº¡i vĂ  ná»™i dung!");
             request.getRequestDispatcher("/lienhe.jsp").forward(request, response);
             return;
         }
 
-        // 1. Lấy thông tin đăng ký của user từ database
+
         String registeredEmail = null;
-        String registeredName = null; // Trong bảng users, tên đăng nhập chính là username
+        String registeredName = null; 
 
         try (Connection conn = new dbConnect().getConnect()) {
             String sql = "SELECT username, email FROM users WHERE username = ?";
@@ -93,21 +87,21 @@ public class ContactServlet extends HttpServlet {
             ps.setString(1, loggedUser);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                registeredName = rs.getString("username");   // tên đăng nhập
+                registeredName = rs.getString("username"); 
                 registeredEmail = rs.getString("email");
             }
             rs.close();
             ps.close();
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi kiểm tra thông tin tài khoản!");
+            request.setAttribute("error", "Lá»—i kiá»ƒm tra thĂ´ng tin tĂ i khoáº£n!");
             request.getRequestDispatcher("/lienhe.jsp").forward(request, response);
             return;
         }
 
-        // 2. So sánh tên và email nhập với thông tin thật
+
         if (registeredName == null || registeredEmail == null) {
-            request.setAttribute("error", "Không tìm thấy thông tin tài khoản của bạn!");
+            request.setAttribute("error", "KhĂ´ng tĂ¬m tháº¥y thĂ´ng tin tĂ i khoáº£n cá»§a báº¡n!");
             request.getRequestDispatcher("/lienhe.jsp").forward(request, response);
             return;
         }
@@ -116,13 +110,13 @@ public class ContactServlet extends HttpServlet {
         boolean emailMatch = inputEmail.trim().equals(registeredEmail);
 
         if (!nameMatch || !emailMatch) {
-            String errMsg = "Tên hoặc email không trùng với lúc đăng ký.";
+            String errMsg = "TĂªn hoáº·c email khĂ´ng trĂ¹ng vá»›i lĂºc Ä‘Äƒng kĂ½.";
             request.setAttribute("error", errMsg);
             request.getRequestDispatcher("/lienhe.jsp").forward(request, response);
             return;
         }
 
-        // 3. Nếu khớp thì lưu vào bảng contacts
+
         try (Connection conn = new dbConnect().getConnect()) {
             String sql = "INSERT INTO contacts (name, email, phone, message) VALUES (?,?,?,?)";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -132,21 +126,21 @@ public class ContactServlet extends HttpServlet {
             ps.setString(4, message);
             int result = ps.executeUpdate();
             if (result > 0) {
-                request.setAttribute("success", "Gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm.");
+                request.setAttribute("success", "Gá»­i liĂªn há»‡ thĂ nh cĂ´ng! ChĂºng tĂ´i sáº½ pháº£n há»“i sá»›m.");
             } else {
-                request.setAttribute("error", "Gửi thất bại, vui lòng thử lại!");
+                request.setAttribute("error", "Gá»­i tháº¥t báº¡i, vui lĂ²ng thá»­ láº¡i!");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi hệ thống, vui lòng thử lại sau!");
+            request.setAttribute("error", "Lá»—i há»‡ thá»‘ng, vui lĂ²ng thá»­ láº¡i sau!");
         
-        // Nếu có lỗi, in ra lỗi thay vì chuyển hướng
+
         try (PrintWriter out = response.getWriter()) {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
-            out.println("<head><title>Lỗi</title></head>");
+            out.println("<head><title>Lá»—i</title></head>");
             out.println("<body>");
-            out.println("<h1>Đã xảy ra lỗi khi gửi liên hệ!</h1>");
+            out.println("<h1>Ä�Ă£ xáº£y ra lá»—i khi gá»­i liĂªn há»‡!</h1>");
             out.println("<p>" + e.getMessage() + "</p>");
             out.println("</body>");
             out.println("</html>");

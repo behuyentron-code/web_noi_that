@@ -65,7 +65,8 @@
                         %>
                     </div>
                 </div>
-
+                    
+                <a href="${pageContext.request.contextPath}/KhuyenMai">Khuyến Mãi</a>   
                 <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
             </div>
 

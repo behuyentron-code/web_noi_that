@@ -190,12 +190,31 @@
                     <img src="${pageContext.request.contextPath}/images/<%= p.getImage() != null ? p.getImage() : "default.jpg"%>"
                          alt="<%= p.getProduct_name()%>"
                          onerror="this.src='https://placehold.co/500x300?text=Nội+Thất'">
-<!--                    <span class="product-badge">-10%</span>-->
+
+                    <%-- Hiển thị badge nếu có khuyến mãi --%>
+                    <% if (p.getDiscount_price() > 0) { %>
+                        <span class="product-badge">-<%= p.getDiscount_price() %>%</span>
+                    <% } %>
                 </div>
-                         
+
                 <div class="product-info">
                     <h4 class="product-name"><%= p.getProduct_name()%></h4>
-                    <div style="text-align: right !important;" class="product-price"><%= formattedPrice%></div>
+
+                    <div class="product-price" style="display:flex; justify-content:flex-end; align-items:baseline; gap:8px;">
+                        <span style="font-size:17px; font-weight:700; color:<%= p.getDiscount_price() > 0 ? "red" : "#4e5c34" %>;">
+                            <%= formattedPrice %>
+                        </span>
+                        <%-- Hiển thị giá gốc bị gạch nếu có khuyến mãi --%>
+                        <% if (p.getDiscount_price() > 0) {
+                            double origPrice = p.getPrice() * 100.0 / (100.0 - p.getDiscount_price());
+                            String formattedOrig = currencyFormat.format(Math.round(origPrice / 1000) * 1000);
+                        %>
+                        <span style="font-size:12px; color:#d1d5db; text-decoration:line-through;">
+                            <%= formattedOrig %>
+                        </span>
+                        <% } %>
+                    </div>
+
                     <div class="product-actions">
                         <button class="btn-add-to-cart" onclick="addToCart(<%= p.getProduct_id()%>, '<%= p.getProduct_name()%>')">
                             <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
@@ -307,8 +326,8 @@
 </div>
 
         <button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-    <i  class="material-symbols-outlined">keyboard_double_arrow_up</i>
-</button>
+            <i  class="material-symbols-outlined">keyboard_double_arrow_up</i>
+        </button>
 
     <script>
         function showToast(msg, isError = false) {

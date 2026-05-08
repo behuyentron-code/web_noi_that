@@ -23,7 +23,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     background: #2c2c2c;
     color: white; 
     padding: 20px; 
-
+    position: fixed;   /* cố định sidebar */
+    height: 100vh;     /* full màn hình */
+    overflow-y: auto;  /* nếu menu dài thì scroll riêng */
 }
 
 .admin-sidebar h3 {
@@ -49,6 +51,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     flex: 1; 
     padding: 30px;
     background: #f5f7f0;
+    margin-left: 260px; /* tránh bị sidebar che */
 }
 
 

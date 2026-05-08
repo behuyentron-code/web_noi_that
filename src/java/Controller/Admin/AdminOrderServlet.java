@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package Controller.Admin;
 
 import DAO.orders_DAO;
@@ -16,8 +15,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +36,18 @@ public class AdminOrderServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
+        String method = request.getMethod();
+
+        // XỬ LÝ PHƯƠNG THỨC POST (Cập nhật trạng thái / Hoàn kho)
+        if (method.equalsIgnoreCase("POST")) {
+            handlePostUpdate(request, response);
+            return; 
+        }
+
+        // XỬ LÝ PHƯƠNG THỨC GET (Hiển thị danh sách / Chi tiết)
         orders_DAO dao = new orders_DAO();
         String action = request.getParameter("action");
+
         if ("detail".equals(action)) {
             int orderId = Integer.parseInt(request.getParameter("id"));
             Map<String, Object> order = dao.getOrderDetail(orderId);
@@ -50,7 +58,9 @@ public class AdminOrderServlet extends HttpServlet {
             String status = request.getParameter("status");
             int page = 1;
             int recordsPerPage = 10;
-            if (request.getParameter("page") != null) page = Integer.parseInt(request.getParameter("page"));
+            if (request.getParameter("page") != null) {
+                page = Integer.parseInt(request.getParameter("page"));
+            }
 
             List<Map<String, Object>> orders = dao.getAllOrders(keyword, status, page, recordsPerPage);
             int totalRecords = dao.countOrders(keyword, status);
@@ -63,18 +73,34 @@ public class AdminOrderServlet extends HttpServlet {
             request.setAttribute("statusFilter", status);
             request.getRequestDispatcher("/admin/orders.jsp").forward(request, response);
         }
+    }
 
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AdminOrderServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AdminOrderServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+    /**
+     * Hỗ trợ xử lý logic POST trong processRequest
+     */
+    private void handlePostUpdate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        
+            try {
+            int orderId = Integer.parseInt(request.getParameter("orderId"));
+            String newStatus = request.getParameter("status");
+
+            orders_DAO dao = new orders_DAO();
+
+            // Gọi hàm xử lý Transaction từ DAO
+            boolean isUpdated = dao.handleUpdateStatusWithTransaction(orderId, newStatus);
+
+            if (isUpdated) {
+                // Chuyển hướng về trang danh sách với thông báo thành công (tùy chọn)
+                response.sendRedirect(request.getContextPath() + "/AdminOrderServlet");
+            } else {
+                response.getWriter().println("Cập nhật thất bại. Vui lòng kiểm tra lại ID đơn hàng.");
+            }
+
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID đơn hàng không hợp lệ");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().println("Lỗi hệ thống: " + e.getMessage());
         }
     }
 
@@ -102,15 +128,7 @@ public class AdminOrderServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int orderId = Integer.parseInt(request.getParameter("orderId"));
-        String status = request.getParameter("status");
-        try (Connection conn = new dbConnect().getConnect();
-             PreparedStatement ps = conn.prepareStatement("UPDATE orders SET status = ? WHERE order_id = ?")) {
-            ps.setString(1, status);
-            ps.setInt(2, orderId);
-            ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
-        response.sendRedirect(request.getContextPath() + "/AdminOrderServlet");
+        processRequest(request, response);
     }
 
     /**
@@ -119,8 +137,7 @@ public class AdminOrderServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Admin Order Management Servlet";
     }// </editor-fold>
 
-  
 }

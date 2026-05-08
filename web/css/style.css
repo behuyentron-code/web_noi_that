@@ -1183,12 +1183,12 @@ p, a, span, strong, button, li, ul {
     position: absolute;
     top: 8px;
     left: 8px;
-    background: #c8e06b;
-    color: #2d4a10;
+    background: red;
+    color: white;
     font-size: 10px;
     font-weight: 700;
     padding: 3px 8px;
-    border-radius: 6px;
+    border-radius: 60px;
     font-family: "Montserrat", sans-serif;
     letter-spacing: .02em;
 }

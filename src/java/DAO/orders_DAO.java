@@ -8,6 +8,7 @@ import Model.dbConnect;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -167,5 +168,78 @@ public class orders_DAO {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    //xử lý việc cập nhật trạng thái và hoàn kho trong một giao dịch
+    public boolean handleUpdateStatusWithTransaction(int orderId, String newStatus) {
+        String sqlCurrent = "SELECT status FROM orders WHERE order_id = ? FOR UPDATE";
+        String sqlDetails = "SELECT product_id, quantity FROM order_details WHERE order_id = ?";
+        String sqlRestore = "UPDATE products SET quantity = quantity + ? WHERE product_id = ?";
+        String sqlUpdate = "UPDATE orders SET status = ? WHERE order_id = ?";
+
+        // Khởi tạo kết nối (Tự động đóng nhờ Try-with-resources)
+        try (Connection conn = new dbConnect().getConnect()) {
+            if (conn == null) return false;
+
+            conn.setAutoCommit(false); // Bắt đầu Transaction
+
+            try (PreparedStatement psGetStatus = conn.prepareStatement(sqlCurrent);
+                 PreparedStatement psGetDetails = conn.prepareStatement(sqlDetails);
+                 PreparedStatement psRestoreStock = conn.prepareStatement(sqlRestore);
+                 PreparedStatement psUpdateStatus = conn.prepareStatement(sqlUpdate)) {
+
+                // 1. Kiểm tra trạng thái hiện tại
+                psGetStatus.setInt(1, orderId);
+                String oldStatus = null;
+                try (ResultSet rs = psGetStatus.executeQuery()) {
+                    if (rs.next()) {
+                        oldStatus = rs.getString("status");
+                    }
+                }
+
+                // Nếu đơn hàng không tồn tại
+                if (oldStatus == null) {
+                    conn.rollback();
+                    return false;
+                }
+
+                // 2. Logic hoàn kho: Chỉ thực hiện khi chuyển từ trạng thái khác sang 'cancelled'
+                if ("cancelled".equals(newStatus) && !"cancelled".equals(oldStatus)) {
+                    psGetDetails.setInt(1, orderId);
+                    try (ResultSet rsDetails = psGetDetails.executeQuery()) {
+                        while (rsDetails.next()) {
+                            int productId = rsDetails.getInt("product_id");
+                            int quantity = rsDetails.getInt("quantity");
+
+                            psRestoreStock.setInt(1, quantity);
+                            psRestoreStock.setInt(2, productId);
+                            psRestoreStock.addBatch(); // Thêm vào batch để tối ưu hiệu suất
+                        }
+                    }
+                    psRestoreStock.executeBatch(); // Chạy lệnh cập nhật kho hàng loạt
+                }
+
+                // 3. Cập nhật trạng thái đơn hàng
+                psUpdateStatus.setString(1, newStatus);
+                psUpdateStatus.setInt(2, orderId);
+                int rowsAffected = psUpdateStatus.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    conn.commit(); // Mọi thứ ổn, xác nhận thay đổi vào DB
+                    return true;
+                } else {
+                    conn.rollback();
+                    return false;
+                }
+
+            } catch (SQLException e) {
+                conn.rollback(); // Có lỗi SQL, hoàn tác mọi thay đổi
+                e.printStackTrace();
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

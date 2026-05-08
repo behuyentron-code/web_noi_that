@@ -14,8 +14,6 @@
     String selectedCategory      = (String) request.getAttribute("selectedCategory");
 
     NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-
-    
 %>
 <head>
     <meta charset="UTF-8">
@@ -23,13 +21,12 @@
     <title>Nội Thất Hiện Đại - Khuyến Mãi</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/khuyen_mai.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
 
-<nav class="top-menu">s
+<!-- ===== NAV ===== -->
+<nav class="top-menu">
     <div class="left-nav">
         <a href="${pageContext.request.contextPath}/home" class="logo-brand">
             <i class="fa-solid fa-leaf"></i> Trang Chủ
@@ -37,49 +34,50 @@
         <div class="dropdown">
             <a class="dropbtn">Sản phẩm <i class="fas fa-chevron-down"></i></a>
             <div class="dropdown-content">
-                <% 
+                <%
                     java.util.List<String> navCats = (java.util.List<String>) request.getAttribute("categories");
-                    if(navCats != null) {
-                        for(String cat : navCats) {
+                    if (navCats != null) {
+                        for (String cat : navCats) {
                 %>
                     <a href="${pageContext.request.contextPath}/hienthi?category=<%= cat %>"><%= cat %></a>
-                <% 
+                <%
                         }
-                    } 
+                    }
                 %>
             </div>
         </div>
-        <a href="khuyen_mai.jsp">Khuyến mãi</a>
+        <a href="${pageContext.request.contextPath}/KhuyenMai">Khuyến Mãi</a>
         <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
     </div>
 
     <div class="right-nav">
         <div class="search-container">
-            <input type="text" placeholder="Tìm kiếm...">
-            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+            <form action="KhuyenMai" method="get">
+                <input name="txtSearch" type="text" placeholder="Tìm kiếm..."
+                       value="<%= (request.getParameter("txtSearch") == null) ? "" : request.getParameter("txtSearch") %>">
+                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
         </div>
 
         <div class="auth-group">
             <a href="cart.jsp" class="icon-btn">
                 <i class="fa-solid fa-cart-shopping"></i>
-                <span class="badge"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
+                <span class="badge" id="cartCount"><%= session.getAttribute("cartCount") != null ? session.getAttribute("cartCount") : 0 %></span>
             </a>
-            
-             <% if (user != null) { %>
-                <%-- Kiểm tra vai trò --%>
+
+            <% if (user != null) { %>
                 <% if ("admin".equals(session.getAttribute("role"))) { %>
                     <a href="${pageContext.request.contextPath}/AdminDashboardServlet" class="admin-link">
                         <i class="fa-solid fa-user-tie"></i> Quản trị
                     </a>
                 <% } else { %>
-                    <%-- Chỉ hiện icon account cho User, không dẫn link đi đâu cả --%>
                     <div class="icon-btn" style="cursor: default;">
-                        <i class="fa-solid fa-circle-user"></i>
+                        <a href="ProfileServlet">
+                            <i class="fa-solid fa-circle-user"></i>
+                        </a>
                     </div>
                 <% } %>
-
                 <a href="login?action=logout" class="btn-pill outline">Đăng xuất</a>
-
             <% } else { %>
                 <a href="#" class="btn-pill outline" onclick="openLogin()">Đăng nhập</a>
                 <a href="#" class="btn-pill outline" onclick="openRegister()">Đăng ký</a>
@@ -88,120 +86,107 @@
     </div>
 </nav>
 
+<!-- ===== MAIN LAYOUT (giống home_page) ===== -->
+<div class="container">
 
-<!-- ===== MAIN ===== -->
-<div class="promo-wrap">
-
-    <!-- FEATURED DEAL (lấy từ DB qua Servlet) -->
-    <% if (featuredProduct != null) {
-        double oldPrice   = featuredProduct.getPrice() * 100.0 / 70.0;
-        double savedAmt   = oldPrice - featuredProduct.getPrice();
-    %>
-    <h2 class="section-title" id="san-pham">
-        <i class="fa-solid fa-star"></i> Deal Đặc Biệt Hôm Nay
-    </h2>
-    <div class="featured-deal">
-        <span class="featured-ribbon">🔥 Hot Deal</span>
-        <img class="deal-img"
-             src="${pageContext.request.contextPath}/images/<%= featuredProduct.getImage() != null ? featuredProduct.getImage() : "default.jpg" %>"
-             alt="<%= featuredProduct.getProduct_name() %>"
-             onerror="this.src='https://placehold.co/700x320?text=No+Image'">
-        <div class="deal-body">
-            <div class="deal-tag"><i class="fa-solid fa-fire"></i> Ưu đãi 24h</div>
-            <h2 class="deal-name"><%= featuredProduct.getProduct_name() %></h2>
-            <p class="deal-desc">
-                <%= featuredProduct.getDescription() != null
-                    ? featuredProduct.getDescription()
-                    : "Sản phẩm nội thất cao cấp, thiết kế hiện đại." %>
-            </p>
-            <div class="deal-price-row">
-                <span class="deal-price-new"><%= fmt.format(featuredProduct.getPrice()) %></span>
-                <span class="deal-price-old"><%= fmt.format(Math.round(oldPrice / 1000) * 1000) %></span>
-                <span class="deal-save">Tiết kiệm <%= fmt.format(Math.round(savedAmt / 1000) * 1000) %></span>
-            </div>
-            <button class="btn-deal"
-                    onclick="addToCart(<%= featuredProduct.getProduct_id() %>, '<%= featuredProduct.getProduct_name() %>')">
-                <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng
-            </button>
-        </div>
-    </div>
-    <% } %>
-
-    <!-- FILTER -->
-    <div class="filter-bar">
-        <div class="filter-tabs">
-            <a href="${pageContext.request.contextPath}/khuyen-mai"
-               class="filter-tab <%= (selectedCategory == null || selectedCategory.isEmpty()) ? "active" : "" %>">
-                Tất cả
-            </a>
+    <!-- SIDEBAR DANH MỤC -->
+    <aside class="left-menu new-sidebar">
+        <h3>DANH MỤC</h3>
+        <ul>
+            <li onclick="location.href='${pageContext.request.contextPath}/KhuyenMai'"
+                class="<%= (selectedCategory == null || selectedCategory.isEmpty()) ? "active-cat" : "" %>">
+                Tất Cả
+            </li>
             <%
-            if (categories != null) {
-                for (String cat : categories) {
-                    boolean active = cat.equals(selectedCategory);
+                if (categories != null && !categories.isEmpty()) {
+                    for (String cat : categories) {
+                        boolean isActive = cat.equals(selectedCategory);
             %>
-            <a href="${pageContext.request.contextPath}/khuyen-mai?category=<%= java.net.URLEncoder.encode(cat,"UTF-8") %>"
-               class="filter-tab <%= active ? "active" : "" %>">
+            <li onclick="location.href='${pageContext.request.contextPath}/KhuyenMai?category=<%= java.net.URLEncoder.encode(cat, "UTF-8") %>'"
+                class="<%= isActive ? "active-cat" : "" %>">
                 <%= cat %>
-            </a>
+            </li>
+            <%
+                    }
+                } else {
+            %>
+            <li>Không có danh mục</li>
+            <% } %>
+        </ul>
+    </aside>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="content">
+        <div class="content-header">
+            <h2 class="section-title">
+                <i class="fa-solid fa-tags" style="color:#4e5c34;margin-right:8px;"></i>
+                <%
+                    if (selectedCategory != null && !selectedCategory.isEmpty()) {
+                        out.print("Khuyến mãi - " + selectedCategory);
+                    } else {
+                        out.print("Tất cả sản phẩm khuyến mãi");
+                    }
+                %>
+                <span style="font-size:14px;font-weight:500;color:#6b7280;margin-left:12px;">
+                    (<%= promoProducts != null ? promoProducts.size() : 0 %> sản phẩm)
+                </span>
+            </h2>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            <%
+                if (promoProducts == null || promoProducts.isEmpty()) {
+            %>
+            <p class="empty-state">Không có sản phẩm khuyến mãi nào trong danh mục này.</p>
+            <%
+                } else {
+                    for (products p : promoProducts) {
+                        long rate = p.getDiscount_price();
+                        double origPrice = rate > 0
+                            ? p.getPrice() * 100.0 / (100.0 - rate)
+                            : p.getPrice();
+                        String formattedPrice    = fmt.format(p.getPrice());
+                        String formattedOrigPrice = fmt.format(Math.round(origPrice / 1000) * 1000);
+            %>
+            <div class="product-card">
+                <div class="product-img">
+                    <img src="${pageContext.request.contextPath}/images/<%= p.getImage() != null ? p.getImage() : "default.jpg" %>"
+                         alt="<%= p.getProduct_name() %>"
+                         onerror="this.src='https://placehold.co/500x300?text=Nội+Thất'">
+                    <% if (rate > 0) { %>
+                    <span class="product-badge">-<%= rate %>%</span>
+                    <% } %>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7c4a;margin-bottom:4px;">
+                        <%= p.getCategoryName() %>
+                    </div>
+                    <h4 class="product-name"><%= p.getProduct_name() %></h4>
+                    <div class="product-price" style="text-align: right !important;">
+                        <span style="font-size:17px;
+                              font-weight:700;
+                              color:red;"><%= formattedPrice %></span>
+                        <% if (rate > 0) { %>
+                        <span style="font-size:12px;color:#d1d5db;text-decoration:line-through;"><%= formattedOrigPrice %></span>
+                        <% } %>
+                        
+                        <div class="product-actions">
+                            <button class="btn-add-to-cart" onclick="addToCart(<%= p.getProduct_id()%>, '<%= p.getProduct_name()%>')">
+                                <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
+                            </button>
+                            <button class="btn-detail" onclick="location.href='${pageContext.request.contextPath}/ProductDetail?id=<%= p.getProduct_id()%>'">
+                                Chi tiết
+                            </button>
+                        </div>
+                
+                    </div>
+                </div>
+            </div>
             <% } } %>
         </div>
-        <div class="result-count">
-            Hiển thị <strong><%= promoProducts != null ? promoProducts.size() : 0 %></strong> sản phẩm
-        </div>
-    </div>
-
-    <!-- PRODUCT GRID -->
-    <div class="promo-grid">
-    <% if (promoProducts == null || promoProducts.isEmpty()) { %>
-        <div class="empty-state">
-            <i class="fa-solid fa-box-open"></i>
-            <p style="font-size:16px;font-weight:600;color:#6b7280;">
-                Không có sản phẩm khuyến mãi trong danh mục này.
-            </p>
-        </div>
-    <% } else {
-        int idx = 0;
-        for (products p : promoProducts) {
-            long rate = p.getDiscount_price();  // lấy từ DB
-            double origPrice = rate > 0
-                ? p.getPrice() * 100.0 / (100.0 - rate)
-                : p.getPrice();
-            int stock = p.getQuantity();
-            idx++;
-    %>
-        <div class="promo-card">
-            <img class="promo-card-img"
-                 src="${pageContext.request.contextPath}/images/<%= p.getImage() != null ? p.getImage() : "default.jpg" %>"
-                 alt="<%= p.getProduct_name() %>"
-                 onerror="this.src='https://placehold.co/500x210?text=No+Image'">
-            <span class="discount-badge">-<%= rate %>%</span>
-            <div class="promo-card-body">
-                <div class="promo-card-cat"><%= p.getCategoryName() %></div>
-                <div class="promo-card-name"><%= p.getProduct_name() %></div>
-                <div class="promo-card-desc">
-                    <%= p.getDescription() != null ? p.getDescription() : "Sản phẩm chất lượng cao" %>
-                </div>
-                <div class="promo-price-row">
-                    <span class="price-new"><%= fmt.format(p.getPrice()) %></span>
-                    <span class="price-old"><%= fmt.format(Math.round(origPrice / 1000) * 1000) %></span>
-                </div>
-                <div class="card-btn-row">
-                    <button class="btn-cart"
-                            onclick="addToCart(<%= p.getProduct_id() %>, '<%= p.getProduct_name() %>')">
-                        <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
-                    </button>
-                    <a href="${pageContext.request.contextPath}/ProductDetail?id=<%= p.getProduct_id() %>"
-                       class="btn-detail" title="Xem chi tiết">
-                        <i class="fa-solid fa-eye"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    <% } } %>
-    </div><!-- /promo-grid -->
-
-    
-</div><!-- /promo-wrap -->
+    </main>
+</div>
 
 <!-- ===== TOAST ===== -->
 <div id="toast" style="
@@ -220,25 +205,20 @@
 <footer class="footer">
     <div>
         <table>
-            <tr>
-                <td><h3>Nhóm 3</h3></td>
-            </tr>
+            <tr><td><h3>Nhóm 3</h3></td></tr>
             <tr>
                 <td><p>Lã Ngọc Huyền</p></td>
                 <td><p> |  29-08-2005</p></td>
             </tr>
-            
             <tr>
                 <td><p>Trần Anh Đức</p></td>
                 <td><p> |  11-11-2005</p></td>
             </tr>
-            
             <tr>
                 <td><p>Nguyễn Phi Long</p></td>
                 <td><p> |  14-06-2005</p></td>
             </tr>
         </table>
-
     </div>
     <div class="footer-logo">
         <img src="images/logo.png">
@@ -281,7 +261,6 @@
 </div>
 
 <script>
-
 // ===== TOAST =====
 let _tt;
 function showToast(msg, isError) {
@@ -292,7 +271,7 @@ function showToast(msg, isError) {
     document.getElementById('toast-msg').textContent = msg;
     t.style.opacity = '1'; t.style.transform = 'translateY(0)';
     clearTimeout(_tt);
-    _tt = setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(20px)'; }, 2800);
+    _tt = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(20px)'; }, 2800);
 }
 
 // ===== CART =====
@@ -303,19 +282,19 @@ function addToCart(productId, productName) {
         document.getElementById('cartCount').textContent = data.cartCount;
         showToast('Đã thêm "' + productName + '" vào giỏ hàng!', false);
     })
-    .catch(() => showToast('Không thể thêm vào giỏ, thử lại sau!', true));
+    .catch(() => showToast('Không thể thêm vào giỏ, vui lòng thử lại!', true));
 }
-
-
 
 // ===== MODAL =====
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get("openModal") === "login")    openLogin();
 if (urlParams.get("openModal") === "register") openRegister();
+
 function openLogin()    { document.getElementById("loginModal").style.display    = "flex"; }
 function openRegister() { document.getElementById("registerModal").style.display = "flex"; }
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 function switchModal(a, b) { closeModal(a); document.getElementById(b).style.display = "flex"; }
 </script>
+
 </body>
 </html>

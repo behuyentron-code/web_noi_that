@@ -88,7 +88,9 @@ public class products_DAO {
                     rs.getString("description"),
                     rs.getString("image"),
                     rs.getInt("category_id"),
-                    rs.getString("category_name")
+                    rs.getString("category_name"),
+                    rs.getLong("discount_price"),   
+                    rs.getInt("quantity")
                 );
             }
         } catch (Exception e) {
@@ -102,52 +104,56 @@ public class products_DAO {
     }
     
     // Thêm sản phẩm mới
-public boolean addProduct(products p) {
-    String sql = "INSERT INTO products (product_name, price, description, image, category_id) VALUES (?, ?, ?, ?, ?)";
-    try (Connection conn = new dbConnect().getConnect();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setString(1, p.getProduct_name());
-        ps.setDouble(2, p.getPrice());
-        ps.setString(3, p.getDescription());
-        ps.setString(4, p.getImage());
-        ps.setInt(5, p.getCategory_id());
-        return ps.executeUpdate() > 0;
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+    public boolean addProduct(products p) {
+        String sql = "INSERT INTO products (product_name, price, description, image, category_id, quantity, discount_price) VALUES (?, ?, ?, ?, ?, ?, ?)";        try (Connection conn = new dbConnect().getConnect();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, p.getProduct_name());
+            ps.setDouble(2, p.getPrice());
+            ps.setString(3, p.getDescription());
+            ps.setString(4, p.getImage());
+            ps.setInt(5, p.getCategory_id());
+            ps.setInt(6, p.getQuantity());
+            ps.setLong(7, p.getDiscount_price());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
-// Cập nhật sản phẩm
-public boolean updateProduct(products p) {
-    String sql = "UPDATE products SET product_name = ?, price = ?, description = ?, image = ?, category_id = ? WHERE product_id = ?";
-    try (Connection conn = new dbConnect().getConnect();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setString(1, p.getProduct_name());
-        ps.setDouble(2, p.getPrice());
-        ps.setString(3, p.getDescription());
-        ps.setString(4, p.getImage());
-        ps.setInt(5, p.getCategory_id());
-        ps.setInt(6, p.getProduct_id());
-        return ps.executeUpdate() > 0;
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+    // Cập nhật sản phẩm
+    public boolean updateProduct(products p) {
+        String sql = "UPDATE products SET product_name=?, price=?, description=?, image=?, category_id=?, quantity=?, discount_price=? WHERE product_id=?";
+        try (Connection conn = new dbConnect().getConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, p.getProduct_name());
+            ps.setDouble(2, p.getPrice());
+            ps.setString(3, p.getDescription());
+            ps.setString(4, p.getImage());
+            ps.setInt(5, p.getCategory_id());
+            ps.setInt(6, p.getQuantity());        
+            ps.setLong(7, p.getDiscount_price());  
+            ps.setInt(8, p.getProduct_id());     
+            
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
-// Xóa sản phẩm
-public boolean deleteProduct(int id) {
-    String sql = "DELETE FROM products WHERE product_id = ?";
-    try (Connection conn = new dbConnect().getConnect();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, id);
-        return ps.executeUpdate() > 0;
-    } catch (Exception e) {
-        e.printStackTrace();
-        return false;
+    // Xóa sản phẩm
+    public boolean deleteProduct(int id) {
+        String sql = "DELETE FROM products WHERE product_id = ?";
+        try (Connection conn = new dbConnect().getConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
 
     
 
@@ -239,4 +245,18 @@ public boolean deleteProduct(int id) {
         return query(sql, categoryName);
     }
       
+    public boolean reduceQuantity(int productId, int qty) {
+    String sql = "UPDATE products SET quantity = quantity - ? " +
+                 "WHERE product_id = ? AND quantity >= ?";
+    try (Connection con = new dbConnect().getConnect();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setInt(1, qty);
+        ps.setInt(2, productId);
+        ps.setInt(3, qty); // điều kiện: chỉ trừ nếu còn đủ hàng
+        return ps.executeUpdate() > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 }

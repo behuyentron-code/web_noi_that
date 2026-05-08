@@ -103,7 +103,7 @@ public class products {
         this.categoryName = categoryName;
     }
     
-        public long getDiscount_price() { 
+    public long getDiscount_price() { 
         return discount_price; 
     }
     public void setDiscount_price(long discount_price) { 

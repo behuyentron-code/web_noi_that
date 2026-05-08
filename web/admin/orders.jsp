@@ -24,21 +24,73 @@
     <link rel="stylesheet" href="css/admin.css">
     <style>
         /* Chỉ giữ lại những gì chưa có trong admin.css */
-        .status-badge     { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
-        .status-pending   { background: #fef9e7; color: #f39c12; }
-        .status-processing{ background: #e8f0fe; color: #2980b9; }
-        .status-shipped   { background: #e8f8f5; color: #16a085; }
-        .status-completed { background: #e9f7ef; color: #27ae60; }
-        .status-cancelled { background: #fdeded; color: #e74c3c; }
+        .status-badge     { 
+            padding: 4px 10px;
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            display: inline-block; 
+        }
+        .status-pending   { 
+            background: #fef9e7;
+            color: #f39c12; 
+        }
+        .status-processing{ 
+            background: #e8f0fe; 
+            color: #2980b9; 
+        }
+        .status-shipped   { 
+            background: #e8f8f5; 
+            color: #16a085; 
+        }
+        .status-completed { 
+            background: #e9f7ef; 
+            color: #27ae60; 
+        }
+        .status-cancelled { 
+            background: #fdeded; 
+            color: #e74c3c; 
+        }
 
-        .pagination { margin-top: 20px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-        .pagination a { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #333; transition: background .2s; }
-        .pagination a:hover { background: #e2e8d8; }
-        .pagination a.active { background: #4e5c34; color: white; border-color: #4e5c34; }
+        .pagination { 
+            margin-top: 20px; 
+            display: flex; 
+            justify-content: center;
+            gap: 8px; 
+            flex-wrap: wrap;
+        }
+        .pagination a { 
+            padding: 8px 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            text-decoration: none; 
+            color: #333; 
+            transition: background .2s;
+        }
+        .pagination a:hover {
+            background: #e2e8d8;
+        }
+        .pagination a.active { 
+            background: #4e5c34;
+            color: white;
+            border-color: #4e5c34;
+        
+        }
 
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn-sm { padding: 5px 12px !important; font-size: 12px !important; }
-        thead th { background: #f5f7f0; }
+        .page-header { 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px; 
+        }
+        
+        .btn-sm { 
+            padding: 5px 12px !important; 
+            font-size: 12px !important;
+        }
+        thead th { 
+            background: #f5f7f0; 
+        }
     </style>
 </head>
 <body>
@@ -125,7 +177,7 @@
                 <a href="${pageContext.request.contextPath}/AdminOrderServlet?page=<%= currentPage-1 %>&keyword=<%= keywordEncoded %>&status=<%= statusFilter %>">« Trước</a>
             <% } %>
             <% for (int i = 1; i <= totalPages; i++) { %>
-                <a href="${pageContext.request.contextPath}AdminOrderServlets?page=<%= i %>&keyword=<%= keywordEncoded %>&status=<%= statusFilter %>"
+                <a href="${pageContext.request.contextPath}/AdminOrderServlet?page=<%= i %>&keyword=<%= keywordEncoded %>&status=<%= statusFilter %>"
                    class="<%= i == currentPage ? "active" : "" %>"><%= i %></a>
             <% } %>
             <% if (currentPage < totalPages) { %>

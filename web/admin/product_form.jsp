@@ -19,14 +19,18 @@
         <title><%= isEdit ? "Sửa" : "Thêm" %> sản phẩm</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+
     </head>
+    
+    
     <body>
     <div class="admin-wrapper">
         <jsp:include page="sidebar.jsp"/>
         <div class="admin-content">
             <h1><%= isEdit ? "Chỉnh sửa sản phẩm" : "Thêm mới sản phẩm" %></h1>
 
-            <form method="post" action="${pageContext.request.contextPath}/admin/products">
+            <form method="post" action="AdminProductServlet">
                 <% if (isEdit) { %>
                     <input type="hidden" name="action" value="update">
                     <input type="hidden" name="product_id" value="<%= p.getProduct_id() %>">
@@ -45,6 +49,21 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div>
+                        <label>Số lượng tồn kho</label>
+                        <input type="number" name="quantity" min="0"
+                               value="<%= isEdit ? p.getQuantity() : "0" %>" required
+                               placeholder="Nhập số lượng tồn">
+                    </div>
+                    <div>
+                        <label>Giảm giá (%)</label>
+                        <input type="number" name="discount_price" min="0" max="99"
+                               value="<%= isEdit ? p.getDiscount_price() : "0" %>"
+                               placeholder="0 = không giảm giá">
+                    </div>
+                </div>
+
                 <div>
                     <label>Mô tả</label>
                     <textarea name="description"><%= isEdit ? p.getDescription() : "" %></textarea>
@@ -60,7 +79,7 @@
                         <select name="category_id">
                             <% for (int i = 0; i < cats.size(); i++) { 
                                 String catName = cats.get(i);
-                                int catId = i + 1; // Giả sử category_id bắt đầu từ 1
+                                int catId = i + 1;
                             %>
                                 <option value="<%= catId %>" <%= (isEdit && p.getCategoryName() != null && p.getCategoryName().equals(catName)) ? "selected" : "" %>>
                                     <%= catName %>
@@ -70,8 +89,8 @@
                     </div>
                 </div>
  
-                    <button type="submit" class="btn-primary">Lưu sản phẩm</button>
-                    <a href="${pageContext.request.contextPath}/admin/products" class="btn">Hủy bỏ</a>
+                <button type="submit" class="btn-primary">Lưu sản phẩm</button>
+                <a href="AdminProductServlet" class="btn">Hủy bỏ</a>
             </form>
         </div>
     </div>

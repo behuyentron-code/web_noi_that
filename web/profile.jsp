@@ -41,6 +41,7 @@
                     </div>
                 </div>
 
+                <a href="${pageContext.request.contextPath}/KhuyenMai">Khuyến Mãi</a>
                 <a href="${pageContext.request.contextPath}/ContactServlet">Liên Hệ</a>
             </div>
 
@@ -138,7 +139,7 @@
                     <td style="padding: 15px; font-weight: 600; color: #4e5c34;">Địa chỉ</td>
                     <td style="padding: 15px;">${userProfile.address != null ? userProfile.address : 'Chưa cập nhật'}</td>
                 </tr>
-                </table>
+            </table>
 
             <div style="margin-top: 30px; display: flex; gap: 15px;">
                 <button class="btn-pill solid" style="cursor: pointer; padding: 10px 25px;" onclick="location.href='home'">Quay lại</button>

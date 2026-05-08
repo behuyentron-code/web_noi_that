@@ -39,14 +39,37 @@
     <title>Chi tiết đơn hàng #<%= order.get("order_id") %></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
         /* Chỉ giữ lại những gì chưa có trong admin.css */
-        .status-badge     { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; }
-        .status-pending   { background: #fef9e7; color: #f39c12; }
-        .status-processing{ background: #e8f0fe; color: #2980b9; }
-        .status-shipped   { background: #e8f8f5; color: #16a085; }
-        .status-completed { background: #e9f7ef; color: #27ae60; }
-        .status-cancelled { background: #fdeded; color: #e74c3c; }
+        .status-badge     { 
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            display: inline-block; 
+        }
+        .status-pending   {
+            background: #fef9e7; 
+            color: #f39c12; 
+        }
+        
+        .status-processing{
+            background: #e8f0fe; 
+            color: #2980b9; 
+        }
+        .status-shipped   {
+            background: #e8f8f5; 
+            color: #16a085; 
+        }
+        .status-completed {
+            background: #e9f7ef; 
+            color: #27ae60; 
+        }
+        .status-cancelled {
+            background: #fdeded; 
+            color: #e74c3c; 
+        }
 
         /* Card thông tin đơn hàng — dùng màu/font nhất quán với admin.css */
         .order-info-card {
@@ -56,8 +79,15 @@
             margin-bottom: 24px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        .order-info-card p { margin: 10px 0; font-size: 14px; color: #2c2c2c; }
-        .order-info-card strong { color: #2c2c2c; }
+        .order-info-card p { 
+            margin: 10px 0; 
+            font-size: 14px; 
+            color: #2c2c2c; 
+        }
+        .order-info-card strong { 
+            color: #2c2c2c; 
+        
+        }
 
         /* Form update — tái dùng .filter-bar style của admin.css nhưng ko wrap trong div.filter-bar */
         .update-form {
@@ -85,9 +115,15 @@
             box-shadow: 0 0 0 3px rgba(78,92,52,0.1);
         }
 
-        thead th { background: #f5f7f0; }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h3 { margin: 0 0 14px; font-size: 16px; color: #2c2c2c; }
+        thead th { 
+            background: #f5f7f0; 
+        }
+        .page-header { 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -104,16 +140,46 @@
         </div>
 
         <%-- Thông tin đơn hàng --%>
-        <div class="order-info-card">
-            <p><strong>Khách hàng:</strong> <%= order.get("username") %></p>
-            <p><strong>Email:</strong> <%= order.get("email") %></p>
-            <p><strong>Số điện thoại:</strong> <%= order.get("phone") %></p>
-            <p><strong>Địa chỉ giao hàng:</strong> <%= order.get("shipping_address") %></p>
-            <p><strong>Phương thức thanh toán:</strong> <%= order.get("payment_method") %></p>
-            <p><strong>Ngày đặt:</strong> <%= order.get("order_date") != null ? sdf.format(order.get("order_date")) : "" %></p>
-            <p><strong>Tổng tiền:</strong> <span style="font-size:16px; color:#4e5c34;"><strong><%= fmt.format(order.get("total_price")) %></strong></span></p>
-            <p><strong>Trạng thái:</strong> <span class="status-badge <%= badgeClass %>"><%= statusLabel %></span></p>
-        </div>
+<div class="order-info-card" style="padding: 0; overflow: hidden;">
+    <table class="spec-table" style="width: 100%; border-collapse: collapse;">
+        <tr style="background: #fcfdfb;">
+            <td style="padding: 15px; font-weight: 800; color: #4e5c34; width: 30%;">Khách hàng</td>
+            <td style="padding: 15px;"><%= order.get("username") %></td>
+        </tr>
+        <tr>
+            <td style="padding: 15px; font-weight: 800; color: #4e5c34;">Email liên hệ</td>
+            <td style="padding: 15px;"><%= order.get("email") %></td>
+        </tr>
+        <tr style="background: #fcfdfb;">
+            <td style="padding: 15px; font-weight: 800; color: #4e5c34;">Số điện thoại</td>
+            <td style="padding: 15px;"><%= order.get("phone") %></td>
+        </tr>
+        <tr>
+            <td style="padding: 15px; font-weight: 800; color: #4e5c34;">Địa chỉ giao hàng</td>
+            <td style="padding: 15px;"><%= order.get("shipping_address") %></td>
+        </tr>
+        <tr style="background: #fcfdfb;">
+            <td style="padding: 15px; font-weight: 800; color: #4e5c34;">Phương thức thanh toán</td>
+            <td style="padding: 15px;"><%= order.get("payment_method") %></td>
+        </tr>
+        <tr>
+            <td style="padding: 15px; font-weight: 800; color: #4e5c34;">Ngày đặt</td>
+            <td style="padding: 15px;"><%= order.get("order_date") != null ? sdf.format(order.get("order_date")) : "" %></td>
+        </tr>
+        <tr style="background: #fcfdfb;">
+            <td style="padding: 15px; font-weight: 800; color: #4e5c34;">Tổng tiền</td>
+            <td style="padding: 15px;">
+                <span style="font-size:18px; color:#4e5c34;"><strong><%= fmt.format(order.get("total_price")) %></strong></span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 15px; font-weight: 800; color: #4e5c34;">Trạng thái</td>
+            <td style="padding: 15px;">
+                <span class="status-badge <%= badgeClass %>"><%= statusLabel %></span>
+            </td>
+        </tr>
+    </table>
+</div>
 
         <%-- Form cập nhật trạng thái --%>
         <%-- action dùng context path đầy đủ, .btn .btn-primary từ admin.css --%>
@@ -157,7 +223,7 @@
                 <tr>
                     <td>
                         <img src="${pageContext.request.contextPath}/images/<%= item.get("image") %>"
-                             width="60" style="border-radius:8px; object-fit:cover;">
+                             style="width:220px; height:175px;border-radius:8px; object-fit:cover;">
                     </td>
                     <td><%= item.get("product_name") %></td>
                     <td><%= qty %></td>
